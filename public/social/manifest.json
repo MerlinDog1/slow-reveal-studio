@@ -1,0 +1,20 @@
+{
+  "file": "/social/studio-og.png",
+  "width": 1200,
+  "height": 630,
+  "sha256": "bd45b99bc7a4f428048aa6dd9903f0fc7bfb531afc5c444b4da2bdfdc2995109",
+  "rendererVersion": "slow-reveal-geometry/1.1.0",
+  "geometrySha256": "51caf77d57178888e567d7f70979d0e3e1e970868e4962ee4f6b641b180a00eb",
+  "status": "digital-renderer-study",
+  "isPhysicalProductEvidence": false,
+  "source": {
+    "file": "/references/black-dog.jpg",
+    "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe",
+    "author": "Mac Gaither",
+    "page": "https://unsplash.com/photos/black-labrador-retriever-ITGs9TnB9og",
+    "license": "Unsplash License",
+    "licenseUrl": "https://unsplash.com/license"
+  },
+  "alt": "Digital dot portrait of a black Labrador rendered by Slow Reveal Studio; source photo by Mac Gaither / Unsplash. Physical prototype pending.",
+  "reproduction": "node --import tsx scripts/build-social.mjs"
+}

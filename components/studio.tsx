@@ -1,0 +1,1515 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import Link from "next/link";
+import {
+  ArrowDownToLine,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronDown,
+  CircleHelp,
+  ImagePlus,
+  Layers,
+  LoaderCircle,
+  Maximize,
+  Minus,
+  Plus,
+  RotateCcw,
+  Save,
+  SlidersHorizontal,
+  Sparkles,
+  Trash2,
+  X,
+} from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
+import {
+  DEFAULT_SETTINGS,
+  PRESETS,
+  renderImage,
+  toSvg,
+  type RenderGeometry,
+  type RenderMode,
+  type RenderSettings,
+} from "@/lib/renderers";
+import {
+  PRODUCTS,
+  FINISHES,
+  INKS,
+  type Product,
+  type Finish,
+} from "@/lib/catalog";
+import { REFERENCE_IMAGES } from "@/lib/reference-images";
+import {
+  DEFAULT_CROP,
+  analyseImage,
+  cropImage,
+  loadImage,
+  type Crop,
+} from "@/lib/image-processing";
+import {
+  getLocalProject,
+  saveLocalProject,
+  deleteLocalProject,
+} from "@/lib/browser-storage";
+import { exportArtwork } from "@/lib/export-artwork";
+import { track } from "@/lib/analytics";
+
+type View = "finished" | "template" | "original" | "compare";
+const MODES: { id: RenderMode; name: string; description: string }[] = [
+  { id: "dots", name: "Signature Dots", description: "One dot at a time." },
+  {
+    id: "mosaic",
+    name: "Mosaic Fill",
+    description: "Small shapes. A bigger picture.",
+  },
+  {
+    id: "contour",
+    name: "Contour Trace",
+    description: "Follow the lines that matter.",
+  },
+  {
+    id: "line-amplification",
+    name: "Line Study",
+    description: "An experiment in rhythm.",
+  },
+];
+const PRESET_NAMES = {
+  easy: "Easy",
+  standard: "Standard",
+  detailed: "Detailed",
+  bold: "Bold",
+  portrait: "Fine portrait",
+};
+function money(pence: number) {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: 0,
+  }).format(pence / 100);
+}
+function Range({
+  label,
+  value,
+  min,
+  max,
+  step = 1,
+  suffix = "",
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  suffix?: string;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <label className="range-field">
+      <span>
+        {label}
+        <output>
+          {Math.round(value * 100) / 100}
+          {suffix}
+        </output>
+      </span>
+      <input
+        aria-label={label}
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+      />
+    </label>
+  );
+}
+
+export function Studio({
+  lab = false,
+  initialMode = "dots",
+}: {
+  lab?: boolean;
+  initialMode?: RenderMode;
+}) {
+  const [settings, setSettings] = useState<RenderSettings>({
+    ...DEFAULT_SETTINGS,
+    mode: initialMode,
+  });
+  const [preset, setPreset] = useState("standard");
+  const [crop, setCrop] = useState<Crop>(DEFAULT_CROP);
+  const [source, setSource] = useState<string | null>(null);
+  const [sourceBlob, setSourceBlob] = useState<Blob | null>(null);
+  const [sourceName, setSourceName] = useState("Your photograph");
+  const [referenceId, setReferenceId] = useState<string | null>(null);
+  const [croppedUrl, setCroppedUrl] = useState<string | null>(null);
+  const [geometry, setGeometry] = useState<RenderGeometry | null>(null);
+  const [rendering, setRendering] = useState(false);
+  const [renderMs, setRenderMs] = useState(0);
+  const [notes, setNotes] = useState<string[]>([]);
+  const [view, setView] = useState<View>("finished");
+  const [compare, setCompare] = useState(50);
+  const [zoomPreview, setZoomPreview] = useState(false);
+  const [panel, setPanel] = useState(lab ? "style" : "photo");
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState("");
+  const [productId, setProductId] = useState<string>(
+    PRODUCTS.find(
+      (p) =>
+        p.widthMm === DEFAULT_SETTINGS.widthMm &&
+        p.heightMm === DEFAULT_SETTINGS.heightMm,
+    )?.id ?? PRODUCTS[0].id,
+  );
+  const [finishId, setFinishId] = useState<string>(FINISHES[0].id);
+  const [inkId, setInkId] = useState<string>(INKS[0].id);
+  const [saved, setSaved] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [rights, setRights] = useState(false);
+  const [safeArea, setSafeArea] = useState(false);
+  const [customPresets, setCustomPresets] = useState<
+    { name: string; settings: RenderSettings }[]
+  >([]);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const worker = useRef<Worker | null>(null);
+  const renderId = useRef(0);
+  const startTime = useRef(0);
+  const sourceUrl = useRef<string | null>(null);
+  const [catalogue, setCatalogue] = useState<{
+    products: Product[];
+    finishes: Finish[];
+  } | null>(null);
+  const products = catalogue?.products ?? PRODUCTS;
+  const finishes = catalogue?.finishes ?? FINISHES;
+  useEffect(() => {
+    fetch("/api/catalog")
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then((c) => setCatalogue(c))
+      .catch(() => {});
+    track("builder_opened", { mode: initialMode, step: lab ? "lab" : "photo" });
+  }, [initialMode, lab]);
+  useEffect(() => {
+    if (!catalogue) return;
+    const current = catalogue.products.find((p) => p.id === productId);
+    if (!current) return;
+    setSettings((s) => {
+      const landscape = s.widthMm > s.heightMm;
+      const widthMm = landscape
+        ? Math.max(current.widthMm, current.heightMm)
+        : Math.min(current.widthMm, current.heightMm);
+      const heightMm = landscape
+        ? Math.min(current.widthMm, current.heightMm)
+        : Math.max(current.widthMm, current.heightMm);
+      return s.widthMm === widthMm && s.heightMm === heightMm
+        ? s
+        : { ...s, widthMm, heightMm };
+    });
+  }, [catalogue, productId]);
+  useEffect(() => {
+    if (view === "template")
+      track("template_viewed", { mode: settings.mode, productId });
+    if (view === "finished")
+      track("finished_preview_viewed", { mode: settings.mode, productId });
+  }, [view, settings.mode, productId]);
+  const product = products.find((p) => p.id === productId) ?? PRODUCTS[0];
+  const finish = finishes.find((f) => f.id === finishId) ?? FINISHES[0];
+  const update = useCallback((patch: Partial<RenderSettings>) => {
+    setSettings((s) => ({ ...s, ...patch }));
+    setSaved(false);
+  }, []);
+  useEffect(() => {
+    const w = new Worker(
+      new URL("../workers/render.worker.ts", import.meta.url),
+    );
+    worker.current = w;
+    w.onmessage = (event) => {
+      const { id, geometry: next, error: workerError } = event.data;
+      if (id !== renderId.current) return;
+      setRendering(false);
+      setRenderMs(Math.round(performance.now() - startTime.current));
+      if (workerError) setError(workerError);
+      else {
+        setGeometry(next);
+        setError("");
+      }
+    };
+    w.onerror = () => {
+      setError(
+        "The renderer stopped. Try a less detailed preset or reload the studio.",
+      );
+      setRendering(false);
+    };
+    return () => {
+      w.terminate();
+    };
+  }, []);
+  useEffect(() => {
+    try {
+      setCustomPresets(JSON.parse(localStorage.getItem("sr-presets") ?? "[]"));
+    } catch {
+      /* ignore obsolete preferences */
+    }
+  }, []);
+  const openBlob = useCallback(
+    async (blob: Blob, name: string, refId: string | null = null) => {
+      const url = URL.createObjectURL(blob);
+      try {
+        const image = await loadImage(url);
+        if (image.naturalWidth * image.naturalHeight > 40_000_000)
+          throw new Error(
+            "Please resize this photograph to 40 megapixels or less.",
+          );
+      } catch (e) {
+        URL.revokeObjectURL(url);
+        throw e;
+      }
+      if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
+      sourceUrl.current = url;
+      setSource(url);
+      setSourceBlob(blob);
+      setSourceName(name);
+      setReferenceId(refId);
+      setCrop(DEFAULT_CROP);
+      setSaved(false);
+      setError("");
+      setRights(false);
+    },
+    [],
+  );
+  const loadReference = useCallback(
+    async (id: string) => {
+      const ref = REFERENCE_IMAGES.find((item) => item.id === id);
+      if (!ref) return;
+      setBusy("Opening photograph");
+      try {
+        const response = await fetch(ref.src);
+        if (!response.ok)
+          throw new Error("This reference could not be opened.");
+        await openBlob(await response.blob(), ref.label, id);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Photo could not be opened.");
+      } finally {
+        setBusy("");
+      }
+    },
+    [openBlob],
+  );
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("restore") === "1")
+      void restore();
+    else if (REFERENCE_IMAGES[0]) void loadReference(REFERENCE_IMAGES[0].id);
+    return () => {
+      if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
+    };
+  }, [loadReference]);
+  useEffect(() => {
+    const escape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoomPreview(false);
+    };
+    window.addEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", escape);
+  }, []);
+  useEffect(() => {
+    if (!source) return;
+    let stopped = false;
+    setRendering(true);
+    setGeometry(null);
+    const id = ++renderId.current;
+    const timer = setTimeout(async () => {
+      try {
+        const image = await loadImage(source);
+        if (stopped) return;
+        const { canvas, pixels } = cropImage(
+          image,
+          crop,
+          settings.widthMm / settings.heightMm,
+        );
+        setCroppedUrl(canvas.toDataURL("image/jpeg", 0.85));
+        setNotes(analyseImage(pixels, image.naturalWidth, image.naturalHeight));
+        startTime.current = performance.now();
+        const input = {
+          data: pixels.data,
+          width: pixels.width,
+          height: pixels.height,
+        };
+        if (worker.current)
+          worker.current.postMessage({ id, input, settings }, [
+            pixels.data.buffer,
+          ]);
+        else {
+          setGeometry(renderImage(input, settings));
+          setRendering(false);
+        }
+      } catch (e) {
+        if (!stopped) {
+          setError(e instanceof Error ? e.message : "Could not render photo.");
+          setRendering(false);
+        }
+      }
+    }, 140);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, [source, crop, settings]);
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(""), 5000);
+    return () => clearTimeout(timer);
+  }, [notice]);
+  async function upload(file?: File) {
+    if (!file) return;
+    track("upload_started", { mode: settings.mode, productId });
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError(
+        "Choose a JPG, PNG or WebP photo. For HEIC, export a JPEG from your photo library first.",
+      );
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Please choose a photograph smaller than 8 MB.");
+      return;
+    }
+    setBusy("Opening your photo");
+    try {
+      await openBlob(file, file.name);
+      track("upload_completed", { mode: settings.mode, productId });
+      setPanel("photo");
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "The image could not be opened.",
+      );
+    } finally {
+      setBusy("");
+    }
+  }
+  async function save() {
+    if (!sourceBlob) return;
+    try {
+      await saveLocalProject({
+        id: "current",
+        name: sourceName,
+        updatedAt: new Date().toISOString(),
+        image: sourceBlob,
+        settings,
+        crop,
+        productId,
+        finishId,
+        referenceId,
+      });
+      setSaved(true);
+      setNotice("Saved on this device. Your photograph has not been uploaded.");
+    } catch {
+      setError(
+        "This browser could not save your design. Download a project package to keep a copy.",
+      );
+    }
+  }
+  async function restore() {
+    try {
+      const project = await getLocalProject();
+      if (!project) {
+        setNotice("No saved design on this device yet.");
+        return;
+      }
+      await openBlob(project.image, project.name, project.referenceId ?? null);
+      setInkId(
+        INKS.find(
+          (i) =>
+            i.color.toLowerCase() ===
+            (project.settings as RenderSettings).inkColor.toLowerCase(),
+        )?.id ?? "black",
+      );
+      setSettings(project.settings as RenderSettings);
+      setCrop(project.crop);
+      setProductId(project.productId);
+      setFinishId(project.finishId);
+      setSaved(true);
+      setNotice("Your saved design is open.");
+    } catch {
+      setError("Your saved design could not be opened.");
+    }
+  }
+  async function remove() {
+    await deleteLocalProject();
+    setSaved(false);
+    setNotice("Saved design removed from this device.");
+  }
+  async function exportFile(format: "svg" | "png" | "pdf" | "package") {
+    if (!geometry) return;
+    setBusy(`Preparing ${format.toUpperCase()}`);
+    try {
+      await exportArtwork(
+        geometry,
+        format,
+        view === "template" ? "template" : "finished",
+        sourceBlob ?? undefined,
+        crop,
+      );
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Export could not be completed.",
+      );
+    } finally {
+      setBusy("");
+    }
+  }
+  function selectProduct(id: string) {
+    const p = products.find((p) => p.id === id);
+    if (!p) return;
+    setProductId(id);
+    track("product_size_selected", { mode: settings.mode, productId: id });
+    update({ widthMm: p.widthMm, heightMm: p.heightMm });
+  }
+  function choosePreset(key: keyof typeof PRESET_NAMES) {
+    setPreset(key);
+    track("preset_selected", { mode: settings.mode, productId, preset: key });
+    update(PRESETS[key]);
+  }
+  function savePreset() {
+    const name = window.prompt("Name this renderer preset");
+    if (!name?.trim()) return;
+    const next = [
+      ...customPresets,
+      { name: name.trim().slice(0, 40), settings },
+    ].slice(-12);
+    setCustomPresets(next);
+    localStorage.setItem("sr-presets", JSON.stringify(next));
+    setNotice("Preset saved on this device.");
+  }
+  async function reviewKit() {
+    if (!sourceBlob || !geometry) return;
+    if (!rights && !referenceId) {
+      setError("Please confirm you have permission to use this photograph.");
+      return;
+    }
+    try {
+      await saveLocalProject({
+        id: "basket",
+        name: sourceName,
+        updatedAt: new Date().toISOString(),
+        image: sourceBlob,
+        settings,
+        crop,
+        productId,
+        finishId,
+        referenceId,
+      });
+      localStorage.setItem(
+        "sr-basket",
+        JSON.stringify({
+          productId,
+          finishId,
+          inkId,
+          sourceName,
+          reference: !!referenceId,
+          updatedAt: new Date().toISOString(),
+        }),
+      );
+      track("add_to_basket", {
+        mode: settings.mode,
+        productId,
+        step: "basket",
+      });
+      window.location.href = "/basket";
+    } catch {
+      setError(
+        "This browser could not keep the design for review. Allow local storage or download a project package from the lab.",
+      );
+    }
+  }
+  const activePreset =
+    Object.entries(PRESETS).find(([, p]) =>
+      Object.entries(p).every(
+        ([key, value]) => settings[key as keyof RenderSettings] === value,
+      ),
+    )?.[0] ?? "custom";
+  const svg = geometry
+    ? toSvg(geometry, view === "template" ? "template" : "finished", {
+        includeSafeArea: safeArea,
+      })
+    : "";
+  const currentRef = REFERENCE_IMAGES.find((r) => r.id === referenceId);
+
+  return (
+    <div className="studio-page">
+      <SiteHeader studio />
+      <div className="studio-topline">
+        <div>
+          <span className="eyebrow">
+            {lab ? "The rendering lab" : "Your creative corner"}
+          </span>
+          <h1>
+            {lab
+              ? MODES.find((m) => m.id === settings.mode)?.name
+              : "Make something meaningful"}
+            <span className="heading-dot">.</span>
+          </h1>
+        </div>
+        <div className="studio-top-actions">
+          <button className="text-button" onClick={restore}>
+            Open saved design
+          </button>
+          <button
+            className="button light small"
+            onClick={save}
+            disabled={!source || !!busy}
+          >
+            {saved ? <Check size={16} /> : <Save size={16} />}{" "}
+            {saved ? "Saved" : "Save design"}
+          </button>
+        </div>
+      </div>
+      <main className="studio-layout">
+        <section className="preview-panel" aria-label="Artwork preview">
+          <div className="preview-toolbar">
+            <div className="view-tabs" role="tablist" aria-label="Preview type">
+              {(["original", "finished", "template", "compare"] as View[]).map(
+                (v) => (
+                  <button
+                    key={v}
+                    role="tab"
+                    id={`preview-tab-${v}`}
+                    aria-controls="artwork-preview"
+                    tabIndex={view === v ? 0 : -1}
+                    aria-selected={view === v}
+                    onClick={() => setView(v)}
+                    onKeyDown={(e) => {
+                      const allViews: View[] = [
+                        "original",
+                        "finished",
+                        "template",
+                        "compare",
+                      ];
+                      const direction =
+                        e.key === "ArrowRight"
+                          ? 1
+                          : e.key === "ArrowLeft"
+                            ? -1
+                            : 0;
+                      if (!direction && e.key !== "Home" && e.key !== "End")
+                        return;
+                      e.preventDefault();
+                      const next =
+                        e.key === "Home"
+                          ? "original"
+                          : e.key === "End"
+                            ? "compare"
+                            : allViews[
+                                (allViews.indexOf(v) +
+                                  direction +
+                                  allViews.length) %
+                                  allViews.length
+                              ];
+                      setView(next);
+                      document.getElementById(`preview-tab-${next}`)?.focus();
+                    }}
+                  >
+                    {v === "compare"
+                      ? "Compare"
+                      : v[0].toUpperCase() + v.slice(1)}
+                  </button>
+                ),
+              )}
+            </div>
+            <button
+              className="icon-button"
+              title="Upload your photograph"
+              aria-label="Upload your photograph"
+              onClick={() => fileInput.current?.click()}
+            >
+              <ImagePlus size={18} />
+            </button>
+            <button
+              className="icon-button"
+              title="Enlarge preview"
+              aria-label="Enlarge preview"
+              onClick={() => setZoomPreview(!zoomPreview)}
+            >
+              <Maximize size={17} />
+            </button>
+          </div>
+          <div
+            id="artwork-preview"
+            role="tabpanel"
+            aria-labelledby={`preview-tab-${view}`}
+            className={`canvas-stage ${zoomPreview ? "enlarged" : ""} ${dragging ? "dragging" : ""}`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              void upload(e.dataTransfer.files[0]);
+            }}
+          >
+            {zoomPreview && (
+              <button
+                className="preview-close button light small"
+                onClick={() => setZoomPreview(false)}
+              >
+                <X size={16} />
+                Close enlarged view
+              </button>
+            )}
+            <div
+              className="canvas-paper"
+              style={
+                {
+                  aspectRatio: `${settings.widthMm}/${settings.heightMm}`,
+                  "--art-ratio": settings.widthMm / settings.heightMm,
+                } as CSSProperties
+              }
+            >
+              {view === "original" && croppedUrl ? (
+                <img
+                  className="artwork-image"
+                  src={croppedUrl}
+                  alt={`Cropped original: ${sourceName}`}
+                />
+              ) : geometry ? (
+                <div
+                  className="rendered-svg"
+                  dangerouslySetInnerHTML={{ __html: svg }}
+                />
+              ) : (
+                <div className="canvas-placeholder">
+                  <Layers size={32} />
+                  <p>
+                    {source
+                      ? "Finding the picture in the dots…"
+                      : "A photograph. A little possibility."}
+                  </p>
+                  <button
+                    className="button"
+                    onClick={() => fileInput.current?.click()}
+                  >
+                    Choose a photo
+                  </button>
+                </div>
+              )}
+              {view === "compare" && croppedUrl && geometry && (
+                <>
+                  <img
+                    className="comparison-image"
+                    src={croppedUrl}
+                    alt="Original photograph for comparison"
+                    style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}
+                  />
+                  <div
+                    className="comparison-divider"
+                    style={{ left: `${compare}%` }}
+                  >
+                    <span>↔</span>
+                  </div>
+                  <input
+                    aria-label="Original and artwork comparison position"
+                    className="comparison-range"
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={compare}
+                    onChange={(e) => setCompare(Number(e.target.value))}
+                  />
+                  <span className="compare-label left">Original</span>
+                  <span className="compare-label right">Finished</span>
+                </>
+              )}
+              {(rendering || busy) && (
+                <div className="render-indicator" role="status">
+                  <LoaderCircle size={16} className="spin" />
+                  {busy || "Rendering"}
+                </div>
+              )}
+            </div>
+            <span className="dimension-line">
+              {settings.widthMm / 10} × {settings.heightMm / 10} cm ·{" "}
+              {view === "template"
+                ? "Your printed guide"
+                : view === "original"
+                  ? "Your starting point"
+                  : "Your finished canvas"}
+            </span>
+          </div>
+          <div className="preview-bottom">
+            <span>
+              <span className="status-dot" />
+              {rendering ? "Updating your canvas" : "Made from your photograph"}
+            </span>
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={safeArea}
+                onChange={(e) => setSafeArea(e.target.checked)}
+              />
+              Show safe area
+            </label>
+          </div>
+          <div className="artwork-stats">
+            <div>
+              <strong>
+                {geometry?.stats.markCount.toLocaleString() ?? "—"}
+              </strong>
+              <span>
+                {settings.mode === "dots"
+                  ? "individual dots"
+                  : "individual marks"}
+              </span>
+            </div>
+            <div>
+              <strong>
+                {geometry
+                  ? `${Math.max(1, Math.round(geometry.stats.estimatedCompletionMinutes / 60))}–${Math.max(2, Math.ceil((geometry.stats.estimatedCompletionMinutes / 60) * 1.4))} hrs`
+                  : "—"}
+              </strong>
+              <span>estimated making time*</span>
+            </div>
+            <div>
+              <strong>{lab ? `${renderMs} ms` : "A little each day"}</strong>
+              <span>
+                {lab ? "last preview render" : "make it at your own pace"}
+              </span>
+            </div>
+          </div>
+          <p className="fine-print">
+            *Making time is an uncalibrated estimate. Preview colours and
+            printed guides need physical sample testing.
+          </p>
+          <div className="reference-section">
+            <div className="section-title">
+              <h2>Find a little inspiration</h2>
+              <span>Try a reference photograph</span>
+            </div>
+            <div className="reference-strip">
+              {REFERENCE_IMAGES.map((ref) => (
+                <button
+                  key={ref.id}
+                  className={`reference-tile ${referenceId === ref.id ? "selected" : ""}`}
+                  onClick={() => loadReference(ref.id)}
+                  disabled={!!busy}
+                >
+                  <img src={ref.src} alt={ref.alt} />
+                  <span>{ref.label}</span>
+                </button>
+              ))}
+            </div>
+            {currentRef && (
+              <p className="reference-credit">
+                Reference photo:{" "}
+                <a href={currentRef.source} target="_blank" rel="noreferrer">
+                  {currentRef.credit}
+                </a>
+                . For renderer exploration; not a completed customer canvas.
+              </p>
+            )}
+          </div>
+        </section>
+        <aside className="controls-panel">
+          <div className="control-tabs">
+            {["photo", "style", "finish"].map((p, i) => (
+              <button
+                key={p}
+                className={panel === p ? "active" : ""}
+                onClick={() => setPanel(p)}
+              >
+                <span>0{i + 1}</span>
+                {p === "finish"
+                  ? "Your canvas"
+                  : p[0].toUpperCase() + p.slice(1)}
+              </button>
+            ))}
+          </div>
+          {panel === "photo" && (
+            <div className="control-content">
+              <div className="control-heading">
+                <span className="eyebrow">It begins with a photograph</span>
+                <h2>One worth keeping.</h2>
+                <p>
+                  Faces, favourite places, the dog who never sits still. Make it
+                  personal.
+                </p>
+              </div>
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="visually-hidden"
+                onChange={(e) => {
+                  void upload(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
+              <button
+                className="upload-drop"
+                onClick={() => fileInput.current?.click()}
+              >
+                <ImagePlus size={25} />
+                <strong>Upload your photograph</strong>
+                <span>JPG, PNG or WebP · Up to 8 MB</span>
+              </button>
+              <p className="privacy-note">
+                Your photo stays in this browser until you choose to save it for
+                checkout.
+              </p>
+              <div className="control-divider" />
+              <div className="section-title">
+                <h3>Find your composition</h3>
+                <button
+                  className="icon-button"
+                  aria-label="Reset crop"
+                  onClick={() => {
+                    setCrop(DEFAULT_CROP);
+                    setSaved(false);
+                  }}
+                >
+                  <RotateCcw size={16} />
+                </button>
+              </div>
+              <Range
+                label="Zoom"
+                value={crop.zoom}
+                min={1}
+                max={3}
+                step={0.01}
+                suffix="×"
+                onChange={(v) => {
+                  setSaved(false);
+                  setCrop((c) => ({ ...c, zoom: v }));
+                }}
+              />
+              <Range
+                label="Horizontal position"
+                value={crop.x}
+                min={-1}
+                max={1}
+                step={0.01}
+                onChange={(v) => {
+                  setSaved(false);
+                  setCrop((c) => ({ ...c, x: v }));
+                }}
+              />
+              <Range
+                label="Vertical position"
+                value={crop.y}
+                min={-1}
+                max={1}
+                step={0.01}
+                onChange={(v) => {
+                  setSaved(false);
+                  setCrop((c) => ({ ...c, y: v }));
+                }}
+              />
+              <button
+                className="button light full"
+                onClick={() => {
+                  setCrop((c) => ({ ...c, rotation: (c.rotation + 90) % 360 }));
+                  setSaved(false);
+                }}
+              >
+                <RotateCcw size={16} />
+                Rotate 90°
+              </button>
+              <div className="photo-advice">
+                <Sparkles size={18} />
+                <div>
+                  <strong>A second pair of eyes</strong>
+                  {notes.map((n) => (
+                    <p key={n}>{n}</p>
+                  ))}
+                </div>
+              </div>
+              <label className="check-label rights">
+                <input
+                  type="checkbox"
+                  checked={rights}
+                  onChange={(e) => setRights(e.target.checked)}
+                />
+                I have permission to use this photograph.
+              </label>
+              <button
+                className="button full"
+                onClick={() => {
+                  track("crop_completed", { mode: settings.mode, productId });
+                  setPanel("style");
+                }}
+              >
+                Choose your style
+                <ArrowRight size={17} />
+              </button>
+            </div>
+          )}
+          {panel === "style" && (
+            <div className="control-content">
+              <div className="control-heading">
+                <span className="eyebrow">A different way to see it</span>
+                <h2>{MODES.find((m) => m.id === settings.mode)?.name}</h2>
+                <p>Watch something familiar become something you make.</p>
+              </div>
+              {lab && (
+                <div className="mode-picker">
+                  {MODES.map((m) => (
+                    <button
+                      key={m.id}
+                      className={settings.mode === m.id ? "selected" : ""}
+                      onClick={() => {
+                        track("renderer_selected", { mode: m.id, productId });
+                        update({ mode: m.id });
+                      }}
+                    >
+                      {m.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {settings.mode !== "dots" && (
+                <div className="inline-warning">
+                  Experimental study. This mode is available in the lab only
+                  until physical completion has been tested.
+                </div>
+              )}
+              {lab && settings.mode === "mosaic" && (
+                <>
+                  <label className="select-field">
+                    Cell shape
+                    <select
+                      value={settings.cellShape ?? "rounded"}
+                      onChange={(e) =>
+                        update({
+                          cellShape: e.target.value as
+                            "square" | "rounded" | "hexagon",
+                        })
+                      }
+                    >
+                      <option value="rounded">Rounded squares</option>
+                      <option value="square">Squares</option>
+                      <option value="hexagon">Hexagons</option>
+                    </select>
+                  </label>
+                  <label className="select-field">
+                    Marker palette
+                    <select
+                      value={settings.palette?.length ?? 1}
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        update({
+                          palette:
+                            n === 1
+                              ? undefined
+                              : [
+                                  "#1e1e1c",
+                                  "#68442f",
+                                  "#b97a68",
+                                  "#c6a25a",
+                                  "#354e3b",
+                                  "#445e7c",
+                                  "#a49b84",
+                                  "#dbccb4",
+                                ].slice(0, n),
+                        });
+                      }}
+                    >
+                      <option value="1">Monochrome</option>
+                      <option value="2">Two colours</option>
+                      <option value="4">Four colours</option>
+                      <option value="6">Six colours</option>
+                      <option value="8">Eight colours</option>
+                    </select>
+                  </label>
+                </>
+              )}
+              <h3 className="field-heading">How would you like to make it?</h3>
+              <div className="preset-grid">
+                {(["easy", "standard", "detailed"] as const).map((key, i) => (
+                  <button
+                    key={key}
+                    className={`preset-card ${activePreset === key ? "selected" : ""}`}
+                    onClick={() => choosePreset(key)}
+                  >
+                    <span
+                      className={`dot-swatch density-${i}`}
+                      aria-hidden="true"
+                    />
+                    <strong>{PRESET_NAMES[key]}</strong>
+                    <small>
+                      {i === 0
+                        ? "Fewer, bolder dots"
+                        : i === 1
+                          ? "A lovely balance"
+                          : "For the little details"}
+                    </small>
+                    {activePreset === key && <Check size={14} />}
+                  </button>
+                ))}
+              </div>
+              <div className="small-presets">
+                {(["bold", "portrait"] as const).map((key) => (
+                  <button
+                    className={activePreset === key ? "selected" : ""}
+                    key={key}
+                    onClick={() => choosePreset(key)}
+                  >
+                    {PRESET_NAMES[key]}
+                  </button>
+                ))}
+              </div>
+              <div className="control-divider" />
+              <h3 className="field-heading">A colour that feels like you</h3>
+              <div className="ink-choices">
+                {INKS.map((ink) => (
+                  <button
+                    key={ink.id}
+                    className={inkId === ink.id ? "selected" : ""}
+                    onClick={() => {
+                      setInkId(ink.id);
+                      update({ inkColor: ink.color });
+                    }}
+                    aria-label={ink.label}
+                    title={ink.label}
+                  >
+                    <span style={{ background: ink.color }}>
+                      {inkId === ink.id && <Check size={13} />}
+                    </span>
+                    <small>{ink.label}</small>
+                  </button>
+                ))}
+              </div>
+              <div className="control-divider" />
+              <details className="tuning" open={lab || undefined}>
+                <summary>
+                  <SlidersHorizontal size={16} />
+                  Fine-tune your image
+                  <ChevronDown size={15} />
+                </summary>
+                <Range
+                  label="Contrast"
+                  min={0.5}
+                  max={2}
+                  step={0.05}
+                  value={settings.contrast}
+                  onChange={(contrast) => update({ contrast })}
+                />
+                <Range
+                  label="Brightness"
+                  min={-0.4}
+                  max={0.4}
+                  step={0.02}
+                  value={settings.brightness}
+                  onChange={(brightness) => update({ brightness })}
+                />
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={settings.autoExposure !== false}
+                    onChange={(e) => update({ autoExposure: e.target.checked })}
+                  />
+                  Recover shadow detail automatically
+                </label>
+                <Range
+                  label="Gamma"
+                  min={0.4}
+                  max={2.2}
+                  step={0.05}
+                  value={settings.gamma}
+                  onChange={(gamma) => update({ gamma })}
+                />
+                {lab && (
+                  <>
+                    <Range
+                      label="Dot spacing"
+                      min={2}
+                      max={10}
+                      step={0.1}
+                      suffix=" mm"
+                      value={settings.spacingMm}
+                      onChange={(spacingMm) => update({ spacingMm })}
+                    />
+                    <Range
+                      label="Minimum diameter"
+                      min={0.5}
+                      max={3}
+                      step={0.1}
+                      suffix=" mm"
+                      value={settings.minDiameterMm}
+                      onChange={(minDiameterMm) => update({ minDiameterMm })}
+                    />
+                    <Range
+                      label="Maximum diameter"
+                      min={1}
+                      max={8}
+                      step={0.1}
+                      suffix=" mm"
+                      value={settings.maxDiameterMm}
+                      onChange={(maxDiameterMm) => update({ maxDiameterMm })}
+                    />
+                    <Range
+                      label="Edge emphasis"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={settings.edgeEmphasis}
+                      onChange={(edgeEmphasis) => update({ edgeEmphasis })}
+                    />
+                    <Range
+                      label="Density"
+                      min={0.3}
+                      max={1.5}
+                      step={0.05}
+                      value={settings.density}
+                      onChange={(density) => update({ density })}
+                    />
+                    <Range
+                      label="Highlight threshold"
+                      min={0}
+                      max={0.5}
+                      step={0.01}
+                      value={settings.threshold}
+                      onChange={(threshold) => update({ threshold })}
+                    />
+                    <Range
+                      label="Guide opacity"
+                      min={0.08}
+                      max={0.6}
+                      step={0.02}
+                      value={settings.guideOpacity}
+                      onChange={(guideOpacity) => update({ guideOpacity })}
+                    />
+                    <Range
+                      label="Safe margin"
+                      min={0}
+                      max={30}
+                      step={1}
+                      suffix=" mm"
+                      value={settings.safeMarginMm}
+                      onChange={(safeMarginMm) => update({ safeMarginMm })}
+                    />
+                    <Range
+                      label="Guide line weight"
+                      min={0.05}
+                      max={0.5}
+                      step={0.01}
+                      suffix=" mm"
+                      value={settings.guideWidthMm ?? 0.15}
+                      onChange={(guideWidthMm) => update({ guideWidthMm })}
+                    />
+                    <label className="check-label">
+                      <input
+                        type="checkbox"
+                        checked={settings.invert}
+                        onChange={(e) => update({ invert: e.target.checked })}
+                      />
+                      Invert tones (experimental)
+                    </label>
+                    <button className="text-button" onClick={savePreset}>
+                      <Save size={14} />
+                      Save this preset
+                    </button>
+                    {customPresets.length > 0 && (
+                      <label className="select-field">
+                        Your presets
+                        <select
+                          defaultValue=""
+                          onChange={(e) => {
+                            const p = customPresets[Number(e.target.value)];
+                            if (p) {
+                              const {
+                                mode,
+                                widthMm,
+                                heightMm,
+                                inkColor,
+                                text,
+                                ...tuning
+                              } = p.settings;
+                              update(tuning);
+                            }
+                          }}
+                        >
+                          <option value="" disabled>
+                            Choose saved preset
+                          </option>
+                          {customPresets.map((p, i) => (
+                            <option value={i} key={i}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                  </>
+                )}
+              </details>
+              <button
+                className="button full"
+                onClick={() => setPanel("finish")}
+              >
+                Make it yours
+                <ArrowRight size={17} />
+              </button>
+            </div>
+          )}
+          {panel === "finish" && (
+            <div className="control-content">
+              <div className="control-heading">
+                <span className="eyebrow">The finishing touches</span>
+                <h2>A place on your wall.</h2>
+                <p>Give your photograph room to breathe.</p>
+              </div>
+              <label className="select-field">
+                Canvas size
+                <select
+                  value={productId}
+                  onChange={(e) => selectProduct(e.target.value)}
+                >
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                className="text-button"
+                onClick={() =>
+                  update({
+                    widthMm: settings.heightMm,
+                    heightMm: settings.widthMm,
+                  })
+                }
+              >
+                <RotateCcw size={14} />
+                Switch portrait / landscape
+              </button>
+              <label className="select-field">
+                Finish
+                <select
+                  value={finishId}
+                  onChange={(e) => {
+                    setSaved(false);
+                    setFinishId(e.target.value);
+                  }}
+                >
+                  {finishes.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="control-divider" />
+              <label className="text-field">
+                A few words, if you like
+                <span>A name, a date, a little reminder.</span>
+                <input
+                  maxLength={64}
+                  value={settings.text?.value ?? ""}
+                  placeholder="Some things are worth slowing down for."
+                  onChange={(e) =>
+                    update({
+                      text: { ...settings.text, value: e.target.value },
+                    })
+                  }
+                  onBlur={() => {
+                    if (settings.text?.value)
+                      track("personalisation_added", {
+                        mode: settings.mode,
+                        productId,
+                      });
+                  }}
+                />
+              </label>
+              {settings.text?.value && (
+                <>
+                  <label className="select-field">
+                    Lettering
+                    <select
+                      value={settings.text.fontFamily ?? "serif"}
+                      onChange={(e) =>
+                        update({
+                          text: {
+                            ...settings.text!,
+                            fontFamily: e.target.value as
+                              "serif" | "sans-serif",
+                          },
+                        })
+                      }
+                    >
+                      <option value="serif">Classic serif</option>
+                      <option value="sans-serif">Simple sans</option>
+                    </select>
+                  </label>
+                  <label className="select-field">
+                    Placement
+                    <select
+                      value={settings.text.placement ?? "bottom-center"}
+                      onChange={(e) =>
+                        update({
+                          text: {
+                            ...settings.text!,
+                            placement: e.target.value as
+                              | "bottom-center"
+                              | "bottom-left"
+                              | "bottom-right"
+                              | "top-center",
+                          },
+                        })
+                      }
+                    >
+                      <option value="bottom-center">Bottom centre</option>
+                      <option value="bottom-left">Bottom left</option>
+                      <option value="bottom-right">Bottom right</option>
+                      <option value="top-center">Top centre</option>
+                    </select>
+                  </label>
+                  <Range
+                    label="Letter size"
+                    min={3}
+                    max={8}
+                    step={0.5}
+                    suffix=" mm"
+                    value={settings.text.sizeMm ?? 7}
+                    onChange={(sizeMm) =>
+                      update({ text: { ...settings.text!, sizeMm } })
+                    }
+                  />
+                </>
+              )}
+              <div className="control-divider" />
+              {lab ? (
+                <>
+                  <h3>Take it to the workbench</h3>
+                  <p className="muted">
+                    Exports follow your chosen view. SVG keeps every mark crisp
+                    at its exact physical size.
+                  </p>
+                  <div className="export-grid">
+                    {(["svg", "png", "pdf", "package"] as const).map(
+                      (format) => (
+                        <button
+                          key={format}
+                          className="button light"
+                          disabled={!geometry || !!busy}
+                          onClick={() => exportFile(format)}
+                        >
+                          <ArrowDownToLine size={15} />
+                          {format === "package"
+                            ? "Full package"
+                            : format.toUpperCase()}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                  <p className="fine-print">
+                    PDF and PNG: 150 dpi. Print at 100% scale. Production
+                    samples require review before printing.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="price-row">
+                    <span>
+                      Your personalised kit
+                      <small>Indicative prototype price</small>
+                    </span>
+                    <strong>
+                      {money(product.pricePence + finish.additionalPence)}
+                    </strong>
+                  </div>
+                  <p className="muted">
+                    Canvas template, matching marker and a simple making guide.
+                    Shipping calculated at checkout.
+                  </p>
+                  {!referenceId && (
+                    <label className="check-label rights">
+                      <input
+                        type="checkbox"
+                        checked={rights}
+                        onChange={(e) => setRights(e.target.checked)}
+                      />
+                      I have permission to use this photograph.
+                    </label>
+                  )}
+                  <button
+                    className="button full"
+                    onClick={reviewKit}
+                    disabled={!geometry || !!busy}
+                  >
+                    Review your kit
+                    <ArrowRight size={17} />
+                  </button>
+                  <p className="fine-print">
+                    Studio preview. Orders open after physical sample approval.
+                  </p>
+                </>
+              )}
+              <button className="text-button danger" onClick={remove}>
+                <Trash2 size={14} />
+                Remove saved design
+              </button>
+            </div>
+          )}
+          <div className="control-footnote">
+            <CircleHelp size={16} />
+            <span>
+              {lab
+                ? "A working space for perfecting the physical experience."
+                : "No account needed. Just a photograph you love."}
+            </span>
+          </div>
+        </aside>
+      </main>
+      {geometry?.warnings.length ? (
+        <div className="render-warnings" role="status">
+          {geometry.warnings.map((w) => (
+            <p key={w}>{w}</p>
+          ))}
+        </div>
+      ) : null}
+      {error && (
+        <div role="alert" className="toast error">
+          <span>{error}</span>
+          <button aria-label="Dismiss error" onClick={() => setError("")}>
+            <X size={18} />
+          </button>
+        </div>
+      )}
+      {notice && (
+        <div role="status" className="toast">
+          <Check size={18} />
+          <span>{notice}</span>
+        </div>
+      )}
+      {!lab && (
+        <div className="studio-lab-link">
+          Curious about the process?{" "}
+          <Link href="/lab/dots">
+            Explore the rendering lab <ArrowRight size={14} />
+          </Link>
+        </div>
+      )}
+      {panel !== "photo" && (
+        <input
+          ref={fileInput}
+          className="visually-hidden"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => {
+            void upload(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+      )}
+    </div>
+  );
+}

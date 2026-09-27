@@ -1,0 +1,178 @@
+{
+  "rendererVersion": "slow-reveal-geometry/1.1.0",
+  "generatedAt": "2026-09-27T22:15:13.422Z",
+  "command": "node --import tsx tests/benchmark-renderers.ts",
+  "settings": {
+    "mode": "dots",
+    "widthMm": 400,
+    "heightMm": 500,
+    "spacingMm": 4.2,
+    "minDiameterMm": 0.9,
+    "maxDiameterMm": 3.8,
+    "contrast": 1.12,
+    "brightness": 0,
+    "gamma": 1,
+    "threshold": 0.04,
+    "edgeEmphasis": 0.25,
+    "density": 1,
+    "invert": false,
+    "inkColor": "#1e1e1c",
+    "guideOpacity": 0.3,
+    "safeMarginMm": 10,
+    "guideWidthMm": 0.15,
+    "autoExposure": true
+  },
+  "method": "Each licensed source is centre-cropped to 800×1000 RGBA and rendered at 400×500 mm. Pearson correlation compares mean source darkness with relative dot area in a 12×16 physical grid. The per-bin normalization uses the identical all-black lattice. This measures coarse tonal structure, not likeness, comfort, accessibility, real ink colour or print quality. Runtime is one local Node run per image and excludes decode/export; it is not a browser performance guarantee.",
+  "physicalValidation": "PENDING: UV/canvas/marker tests and hand-completed prototypes are not performed by this benchmark.",
+  "contactSheet": "renderer-contact-sheet.png",
+  "results": [
+    {
+      "fixture": "portrait",
+      "sourceSha256": "c539da5c8e48addde1dde35005e93c5d91ed732839c072e7f02eb1ff3f123393",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 11464,
+      "estimatedCompletionMinutes": 534,
+      "renderMs": 113.6,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4,
+      "tonalCorrelation12x16": 0.9975,
+      "exposureScale": 1.797,
+      "deterministic": true,
+      "geometrySha256": "831f8e9d75f9bf05f537f8c5c5e8a5f4f7260cca48bf1e57ae79b86e29d5ae10",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
+        "This photo is dark. Try a tighter crop or increase brightness.",
+        "Automatic exposure lifted dark detail. Compare with the original and disable it for intentional low-key artwork."
+      ]
+    },
+    {
+      "fixture": "couple",
+      "sourceSha256": "7086c1c6d54e225b7c55b64e1f49b62f471a1df7f87a3f03e37bbc0a8b9b7252",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 11269,
+      "estimatedCompletionMinutes": 355,
+      "renderMs": 125,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.435,
+      "tonalCorrelation12x16": 0.9993,
+      "exposureScale": 1,
+      "deterministic": true,
+      "geometrySha256": "30cb9210f292ead99888e6c459b1e6df572d4148a1d4b052c30bd08ef85ffd25",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
+      ]
+    },
+    {
+      "fixture": "family",
+      "sourceSha256": "36f31f21e25a1ba9bd21b19b734e43d187bd1c097898695806f7fc2f7a9e4b7b",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 11718,
+      "estimatedCompletionMinutes": 460,
+      "renderMs": 104.4,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4,
+      "tonalCorrelation12x16": 0.9992,
+      "exposureScale": 1,
+      "deterministic": true,
+      "geometrySha256": "9e4f50a92b2f590a5adf68545f1b5f95805034ca2c1a4c362106fecee9a4d5d2",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
+      ]
+    },
+    {
+      "fixture": "black-dog",
+      "sourceSha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 11600,
+      "estimatedCompletionMinutes": 524,
+      "renderMs": 123.1,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4,
+      "tonalCorrelation12x16": 0.9961,
+      "exposureScale": 2.4148,
+      "deterministic": true,
+      "geometrySha256": "51caf77d57178888e567d7f70979d0e3e1e970868e4962ee4f6b641b180a00eb",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
+        "This photo is dark. Try a tighter crop or increase brightness.",
+        "Automatic exposure lifted dark detail. Compare with the original and disable it for intentional low-key artwork."
+      ]
+    },
+    {
+      "fixture": "light-pet",
+      "sourceSha256": "c66b4096a305f0905da0bbd1d850264018f1410a759452e488ac0f0a94c8e510",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 10840,
+      "estimatedCompletionMinutes": 434,
+      "renderMs": 104,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4081,
+      "tonalCorrelation12x16": 0.9979,
+      "exposureScale": 1,
+      "deterministic": true,
+      "geometrySha256": "db17068e25d7f7b335c4652fac1fc2dc765c733f18e8da23d415d857c58a247d",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
+      ]
+    },
+    {
+      "fixture": "building",
+      "sourceSha256": "05c60cadc1dc41cea1ba4759d8f85763b2cd4b7675c4bc6ff29252380c25844e",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 10066,
+      "estimatedCompletionMinutes": 408,
+      "renderMs": 103.9,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4,
+      "tonalCorrelation12x16": 0.9971,
+      "exposureScale": 1,
+      "deterministic": true,
+      "geometrySha256": "4a126626532c06d800c89c63b3e535228d655156d08d6bdb02097df0d112d9ab",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
+      ]
+    },
+    {
+      "fixture": "vehicle",
+      "sourceSha256": "5ff93fa03c053613f17e62138d844bdb8cdc3ad796cd72842732b60d6e235a36",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 11723,
+      "estimatedCompletionMinutes": 493,
+      "renderMs": 105.9,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4,
+      "tonalCorrelation12x16": 0.9995,
+      "exposureScale": 1,
+      "deterministic": true,
+      "geometrySha256": "37bc74c06c77e5fa99e87da9280846ac32b6771e4a85053916023b8d6f15b740",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
+      ]
+    },
+    {
+      "fixture": "landscape",
+      "sourceSha256": "067ca3e0a06a27bddc91a46311dc45ed4c347f27c1bdfc498e58edb21997b912",
+      "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
+      "markCount": 11707,
+      "estimatedCompletionMinutes": 472,
+      "renderMs": 95.9,
+      "minDiameterMm": 0.9,
+      "maxDiameterMm": 3.8,
+      "minimumClearGapMm": 0.4,
+      "tonalCorrelation12x16": 0.9997,
+      "exposureScale": 1,
+      "deterministic": true,
+      "geometrySha256": "f943383415ffcefeb69669a34ad35f6959f1aa4b77a78641ffdb15b207c84e7a",
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+# Renderer implementation and limits
+
+The shared TypeScript renderer produces a serializable, versioned geometry snapshot in **millimetres**. Browser previews, downloadable SVG and server production artwork all use that snapshot. A saved snapshot contains no timestamp, elapsed runtime, random seed from the clock, remote URL or customer image data. The caller may time a render without changing its identity.
+
+## API
+
+`renderImage({data: Uint8ClampedArray, width, height}, settings)` consumes already cropped RGBA pixels. `toSvg(geometry, "finished" | "template", options)` serializes exactly that geometry. Both are exported by `lib/renderers/index.ts`, together with `RenderSettings`, `RenderGeometry`, `DEFAULT_SETTINGS`, `PRESETS`, `normalizeSettings` and `RENDERER_VERSION`.
+
+The worker accepts `{id, input, settings}` and responds with `{id, geometry}` or `{id, error}`. Consumers must discard stale IDs and display failures. The worker does not upload or log source pixels.
+
+SVG width and height carry `mm` units and the viewBox uses the same physical coordinates. `background:false` omits the simulated substrate for production; the default warm paper rectangle is a preview aid. `includeSafeArea:true` adds a diagnostic safe-area outline and must not be used in print jobs. Background strings and inks require six-digit hexadecimal colours. Text and metadata are XML-escaped.
+
+## Signature Dots
+
+- Fixed hexagonal centres depend on physical canvas size, margins, spacing and density. Changing display resolution does not add or remove lattice centres.
+- Four-sample reduction caps analysis at a 1,000-pixel long edge. Integral-area samples suppress aliasing; a larger neighbourhood restores local contrast around features.
+- Bounded automatic exposure lifts dark, non-flat photos. `autoExposure:false` preserves intentional low-key tonal treatment. Brightness, contrast and gamma then apply. This is not face recognition or segmentation.
+- Dot area tracks local darkness. Sparse deterministic sampling retains highlights below the printable minimum without making undersize marks. The threshold preserves empty paper.
+- Radii are bounded by the chosen minimum and maximum. Effective spacing/maximum diameter are adjusted when required to maintain at least a 0.25 mm clear gap and no more than 60,000 marks. Adjustments appear in warnings and stats.
+- Template outlines are inset into the finished footprint so the guide can be covered by the intended filled mark. Guide width is also bounded by half the minimum diameter.
+
+The proposed minimums, gaps and guide settings are engineering defaults, **not material-tested production limits**. Easy, Standard and Detailed change physical workload. Completion estimates use provisional per-mark and filled-area constants and are not customer promises.
+
+## Other modes
+
+**Mosaic:** square, rounded or hexagonal cells; monochrome area modulation or 2–8 supplied marker colours. Palette mapping picks the nearest weighted RGB colour, with unmarked white as a paper tone. Numbers on the template identify supplied colours; a separate key is required in the kit. This does not simulate pigment mixing, marker opacity or ink colour management.
+
+**Contour:** two smoothed tonal-boundary levels, joined into connected paths and simplified with an iterative Douglas–Peucker pass. Tiny components are removed. It is an experimental tracing activity, without semantic face detail, subject segmentation or a continuous single-line claim.
+
+**Line Amplification:** horizontal, quantized-thickness strips. The template outlines the regions to fill using a ruler. Every kit requires a ruler or straight edge. Physical usability remains untested.
+
+Alternative modes remain experimental until hand-completed prototypes pass review.
+
+## Personalisation
+
+Text is limited to 80 characters, curated serif/sans-serif choices and four placements. It reserves a band outside the dot image and uses actual glyph bounds, advances and pair kerning to fit. Both personalisation and mosaic numerals serialize as SVG paths. Browser previews and libvips/server exports consume identical vectors without a font download, installed system font, browser text measurement or platform substitution.
+
+Renderer `1.1.0` uses the licensed **SRS Serif Outline** and **SRS Sans Outline** sets derived from the 400-weight Fontsource Playfair Display and DM Sans WOFFs, both package version 5.3.0. These internal derivative names respect the Playfair Display Reserved Font Name. Copyright, attribution and complete SIL OFL 1.1 licences are retained in `public/fonts/`. The outline data remains OFL licensed; finished documents are not required to adopt that licence.
+
+The common repertoire contains **339 characters**: printable ASCII, supported Latin-1/extended Latin accents, typographic quotes, en/em dashes, ellipsis, common symbols and currencies including £, €, ¥ and ₹. The exact list is exported as `SUPPORTED_TEXT_CHARACTERS` and recorded in `lib/renderers/font-data.json`. NFC normalization makes composed and decomposed equivalents (such as `é` and `e` + combining acute) produce identical geometry. Unsupported characters, including emoji and currently unsupported non-Latin scripts, fail with an explicit codepoint message instead of silently substituting a glyph. This is a Latin lettering subset, not a complete international shaping engine.
+
+Run `node scripts/build-font-data.mjs` to reproduce the glyph data. Build-only `opentype.js@2.0.0` extracts outlines; `fontkit@2.0.4` reads pair positioning, including Playfair's GPOS extension table. Both tools are MIT licensed and neither ships in the runtime renderer. Source hashes and a deterministic font revision identify the vectors. The generated file is 542,753 bytes (158,768 gzip bytes) for both fonts together. A saved text geometry includes its font revision; a mismatched revision requires a new design revision. Very long text can become too small and produces a warning.
+
+The opt-in regression command `$env:RENDERER_BROWSER_QA='1'; node --import tsx --test tests/renderers.test.ts` (PowerShell, installed Edge required) compares headless Chromium/Edge with sharp/libvips at identical output dimensions. The accented/currency lettering fixture measured **97.52% serif and 97.99% sans-serif dark-pixel mask overlap**. The SVG path geometry is identical; residual pixel differences are rasterizer antialiasing. Tests also verify exact preview/template path agreement, safe bounds at every anchor, pair kerning, NFC equivalence, JSON serialization and unsupported-script errors. The server comparison rasterizes directly at the final pixel size, matching the production PNG pipeline.
+
+## Reproducible benchmarks
+
+Run `node --import tsx tests/benchmark-renderers.ts` from the repository root. It reads all eight licensed fixture photographs, verifies deterministic output and physical gaps, and writes `docs/renderer-benchmarks.json` and `docs/renderer-contact-sheet.png`. The source hashes identify the exact fixtures; defaults and renderer version are stored in the report.
+
+The tonal correlation compares coarse 12×16 source darkness bins against relative filled dot area. It is a limited image-structure metric, **not** evidence of recognisable faces, an enjoyable activity, colour accuracy or manufacturability. The contact sheet must be inspected alongside the numbers. Full-canvas template thumbnails look faint by design; judge guide visibility at 1:1 and on real canvas.
+
+Visual review found a recognisable subject/scene in all eight default renderings. The dark portrait and black dog benefit from bounded exposure normalization but retain challenging shadow details. The light-pet source has a small subject and busy background, so a tighter crop is preferable. The building and vehicle contain fine texture that a coarse kit simplifies. These limitations must stay visible rather than replacing difficult benchmark photos.
+
+## Remaining physical and algorithmic gates
+
+1. Print and hand-complete real UV/canvas/marker samples, calibrate minimum sizes, guide contrast, ink adhesion, smudging, fatigue and completion time.
+2. Confirm eight representative results with human likeness and activity-quality scoring, including accessibility and mobile viewing.
+3. Approve printer-specific bleed, white ink, ICC/colour handling and registration marks, and proof the outlined lettering on real material before claiming production readiness.
+4. Add semantic photo suitability/subject analysis only after evaluation; current warnings cover source size, exposure and tonal range and must not imply face detection.
+5. Preserve paid geometry snapshots and renderer versions. A crop, preset or algorithm change creates a new revision for review rather than mutating an approved job.

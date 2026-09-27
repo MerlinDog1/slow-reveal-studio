@@ -1,0 +1,36 @@
+# Competitor and adjacent workflow research
+
+Checked 27 September 2026. Observations below concern public product pages, not completed purchases or an independent quality audit. Pricing is the displayed locale/variant at inspection, not a UK landed-cost comparison. Live upload conversion, paid proofs, fulfilment and physical quality were not tested. No competitor assets, code, copy or design identity are reused.
+
+## Direct references
+
+| Product / source | Observed journey, choices and contents | Price and dispatch evidence | Trust / merchandising | Design implication and friction to test |
+|---|---|---|---|---|
+| [Oh My Dotz own-photo product](https://www.ohmydotz.com/products/own-photo-dot-painting) | Photo upload; manual photo check claimed; 30×40 through 80×100cm; canvas, stretched, black frame; instructions and dual-tip markers listed | $38 shown; currency displayed by site, no conversion inferred; exact configured dispatch unverified | [Homepage](https://www.ohmydotz.com/) groups themes and gifts, shows submitted finished works and on-site reviews | Explain the hand-completion action immediately. Use our own photo guidance and human review; test whether size options obscure physical workload. Do not copy testimonial counts or guarantees. |
+| [Paint By Dots custom photo](https://dotpainting.co.uk/products/custom-photo-dot-painting-kit) | Upload; person reviews clarity/light/subject; before/after slider; 30×40 to 80×120cm; rolled, ready-to-hang, DIY frame; black/blue/gold; canvas, pens, guide | £26 base shown. [Homepage](https://dotpainting.co.uk/) says production 2–4 working days and delivery 3–5 after dispatch, but also a 5–7-day card: this is not a promise we can adopt | On-site verified-purchase label, permission statement for customer photos, suitability examples, size guidance, FAQ | Make Original, Finished and Template equally explicit; disclose review holds and actual production timeline. Our own evidence must support marker count and time estimates. |
+
+Both are evidence that emotional context, a visible making process and a clear finished result are useful category explanations. This is an inference for product design, not proof of conversion performance. The public pages did not prove a live renderer equivalent to our planned lab. Test this separately before claiming differentiation.
+
+## Adjacent categories
+
+| Category / official reference | Observed mechanics and public evidence | Pricing / contents / dispatch | Pattern to adapt; remaining uncertainty |
+|---|---|---|---|
+| [Custom paint-by-numbers: Masterpiece By Numbers](https://usa.masterpiecebynumbers.com/products/masterpiece_by_numbers_custom_paint_by_numbers_kit) | Upload on product page; email fallback; framed/unframed and extra-paint option; on-site reviews and completed-photo examples | US $54.95 shown; 16×20in linen canvas, brushes, separate paints; custom production/delivery stated 6–8 weeks | Make spare consumables and timeframe clear. Avoid vast palettes for first launch. Live preview, UK duties and actual service untested. |
+| [Diamond painting: Paint With Diamonds](https://paintwithdiamonds.com/collections/all-custom) | Dedicated own-photo collection; kit selection; promotional bundles | Custom full-drill tile shown $24.99 sale / $29.99 regular. Full selected kit, dispatch and live preview not inspected | Map symbol/cell workload to size before checkout. Inspect finished kit and symbol legibility before adopting any pattern. Reviews not independently checked. |
+| [Photo-to-cross-stitch: Pic2Pat](https://www.pic2pat.com/index.en.php) | Three-step upload to server, stitch dimensions/density, downloadable printable pattern and thread quantities; 18MB limit | Pattern tool is presented as free; no physical kit shipment inferred | Inventory-aware palettes, durable downloadable legend, exact physical density are useful. Do not copy conversion code. Full new-editor behaviour untested. |
+| [Personalised colouring book: Toodaloo](https://www.toodaloo.studio/) | Upload phone/computer photos, preview every line drawing, customise cover | Price, selected book contents, dispatch and reviews unverified | Prove the actual guide before purchase. Test consistency across photos and avoid making photo subjects unrecognisable. |
+| [Personalised colouring book: MyColouringBook](https://mycolouringbook.co.uk/) | Each uploaded photo becomes a colour reference page and a colouring page | £24 displayed with UK delivery; physical book quality untested | A source reference alongside the making template reduces uncertainty. Page count/turnaround and final choices require configured-order inspection. |
+| [Photo mosaics: Mosaically](https://mosaically.com/) | Photo-mosaic creation is the primary call to action; finished keepsake positioning | Configured price, kit contents, shipping and reviews not checked | Explain the difference between filling geometric cells and assembling many miniature photos. Test zoom/overview before adapting navigation. |
+| [Line portraits: Letterfest](https://us.letterfest.com/en-au/products/daddy-line-portrait) | Photo upload or email; simplified artist-drawn portrait, no background; digital proof link and small revisions before print | Observed page shows $58 but locale/currency basis is ambiguous; no UK comparison made; this is a finished print, not an activity kit | A proof/approval state is useful, but ours must retain immutable paid revision history. Physical tracing difficulty and shipping untested. |
+| [Web-to-print: Zakeke](https://www.zakeke.com/solutions/visual-product-customizer/) | Real-time text/image customisation and production file formats. [Order registration docs](https://docs.zakeke.com/docs/API/Integration/Visual-Product-Customizer/order-registration-customizer) tie print files to registered orders | Software service; price/physical kit not comparable | Freeze a configured design at payment and deliver files with the order, while keeping human print approval during R&D. No proprietary implementation copied. |
+
+## Decisions to validate in our own product
+
+1. Use meaningful example subjects and plain physical verbs: fill a circle, fill a cell, trace a line. Test comprehension with first-time users.
+2. Show the template, not only a simulated result. Keep stock/generated imagery labelled and separate from customer evidence.
+3. Prefer workload-aware presets and limited palettes over a long generic filter menu. Display provisional completion estimates as estimates until hand tests calibrate them.
+4. Treat poor photos as a review conversation; allow an override for experimentation. A high source resolution alone does not prove recognisable facial detail.
+5. Build a proof/review trail and alternate-photo flow that never silently changes what was purchased.
+6. Record truthful dispatch promises only after measured fulfilment tests. On-site competitor reviews are their claims and must not become ours.
+
+Next validation: walk through actual mobile uploads using licensed lab fixtures without submitting an order; measure pre-purchase preview availability, privacy wording, cropping controls, accidental-loss handling and accessibility. Document findings before claiming superior performance or conversion. Sample purchases and interviews remain external research work.

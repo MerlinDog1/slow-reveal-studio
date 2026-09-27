@@ -1,0 +1,148 @@
+[
+  {
+    "id": "dots-progression",
+    "file": "/marketing/dots-progression-digital.png",
+    "alt": "One dot at a time.: the same licensed black-dog source beside its dots template, simulated partial completion and finished digital artwork.",
+    "status": "renderer-digital-study",
+    "isPhysicalProductEvidence": false,
+    "requiredCaption": "Digital rendering · simulated completion",
+    "generatedAt": "2026-09-27",
+    "tool": "shared TypeScript renderer + Sharp layout",
+    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "sourceImages": [
+      "/references/black-dog.jpg"
+    ],
+    "sourceAttribution": {
+      "author": "Mac Gaither",
+      "source": "https://unsplash.com/photos/black-labrador-retriever-ITGs9TnB9og",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
+    },
+    "geometryFile": "/marketing/digital/dots-progression-geometry.json",
+    "geometrySha256": "ed219c1b407f92bd9a4d84831b232e78d31ce98945af193bed303105278405e1",
+    "deterministic": true,
+    "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
+    "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+    "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+    "width": 2200,
+    "height": 930,
+    "sha256": "7db0411323222d87b3bf060d646e06da5a61c0a8a9f55460185726ec3ce5d95c",
+    "bytes": 1693883
+  },
+  {
+    "id": "mosaic-progression",
+    "file": "/marketing/mosaic-progression-digital.png",
+    "alt": "Small shapes. A bigger picture.: the same licensed building source beside its mosaic template, simulated partial completion and finished digital artwork.",
+    "status": "renderer-digital-study",
+    "isPhysicalProductEvidence": false,
+    "requiredCaption": "Digital rendering · simulated completion",
+    "generatedAt": "2026-09-27",
+    "tool": "shared TypeScript renderer + Sharp layout",
+    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "sourceImages": [
+      "/references/building.jpg"
+    ],
+    "sourceAttribution": {
+      "author": "T (@tanyabarrow; previously Tanya Barrow)",
+      "source": "https://unsplash.com/photos/thatched-roof-cottage-surrounded-by-trees-and-garden-ApgKMT5RpzY",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "sha256": "05c60cadc1dc41cea1ba4759d8f85763b2cd4b7675c4bc6ff29252380c25844e"
+    },
+    "geometryFile": "/marketing/digital/mosaic-progression-geometry.json",
+    "geometrySha256": "9f355ed8ecffa92c3837af21cc09171854a3255234dda8d95e377cef33765e28",
+    "deterministic": true,
+    "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art. Palette: #1e1e1c, #68442f, #7b8b77, #c6a25a; template numbers map in that order.",
+    "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+    "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+    "width": 2200,
+    "height": 930,
+    "sha256": "8fc37b5d1f0fd6ac328cca83ea2b97f7e78e28ced2dd0e3d1b5021c3aa6fa47f",
+    "bytes": 1453681
+  },
+  {
+    "id": "contour-progression",
+    "file": "/marketing/contour-progression-digital.png",
+    "alt": "Follow the lines that matter.: the same licensed vehicle source beside its contour template, simulated partial completion and finished digital artwork.",
+    "status": "renderer-digital-study",
+    "isPhysicalProductEvidence": false,
+    "requiredCaption": "Digital rendering · simulated completion",
+    "generatedAt": "2026-09-27",
+    "tool": "shared TypeScript renderer + Sharp layout",
+    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "sourceImages": [
+      "/references/vehicle.jpg"
+    ],
+    "sourceAttribution": {
+      "author": "Nathan Dumlao",
+      "source": "https://unsplash.com/photos/vintage-white-car-Eh8PK-jlLCI/",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "sha256": "5ff93fa03c053613f17e62138d844bdb8cdc3ad796cd72842732b60d6e235a36"
+    },
+    "geometryFile": "/marketing/digital/contour-progression-geometry.json",
+    "geometrySha256": "07bce696169b014d414a1a8aba5f9a15c4e7869a528732a4d0557e283413cb5b",
+    "deterministic": true,
+    "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
+    "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+    "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+    "width": 2200,
+    "height": 930,
+    "sha256": "57a040eeb6eee530012534bcbde597e0d4dadb39a477a275f6410ca0ce418254",
+    "bytes": 915354
+  },
+  {
+    "id": "colour-options",
+    "file": "/marketing/colour-options-digital.png",
+    "alt": "The same black-dog dot portrait geometry rendered in soft black, deep navy, warm sepia and forest green.",
+    "status": "renderer-digital-study",
+    "isPhysicalProductEvidence": false,
+    "requiredCaption": "Digital rendering · screen colours are illustrative",
+    "generatedAt": "2026-09-27",
+    "tool": "shared TypeScript renderer + Sharp layout",
+    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "sourceImages": [
+      "/references/black-dog.jpg"
+    ],
+    "sourceAttribution": {
+      "author": "Mac Gaither",
+      "source": "https://unsplash.com/photos/black-labrador-retriever-ITGs9TnB9og",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
+    },
+    "geometryFile": "/marketing/digital/colour-options-geometry.json",
+    "geometrySha256": "ed219c1b407f92bd9a4d84831b232e78d31ce98945af193bed303105278405e1",
+    "palette": [
+      {
+        "id": "black",
+        "label": "Soft black",
+        "color": "#1E1E1C"
+      },
+      {
+        "id": "navy",
+        "label": "Deep navy",
+        "color": "#233B56"
+      },
+      {
+        "id": "sepia",
+        "label": "Warm sepia",
+        "color": "#68442F"
+      },
+      {
+        "id": "forest",
+        "label": "Forest green",
+        "color": "#354E3B"
+      }
+    ],
+    "deterministic": true,
+    "qa": "All four variants retain exactly the same circle coordinates/radii. No physical marker appearance, metallic reflectance or material result is claimed.",
+    "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+    "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+    "width": 2200,
+    "height": 930,
+    "sha256": "7d53be9831a16af87451a9ac8c05590a79f52604b2938aa62919c32072c0361f",
+    "bytes": 1612002
+  }
+]

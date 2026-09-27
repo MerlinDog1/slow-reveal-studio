@@ -1,14 +1,23 @@
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
 import {
   cropSchema,
   settingsSchema,
   type Order,
   type Revision,
+  type Package,
 } from "./schema";
 import { getRecord, replaceOrder } from "./store";
 import { ApiError } from "./security";
 import { createProductionPackage } from "./production";
 import { normalizeSettings } from "../renderers";
+import {
+  currentRevision,
+  currentPackage,
+  customerProofApproved,
+  discardUncommittedPackage,
+} from "./orders";
+export { currentPackage } from "./orders";
 import {
   deliverNotification,
   newNotification,
@@ -41,6 +50,22 @@ export function applyReviewAction(
   tracking?: string,
 ): Order {
   if (
+    (action === "approve" || action === "dispatch") &&
+    !customerProofApproved(order)
+  )
+    throw new ApiError(
+      409,
+      "The customer must approve both views of this replacement proof before print approval.",
+    );
+  if (
+    action === "approve" &&
+    order.reviewStatus === "alternate-photo-requested"
+  )
+    throw new ApiError(
+      409,
+      "Resolve the requested alternate photo before print approval.",
+    );
+  if (
     action === "dispatch" &&
     (order.reviewStatus !== "approved" ||
       order.approvedRevisionId !== order.currentRevisionId)
@@ -66,6 +91,16 @@ export function applyReviewAction(
           : "dispatched";
   return {
     ...order,
+    ...(action === "request-photo"
+      ? {
+          photoRequest: {
+            id: randomUUID(),
+            revisionId: order.currentRevisionId,
+            requestedAt: new Date().toISOString(),
+            note,
+          },
+        }
+      : {}),
     reviewStatus,
     approvedRevisionId:
       action === "approve"
@@ -89,6 +124,7 @@ export async function updateOrder(
   id: string,
   input: unknown,
   transport?: NotificationTransport,
+  produce = createProductionPackage,
 ): Promise<{ order: Order; notification?: NotificationResult }> {
   const body = actionSchema.parse(input);
   const order = await getRecord<Order>("orders", id);
@@ -117,13 +153,23 @@ export async function updateOrder(
     return { order: (await getRecord<Order>("orders", id))!, notification };
   }
   let next: Order;
+  let uncommitted: Package | undefined;
   if (body.action === "regenerate") {
     if (order.reviewStatus === "dispatched")
       throw new ApiError(409, "Dispatched artwork cannot be regenerated.");
-    const design = order.originalSnapshot.design;
-    const latest = order.revisions.find(
-      (revision) => revision.id === order.currentRevisionId,
-    );
+    const latest = currentRevision(order);
+    const current = currentPackage(order);
+    const design = {
+      ...order.originalSnapshot.design,
+      source: current.source,
+      warnings: Array.isArray(current.manifest.sourceWarnings)
+        ? current.manifest.sourceWarnings.filter(
+            (item): item is string => typeof item === "string",
+          )
+        : latest
+          ? []
+          : order.originalSnapshot.design.warnings,
+    };
     const base = latest?.settings ?? design.settings;
     const settings = normalizeSettings({
       ...(body.settings ?? base),
@@ -133,12 +179,8 @@ export async function updateOrder(
       inkColor: base.inkColor,
     });
     const crop = body.crop ?? latest?.crop ?? design.crop;
-    const production = await createProductionPackage(
-      design,
-      id,
-      settings,
-      crop,
-    );
+    const production = await produce(design, id, settings, crop);
+    uncommitted = production;
     const revision: Revision = {
       id: String(production.manifest.revisionId),
       createdAt: new Date().toISOString(),
@@ -146,6 +188,8 @@ export async function updateOrder(
       settings,
       crop,
       note: body.note,
+      origin: "admin-regeneration",
+      customerProofRequired: latest?.customerProofRequired,
     };
     next = {
       ...order,
@@ -180,7 +224,12 @@ export async function updateOrder(
       : undefined;
   if (customerNotification)
     next.notifications = [...(next.notifications ?? []), customerNotification];
-  await replaceOrder(order, next);
+  try {
+    await replaceOrder(order, next);
+  } catch (error) {
+    if (uncommitted) await discardUncommittedPackage(id, uncommitted);
+    throw error;
+  }
   let notification: NotificationResult | undefined;
   if (body.action === "dispatch" || body.action === "request-photo") {
     notification = await deliverNotification(
@@ -193,10 +242,4 @@ export async function updateOrder(
     order: (await getRecord<Order>("orders", id))!,
     ...(notification ? { notification } : {}),
   };
-}
-export function currentPackage(order: Order) {
-  return (
-    order.revisions.find((revision) => revision.id === order.currentRevisionId)
-      ?.package ?? order.originalSnapshot.package
-  );
 }

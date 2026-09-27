@@ -1,8 +1,30 @@
 # Verification record — 27 September 2026
 
-This records software checks for the first implementation. It is not approval of a physical kit or live commercial service.
+This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
 
-## Automated checks
+## Current integrated follow-up
+
+- `npm run typecheck`: passed after the replacement, release-policy, photo-analysis and operator-review changes.
+- `npm test`: **50 cases, 48 passed, zero failed, two optional browser raster/EXIF checks skipped by default**. The separately enabled photo browser check passed all eight EXIF orientations; that does not cover every mobile camera/browser combination.
+- `npm run build`: passed with only the approved default Dot Lab generated. Alternative-mode availability requires explicit physical approval and a rebuild.
+- New trust-boundary coverage includes order/request-scoped replacement uploads, immutable paid originals and proof attestations, idempotent submission, concurrent/stale requests, current-source regeneration, uncommitted package cleanup, proof-hash approval and retention of interrupted intake.
+- The earlier dependency audit remains applicable to the unchanged dependency lockfile. All 35 final production trace manifests contain zero references to private `.data/` files; `git diff --check` passed. Local fixture data and test credentials remain ignored.
+
+The new guest flow was exercised through the actual UI on an isolated local adapter, with a synthetic paid-order fixture and licensed repository photographs. No payment provider or mail service was configured or called:
+
+1. The production desk displayed exact lettering, current warnings, kit contents and mark count. Editing crop blocked print approval and package download; undo restored the loaded revision.
+2. An operator requested an alternate photo. The private order page showed the request note and required photo permission before submission.
+3. A different photograph was selected through the file chooser, cropped, privately saved and rendered into a new revision. Both stored proof images loaded; approval stayed disabled until explicit consent.
+4. The operator desk showed the replacement source and kept print approval blocked until the customer approved that revision's proof hash. After customer approval, the separate physical-validation gate still rejected print approval.
+5. Stored records confirmed the original paid snapshot hash was unchanged, the replacement source differed, and exactly one revision and one matching proof approval were appended. The order stayed `awaiting-review`; an absent customer email left its notification pending rather than falsely claiming delivery.
+
+Screenshots: [replacement proof pair](replacement-proof-preview.png), [mobile approval confirmation](replacement-approval-mobile.png), [restored landscape editor](photo-advice-preview.png), [mobile photo advice](photo-advice-mobile.png). These are local test evidence, not real orders or completed kits.
+
+At 390 × 844, the editor and order proof page had no horizontal overflow; both private proof images loaded. The desktop editor restored the saved 50 × 40 cm photo and lettering, displayed retained-source advice and explicitly reported unavailable face detection. No browser console errors or warnings occurred in these checks. Removed-catalogue-option scenarios were reviewed in source but have not been exercised against a live changed database catalogue.
+
+Release HTTP checks returned 200 for home, creator, Dot Lab and studies, 404 for the three unapproved experimental labs, and 401 for the unauthenticated admin API. The experimental-route 404s emitted Next.js internal `NoFallbackError` diagnostics on the local server; the HTTP responses remained 404 and no lab content was served. The public catalogue exposed only Dots and kept live checkout disabled.
+
+## Earlier baseline checks
 
 - `npm run typecheck`: passed after final code integration.
 - `npm test`: 33 cases; 32 passed, zero failed, one optional workstation-browser raster comparison skipped by default.

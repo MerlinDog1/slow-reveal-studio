@@ -108,9 +108,9 @@ export async function putRecord<T>(
               409,
               "Paid artwork snapshots are immutable; create a revision.",
             );
-        for (const key of ["revisions", "audit"]) {
-          const existing = old[key] as unknown[];
-          const replacement = next[key] as unknown[];
+        for (const key of ["revisions", "audit", "customerProofApprovals"]) {
+          const existing = (old[key] ?? []) as unknown[];
+          const replacement = (next[key] ?? []) as unknown[];
           if (
             !Array.isArray(replacement) ||
             replacement.length < existing.length ||

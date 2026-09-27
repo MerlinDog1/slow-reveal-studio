@@ -119,6 +119,23 @@ export async function runRetention() {
   let analyticsBatchesDeleted = 0;
   let abandonedCheckoutsDeleted = 0;
   let checkoutsForManualReview = 0;
+  let interruptedReplacementsDeleted = 0;
+  for (const order of orders) {
+    if (
+      !order.replacementIntake ||
+      Date.parse(order.replacementIntake.startedAt) > Date.now() - 86400_000
+    )
+      continue;
+    // Claim removal first: an old worker can no longer commit this intake.
+    try {
+      await replaceOrder(order, { ...order, replacementIntake: undefined });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) continue;
+      throw error;
+    }
+    await removeAsset(order.replacementIntake.source);
+    interruptedReplacementsDeleted++;
+  }
   for (const upload of uploads)
     if (Date.parse(upload.expiresAt) < Date.now()) {
       await deleteUpload(upload.id);
@@ -178,5 +195,6 @@ export async function runRetention() {
     analyticsBatchesDeleted,
     abandonedCheckoutsDeleted,
     checkoutsForManualReview,
+    interruptedReplacementsDeleted,
   };
 }

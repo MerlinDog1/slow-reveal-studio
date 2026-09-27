@@ -7,9 +7,10 @@ import {
   toSvg,
   normalizeSettings,
   RENDERER_VERSION,
+  effectiveGuideWidthMm,
 } from "../renderers";
 import type { RenderSettings, RenderGeometry } from "../renderers/types";
-import { getAsset, putAsset } from "./assets";
+import { getAsset, putAsset, removeAsset, type PrivateAsset } from "./assets";
 import type { Crop, Design, Package } from "./schema";
 import { ApiError, digest } from "./security";
 
@@ -185,10 +186,14 @@ export async function createProductionPackage(
     dpi: 300,
     bleedMm: 0,
     safeMarginMm: settings.safeMarginMm,
-    guideWidthMm: settings.guideWidthMm ?? 0.15,
+    guideWidthMm: effectiveGuideWidthMm(settings),
+    guideWidthMeaning:
+      "Maximum outline width; narrower paths retain their own width.",
+    requestedGuideWidthMm: settings.guideWidthMm ?? 0.15,
     substrate: design.finishId,
     ink: design.inkId,
     productionStatus: "requires-human-review",
+    sourceWarnings: design.warnings,
     kit:
       design.mode === "line-amplification"
         ? ["canvas", "markers", "instructions", "ruler / straight edge"]
@@ -240,36 +245,47 @@ export async function createProductionPackage(
     ),
   );
   const base = `orders/${orderId}/${revisionId}`;
-  const privateSource = await putAsset(
-    `${base}/original.${originalExtension}`,
-    source,
-    design.source.mime,
-  );
-  const templateSvg = await putAsset(
-    `${base}/template.svg`,
-    Buffer.from(template),
-    "image/svg+xml",
-  );
-  const finishedSvg = await putAsset(
-    `${base}/finished.svg`,
-    Buffer.from(finished),
-    "image/svg+xml",
-  );
-  const zipped = await putAsset(
-    `${base}/${prefix}.zip`,
-    await archive.generateAsync({
-      type: "nodebuffer",
-      compression: "DEFLATE",
-      compressionOptions: { level: 4 },
-    }),
-    "application/zip",
-  );
-  return {
-    archive: zipped,
-    templateSvg,
-    finishedSvg,
-    source: privateSource,
-    manifest,
-    snapshotHash,
+  const written: PrivateAsset[] = [];
+  const write = async (key: string, bytes: Buffer, mime: string) => {
+    const asset = await putAsset(key, bytes, mime);
+    written.push(asset);
+    return asset;
   };
+  try {
+    const privateSource = await write(
+      `${base}/original.${originalExtension}`,
+      source,
+      design.source.mime,
+    );
+    const templateSvg = await write(
+      `${base}/template.svg`,
+      Buffer.from(template),
+      "image/svg+xml",
+    );
+    const finishedSvg = await write(
+      `${base}/finished.svg`,
+      Buffer.from(finished),
+      "image/svg+xml",
+    );
+    const zipped = await write(
+      `${base}/${prefix}.zip`,
+      await archive.generateAsync({
+        type: "nodebuffer",
+        compression: "DEFLATE",
+        compressionOptions: { level: 4 },
+      }),
+      "application/zip",
+    );
+    return {
+      archive: zipped,
+      templateSvg,
+      finishedSvg,
+      source: privateSource,
+      manifest,
+      snapshotHash,
+    };
+  } catch (error) {
+    await Promise.allSettled(written.map(removeAsset));
+    throw error;
+  }
 }

@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { Studio } from "@/components/studio";
+import { getAvailableModes } from "@/lib/mode-availability";
 export const dynamicParams = false;
 export function generateStaticParams() {
-  return ["dots", "mosaic", "contour", "line-amplification"].map((mode) => ({
+  return getAvailableModes().map((mode) => ({
     mode,
   }));
 }
@@ -12,11 +13,12 @@ export default async function Lab({
   params: Promise<{ mode: string }>;
 }) {
   const { mode } = await params;
-  if (!["dots", "mosaic", "contour", "line-amplification"].includes(mode))
-    notFound();
+  const availableModes = getAvailableModes();
+  if (!availableModes.some((available) => available === mode)) notFound();
   return (
     <Studio
       lab
+      availableModes={availableModes}
       initialMode={mode as "dots" | "mosaic" | "contour" | "line-amplification"}
     />
   );

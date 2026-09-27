@@ -10,20 +10,22 @@ npm run dev
 
 On the first run, copy the example environment file as above; preserve an existing `.env.local` if already configured. Open **http://127.0.0.1:3000**. The photo editor, all four labs, reference photos, local saves and prototype exports work without service credentials. Uploads in the editor stay in the browser. The review page explicitly uploads a private design only when the visitor chooses to save it.
 
+`npm run build` produces a release with Dots available by default. Alternative modes appear in production routes, the builder and private-save API only after physical approval and inclusion in `PHYSICALLY_VALIDATED_MODES`. Rebuild and redeploy after changing mode approval because lab routes are generated at build time. Search indexing settings do not grant access to experimental modes; local development continues to offer all four labs for research.
+
 ## Routes
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Studio introduction and interactive dot example |
-| `/create` | Customer photo/crop/style/colour/text/size builder |
-| `/lab/dots` | Full dot controls, presets and prototype exports |
-| `/lab/mosaic`, `/lab/contour`, `/lab/line-amplification` | Experimental physical activity modes |
-| `/basket` | Kit review, private save, canonical production proof and gated checkout |
-| `/design/:id#token=…` | Private saved design; the capability stays out of server URL query logs |
-| `/order/:id#token=…` | Verified payment and fulfilment status |
-| `/admin` | Token-protected production review and launch readiness |
-| `/studies` | Fourteen labelled digital studies and illustrative concepts |
-| `/journal`, `/privacy` | Development notes and current data handling |
+| Route                                                    | Purpose                                                                                            |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `/`                                                      | Studio introduction and interactive dot example                                                    |
+| `/create`                                                | Customer photo/crop/style/colour/text/size builder                                                 |
+| `/lab/dots`                                              | Full dot controls, presets and prototype exports                                                   |
+| `/lab/mosaic`, `/lab/contour`, `/lab/line-amplification` | Experimental physical activity modes                                                               |
+| `/basket`                                                | Kit review, private save, canonical production proof and gated checkout                            |
+| `/design/:id#token=…`                                    | Private saved design; the capability stays out of server URL query logs                            |
+| `/order/:id#token=…`                                     | Payment/fulfilment status, requested replacement-photo submission and revised-proof approval       |
+| `/admin`                                                 | Token-protected production review and launch readiness                                             |
+| `/studies`                                               | Labelled digital studies and illustrative concepts; unapproved alternative-mode studies stay local |
+| `/journal`, `/privacy`                                   | Development notes and current data handling                                                        |
 
 ## Optional local private-design and admin setup
 

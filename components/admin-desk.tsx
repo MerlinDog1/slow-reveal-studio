@@ -9,6 +9,7 @@ import {
 import { formatPrice } from "@/lib/catalog";
 import { downloadBlob } from "@/lib/export-artwork";
 import type { Order } from "@/lib/server/schema";
+import { orderReviewDetails, hasUnappliedCrop } from "@/lib/order-review";
 type Desk = {
   analytics?: {
     windowDays: number;
@@ -45,6 +46,8 @@ export function AdminDesk() {
     y: number;
     rotation: number;
   }>({ zoom: 1, x: 0, y: 0, rotation: 0 });
+  const review = selected ? orderReviewDetails(selected) : null;
+  const cropDirty = Boolean(review && hasUnappliedCrop(crop, review.crop));
   async function load() {
     setBusy(true);
     setError("");
@@ -102,6 +105,12 @@ export function AdminDesk() {
   }
   async function action(action: string, notificationId?: string) {
     if (!selected) return;
+    if (cropDirty && (action === "approve" || action === "dispatch")) {
+      setError(
+        "Create revised artwork or undo the crop changes before approving or dispatching.",
+      );
+      return;
+    }
     setBusy(true);
     setError("");
     setNotice("");
@@ -312,6 +321,19 @@ export function AdminDesk() {
                 Current revision: {selected.currentRevisionId} ·{" "}
                 {selected.reviewStatus}
               </p>
+              {review?.customerProofPending && (
+                <p className="inline-warning" role="status">
+                  The customer must approve both proofs of this revised artwork
+                  through their private order link before it can be approved for
+                  print.
+                </p>
+              )}
+              {selected.reviewStatus === "alternate-photo-requested" && (
+                <p className="inline-warning" role="status">
+                  An alternate photo is requested. Resolve that request and
+                  review the revised artwork before print approval.
+                </p>
+              )}
               <div className="admin-previews">
                 {[
                   [source, "Source photograph"],
@@ -325,12 +347,68 @@ export function AdminDesk() {
                 ))}
               </div>
               <p>
-                {selected.originalSnapshot.design.settings.widthMm} ×{" "}
-                {selected.originalSnapshot.design.settings.heightMm} mm ·{" "}
+                {review?.settings.widthMm} × {review?.settings.heightMm} mm ·{" "}
                 {selected.originalSnapshot.design.mode} ·{" "}
                 {selected.originalSnapshot.design.finishId} ·{" "}
                 {selected.originalSnapshot.design.inkId}
               </p>
+              {review && (
+                <div className="review-details">
+                  <h3>Selected kit</h3>
+                  <p>
+                    {review.kit.length
+                      ? review.kit.join(" · ")
+                      : "Check the production manifest for kit contents."}
+                  </p>
+                  {review.markCount !== undefined && (
+                    <p>
+                      {review.markCount.toLocaleString("en-GB")} marks in this
+                      revision.
+                    </p>
+                  )}
+                  {Boolean(review.settings.palette?.length) && (
+                    <p>
+                      Palette:{" "}
+                      {review.settings.palette
+                        ?.map((colour, i) => `${i + 1}: ${colour}`)
+                        .join(" · ")}
+                    </p>
+                  )}
+                  <h3>Personalised lettering</h3>
+                  {review.text ? (
+                    <>
+                      <blockquote>{review.text}</blockquote>
+                      <p>
+                        {review.settings.text?.fontFamily === "sans-serif"
+                          ? "Simple sans"
+                          : "Classic serif"}{" "}
+                        · {review.settings.text?.sizeMm ?? 7} mm requested ·{" "}
+                        {review.settings.text?.placement?.replaceAll(
+                          "-",
+                          " ",
+                        ) ?? "bottom centre"}
+                        . Check final letter size in the proof when long text is
+                        fitted.
+                      </p>
+                    </>
+                  ) : (
+                    <p>No personalised text.</p>
+                  )}
+                  <h3>Automated review advice</h3>
+                  {review.warnings.length ? (
+                    <ul>
+                      {review.warnings.map((warning) => (
+                        <li key={warning}>{warning}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>
+                      No automated warnings were recorded. Inspect the source
+                      and both proofs before approving.
+                    </p>
+                  )}
+                </div>
+              )}
               <div className="crop-inputs">
                 {["zoom", "x", "y", "rotation"].map((key) => (
                   <label className="text-field" key={key}>
@@ -351,6 +429,21 @@ export function AdminDesk() {
                   </label>
                 ))}
               </div>
+              {cropDirty && (
+                <div className="inline-warning" role="status">
+                  <p>
+                    The crop changes are not in these previews yet. Create
+                    revised artwork to apply them, then review the new proofs.
+                  </p>
+                  <button
+                    className="text-button"
+                    disabled={busy}
+                    onClick={() => review && setCrop(review.crop)}
+                  >
+                    Undo crop changes
+                  </button>
+                </div>
+              )}
               <label className="text-field">
                 Review note
                 <input
@@ -370,7 +463,14 @@ export function AdminDesk() {
               <div className="admin-actions">
                 <button
                   className="button"
-                  disabled={busy || !proofReady}
+                  disabled={
+                    busy ||
+                    !proofReady ||
+                    cropDirty ||
+                    review?.customerProofPending ||
+                    selected.reviewStatus === "alternate-photo-requested" ||
+                    selected.reviewStatus === "dispatched"
+                  }
                   onClick={() => action("approve")}
                 >
                   Approve for print
@@ -398,21 +498,25 @@ export function AdminDesk() {
                 </button>
                 <button
                   className="button light"
-                  disabled={busy || selected.reviewStatus !== "approved"}
+                  disabled={
+                    busy ||
+                    cropDirty ||
+                    review?.customerProofPending ||
+                    selected.reviewStatus !== "approved"
+                  }
                   onClick={() => action("dispatch")}
                 >
                   Mark dispatched
                 </button>
                 <button
                   className="button light"
-                  disabled={busy}
+                  disabled={busy || cropDirty}
                   onClick={download}
                 >
                   <ArrowDownToLine size={15} />
                   Production package
                 </button>
               </div>
-              <h3>Review history</h3>
               {Boolean(selected.notifications?.length) && (
                 <div className="prose-card">
                   <h3>Customer emails</h3>
@@ -438,6 +542,7 @@ export function AdminDesk() {
                   ))}
                 </div>
               )}
+              <h3>Review history</h3>
               {selected.audit.map((a, i) => (
                 <p className="fine-print" key={i}>
                   {new Date(a.at).toLocaleString("en-GB")} · {a.action} ·{" "}

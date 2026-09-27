@@ -11,11 +11,13 @@ import {
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { HeroArtwork } from "@/components/hero-artwork";
 import { trustedPublicOrigin } from "@/lib/public-origin";
+import { getAvailableModes } from "@/lib/mode-availability";
 
 export const metadata = {
   alternates: trustedPublicOrigin() ? { canonical: "/" } : undefined,
 };
 export default function Home() {
+  const availableModes = getAvailableModes();
   return (
     <>
       <SiteHeader />
@@ -140,21 +142,31 @@ export default function Home() {
               Step inside the dot lab
               <ArrowRight size={17} />
             </Link>
-            <div className="mode-links">
-              <Link href="/lab/mosaic">
-                Mosaic studies <ArrowUpRight size={14} />
-              </Link>
-              <Link href="/lab/contour">
-                Contour studies <ArrowUpRight size={14} />
-              </Link>
-              <Link href="/lab/line-amplification">
-                Line studies <ArrowUpRight size={14} />
-              </Link>
-            </div>
-            <p className="fine-print">
-              Alternative modes are experiments until physical making tests are
-              complete.
-            </p>
+            {availableModes.length > 1 && (
+              <div className="mode-links">
+                {availableModes.includes("mosaic") && (
+                  <Link href="/lab/mosaic">
+                    Mosaic studies <ArrowUpRight size={14} />
+                  </Link>
+                )}
+                {availableModes.includes("contour") && (
+                  <Link href="/lab/contour">
+                    Contour studies <ArrowUpRight size={14} />
+                  </Link>
+                )}
+                {availableModes.includes("line-amplification") && (
+                  <Link href="/lab/line-amplification">
+                    Line studies <ArrowUpRight size={14} />
+                  </Link>
+                )}
+              </div>
+            )}
+            {process.env.NODE_ENV === "development" && (
+              <p className="fine-print">
+                Alternative modes are experiments until physical making tests
+                are complete.
+              </p>
+            )}
           </div>
         </section>
         <section className="kit-section section">

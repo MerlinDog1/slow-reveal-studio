@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import marketing from "@/public/marketing/manifest.json";
+import { getAvailableModes } from "@/lib/mode-availability";
 
 export const metadata = {
   title: "Studies in making",
@@ -81,6 +82,14 @@ const studies = [
   ],
 ];
 export default function Studies() {
+  const availableModes = getAvailableModes();
+  const visibleStudies = studies.filter(([file]) => {
+    if (file.startsWith("mosaic-")) return availableModes.includes("mosaic");
+    if (file.startsWith("contour-")) return availableModes.includes("contour");
+    if (file.startsWith("lines-"))
+      return availableModes.includes("line-amplification");
+    return true;
+  });
   return (
     <>
       <SiteHeader />
@@ -94,7 +103,7 @@ export default function Studies() {
           or customer results.
         </p>
         <div className="studies-grid">
-          {studies.map(([file, title, caption]) => {
+          {visibleStudies.map(([file, title, caption]) => {
             const asset = marketing.assets.find(
               (item) => item.file === `/marketing/${file}`,
             );

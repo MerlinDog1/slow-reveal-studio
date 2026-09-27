@@ -21,6 +21,18 @@ SVG width and height carry `mm` units and the viewBox uses the same physical coo
 
 The proposed minimums, gaps and guide settings are engineering defaults, **not material-tested production limits**. Easy, Standard and Detailed change physical workload. Completion estimates use provisional per-mark and filled-area constants and are not customer promises.
 
+### Effective guide width
+
+The serializer uses `min(requested guideWidthMm (default 0.15), minDiameterMm / 2)` for the base guide width. The production manifest records that clamped value as `guideWidthMm` and retains the original request as `requestedGuideWidthMm`. Circle/cell outlines use the base value; path guides use `min(path.width, base guide width)` and can therefore be narrower. The manifest value is a base/maximum guide width, not a guarantee of uniform stroke width throughout every mode. For example, a requested 0.5 mm guide with a 0.5 mm minimum dot diameter yields a 0.25 mm outline. Opacity and width still require an actual printed proof.
+
+## Local photo advice and orientation
+
+`lib/photo-analysis.ts` provides advisory statistics from the current crop, capped at a 256-pixel long edge. The editor recalculates after crop, canvas size and safe-margin changes. Advice covers retained source pixels and approximate PPI at the selected physical size, exposure, tonal range, sparse detail/possible softness, fine detail near the image edges and strongly contrasting regions. A 16×16 contrast grid can suggest that a small or edge-touching region deserves inspection, but it does not identify the subject, remove a background or perform semantic segmentation. The language remains conditional and the customer can continue after checking the previews.
+
+Where the browser supplies its native `FaceDetector`, an optional local check records normalized possible-face boxes transiently and maps them through the same crop/rotation transform. It can offer advice about small, trimmed or multiple possible faces. The request is bounded to twelve detections and a 1.4-second timeout; unavailable, failed and timed-out states are explicit. An unavailable detector reports an unknown count, not zero. No detector model is downloaded, no image/boxes are sent to a remote service, and no identity or recognition result is produced. This is not a robust or universal face-count guarantee; false positives and missed faces remain possible, and API availability depends on the browser/OS configuration.
+
+`lib/image-processing.ts` uses the modern browser decoder's EXIF-oriented dimensions and does not apply a second EXIF rotation. The server calls Sharp `autoOrient()` before applying the user's quarter-turn rotation. Both use the same cover/zoom/pan convention, with browser/server resampling differences still resolved by the final accepted server proof. HEIC conversion is not implemented. `tests/photo-analysis.test.ts` includes bounded-statistics/crop/detector-failure cases and an opt-in eight-orientation browser fixture: `$env:PHOTO_BROWSER_QA='1'; node --import tsx --test tests/photo-analysis.test.ts` (PowerShell, installed Edge required). Test existence is not evidence of every real device/decoder combination; final executed results belong in BUILD_STATUS/VERIFICATION.
+
 ## Other modes
 
 **Mosaic:** square, rounded or hexagonal cells; monochrome area modulation or 2–8 supplied marker colours. Palette mapping picks the nearest weighted RGB colour, with unmarked white as a paper tone. Numbers on the template identify supplied colours; a separate key is required in the kit. This does not simulate pigment mixing, marker opacity or ink colour management.
@@ -29,7 +41,7 @@ The proposed minimums, gaps and guide settings are engineering defaults, **not m
 
 **Line Amplification:** horizontal, quantized-thickness strips. The template outlines the regions to fill using a ruler. Every kit requires a ruler or straight edge. Physical usability remains untested.
 
-Alternative modes remain experimental until hand-completed prototypes pass review.
+Alternative modes remain experimental until hand-completed prototypes pass review. Local development exposes all four labs. In production, `getAvailableModes()` exposes Signature Dots by default and permits another mode only when `PHYSICAL_VALIDATION_APPROVED=true` and that mode is explicitly listed in `PHYSICALLY_VALIDATED_MODES`. Public mode choices, catalogue/API availability and links use this policy. Lab routes use `generateStaticParams` with `dynamicParams=false`, so changing the approved list requires a rebuild/redeployment. These flags are operator assertions; setting them does not supply the missing physical evidence or independently open live checkout.
 
 ## Personalisation
 
@@ -56,5 +68,5 @@ Visual review found a recognisable subject/scene in all eight default renderings
 1. Print and hand-complete real UV/canvas/marker samples, calibrate minimum sizes, guide contrast, ink adhesion, smudging, fatigue and completion time.
 2. Confirm eight representative results with human likeness and activity-quality scoring, including accessibility and mobile viewing.
 3. Approve printer-specific bleed, white ink, ICC/colour handling and registration marks, and proof the outlined lettering on real material before claiming production readiness.
-4. Add semantic photo suitability/subject analysis only after evaluation; current warnings cover source size, exposure and tonal range and must not imply face detection.
+4. Evaluate the local crop/statistical advice and optional browser detector across representative photos and devices. Semantic subject/background segmentation, robust universal face counting and dependable likeness prediction remain absent; the current contrast-region heuristic and possible-face advice must not be presented as those capabilities.
 5. Preserve paid geometry snapshots and renderer versions. A crop, preset or algorithm change creates a new revision for review rather than mutating an approved job.

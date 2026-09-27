@@ -21,7 +21,7 @@ import {
 import { FONT_OUTLINE_VERSION, measureLettering } from "./fonts";
 
 export * from "./types";
-export { toSvg } from "./svg";
+export { toSvg, effectiveGuideWidthMm } from "./svg";
 export {
   FONT_OUTLINE_VERSION,
   SUPPORTED_TEXT_CHARACTERS,

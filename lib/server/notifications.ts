@@ -20,7 +20,7 @@ export function newNotification(
   return {
     id: randomUUID(),
     type,
-    templateVersion: 1,
+    templateVersion: 2,
     createdAt: new Date().toISOString(),
     status: "pending",
     attempts: 0,
@@ -63,7 +63,10 @@ export function notificationMessage(
     };
   return {
     subject: "A photo review for your Slow Reveal order",
-    text: `Order ${number}\nWe need an alternate photo before printing. Please reply to the studio to arrange a private replacement upload.\n${notification.note || ""}\n\nYour private order status: ${link}`,
+    text:
+      notification.templateVersion === 1
+        ? `Order ${number}\nWe need an alternate photo before printing. Please reply to the studio to arrange a private replacement upload.\n${notification.note || ""}\n\nYour private order status: ${link}`
+        : `Order ${number}\nWe need an alternate photo before printing. Open your private order page below to upload it securely. Your original artwork is preserved. Review and approve both views of the replacement proof there; the studio will then review it before printing.\n${notification.note || ""}\n\nUpload your alternate photo and review its proof: ${link}\nKeep this link private: it grants access to your order.`,
     idempotencyKey: `notification-${notification.id}`,
   };
 }

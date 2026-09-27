@@ -51,6 +51,17 @@ export const settingsSchema = z.object({
     .optional(),
   cellShape: z.enum(["square", "rounded", "hexagon"]).optional(),
 });
+export const sourceInputSchema = z.union([
+  z
+    .object({
+      dataUrl: z.string().max(12 * 1024 * 1024),
+      name: z.string().max(180).optional(),
+    })
+    .strict(),
+  z
+    .object({ uploadId: z.string().uuid(), token: z.string().min(32).max(256) })
+    .strict(),
+]);
 export const designSchema = z
   .object({
     mode: z.enum(["dots", "mosaic", "contour", "line-amplification"]),
@@ -59,20 +70,7 @@ export const designSchema = z
     inkId: z.string().max(40),
     crop: cropSchema,
     settings: settingsSchema,
-    source: z.union([
-      z
-        .object({
-          dataUrl: z.string().max(12 * 1024 * 1024),
-          name: z.string().max(180).optional(),
-        })
-        .strict(),
-      z
-        .object({
-          uploadId: z.string().uuid(),
-          token: z.string().min(32).max(256),
-        })
-        .strict(),
-    ]),
+    source: sourceInputSchema,
     rightsConfirmed: z.literal(true),
     marketingConsent: z.boolean().default(false),
     email: z.string().email().max(254).optional(),
@@ -124,6 +122,11 @@ export type Revision = {
   settings: RenderSettings;
   crop: Crop;
   note: string;
+  origin?: "customer-replacement" | "admin-regeneration";
+  submissionId?: string;
+  replacementRequestId?: string;
+  replacementInputHash?: string;
+  customerProofRequired?: boolean;
 };
 export type Order = {
   id: string;
@@ -151,12 +154,34 @@ export type Order = {
   confirmationSent?: boolean;
   dataDeletedAt?: string;
   notifications?: OrderNotification[];
+  photoRequest?: {
+    id: string;
+    revisionId: string;
+    requestedAt: string;
+    note: string;
+    submittedRevisionId?: string;
+    fulfilledAt?: string;
+  };
+  replacementIntake?: {
+    submissionId: string;
+    requestId: string;
+    baseRevisionId: string;
+    inputHash: string;
+    leaseId: string;
+    startedAt: string;
+    source: PrivateAsset;
+  };
+  customerProofApprovals?: {
+    revisionId: string;
+    snapshotHash: string;
+    approvedAt: string;
+  }[];
 };
 
 export type OrderNotification = {
   id: string;
   type: "confirmation" | "dispatch" | "request-photo";
-  templateVersion: 1;
+  templateVersion: 1 | 2;
   createdAt: string;
   status: "pending" | "sending" | "sent";
   attempts: number;

@@ -8,7 +8,7 @@ import {
   deleteLocalProject,
   type LocalProject,
 } from "@/lib/browser-storage";
-import { PRODUCTS, FINISHES, INKS, SHIPPING, formatPrice } from "@/lib/catalog";
+import { INKS, formatPrice, type Product, type Finish } from "@/lib/catalog";
 import { loadImage, cropImage } from "@/lib/image-processing";
 import {
   track,
@@ -16,7 +16,12 @@ import {
   markAnalyticsJourneyComplete,
   flushAnalytics,
 } from "@/lib/analytics";
-import { renderImage, toSvg, type RenderSettings } from "@/lib/renderers";
+import {
+  renderImage,
+  toSvg,
+  type RenderSettings,
+  type RenderMode,
+} from "@/lib/renderers";
 type SavedDesign = { id: string; token: string; url: string };
 function asDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -48,10 +53,12 @@ export function Basket() {
   const [rights, setRights] = useState(false);
   const [inkId, setInkId] = useState<string>("black");
   const [catalog, setCatalog] = useState<{
-    products: (typeof PRODUCTS)[number][];
-    finishes: (typeof FINISHES)[number][];
-    shipping: (typeof SHIPPING)[number][];
+    products: Product[];
+    finishes: Finish[];
+    shipping: { id: string; label: string; pricePence: number }[];
+    availableModes: RenderMode[];
   } | null>(null);
+  const [catalogError, setCatalogError] = useState("");
   useEffect(() => {
     getLocalProject("basket")
       .then(async (p) => {
@@ -93,13 +100,34 @@ export function Basket() {
       )
       .finally(() => setLoading(false));
     fetch("/api/catalog")
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (!r.ok)
+          throw new Error(
+            "The current catalogue could not be loaded. Please reload before saving or checking out.",
+          );
+        const c = await r.json();
+        if (
+          !Array.isArray(c.products) ||
+          !Array.isArray(c.finishes) ||
+          !Array.isArray(c.shipping) ||
+          !Array.isArray(c.availableModes)
+        )
+          throw new Error(
+            "The current catalogue is unavailable. Please reload before continuing.",
+          );
+        return c;
+      })
       .then((c) => {
         setReady(c.liveCheckoutEnabled === true);
         setDirectUploads(c.directUploads === true);
         setCatalog(c);
+        if (!c.shipping.some((item: { id: string }) => item.id === "standard"))
+          setShippingId(c.shipping[0]?.id ?? "");
       })
-      .catch(() => setReady(false));
+      .catch((e) => {
+        setReady(false);
+        setCatalogError(e.message);
+      });
   }, []);
   useEffect(() => {
     if (!design) return;
@@ -146,21 +174,37 @@ export function Basket() {
       if (url) URL.revokeObjectURL(url);
     };
   }, [design, proofView]);
-  const product = (catalog?.products ?? PRODUCTS).find(
-    (p) => p.id === project?.productId,
+  const product = catalog?.products.find((p) => p.id === project?.productId);
+  const finish = catalog?.finishes.find((f) => f.id === project?.finishId);
+  const shipping = catalog?.shipping.find((s) => s.id === shippingId);
+  const selectedSettings = project?.settings as RenderSettings | undefined;
+  const dimensionsMatch = Boolean(
+    product &&
+    selectedSettings &&
+    ((selectedSettings.widthMm === product.widthMm &&
+      selectedSettings.heightMm === product.heightMm) ||
+      (selectedSettings.widthMm === product.heightMm &&
+        selectedSettings.heightMm === product.widthMm)),
   );
-  const finish = (catalog?.finishes ?? FINISHES).find(
-    (f) => f.id === project?.finishId,
+  const selectionAvailable = Boolean(
+    product &&
+    finish &&
+    shipping &&
+    dimensionsMatch &&
+    selectedSettings &&
+    catalog?.availableModes.includes(selectedSettings.mode),
   );
-  const shipping =
-    (catalog?.shipping ?? SHIPPING).find((s) => s.id === shippingId) ??
-    SHIPPING[0];
-  const total =
-    (product?.pricePence ?? 0) +
-    (finish?.additionalPence ?? 0) +
-    shipping.pricePence;
+  const total = selectionAvailable
+    ? product!.pricePence + finish!.additionalPence + shipping!.pricePence
+    : null;
   async function savePrivate() {
     if (!project) return null;
+    if (!selectionAvailable) {
+      setError(
+        "Choose a currently available size, finish and artwork mode in the studio before saving for checkout.",
+      );
+      return null;
+    }
     if (!rights) {
       setError(
         "Please confirm you have permission to use this photograph before saving it online.",
@@ -243,7 +287,8 @@ export function Basket() {
       !proofApproved ||
       !proofLoaded ||
       proofViews.length < 2 ||
-      !proofHash
+      !proofHash ||
+      !selectionAvailable
     ) {
       setError(
         "Save your design and review its final production proof before checkout.",
@@ -340,11 +385,13 @@ export function Basket() {
             · {(project.settings as RenderSettings).widthMm / 10} ×{" "}
             {(project.settings as RenderSettings).heightMm / 10} cm
           </span>
-          <span>{formatPrice(product?.pricePence ?? 0)}</span>
+          <span>
+            {product ? formatPrice(product.pricePence) : "Price unavailable"}
+          </span>
         </div>
         <div className="summary-row">
-          <span>{finish?.label}</span>
-          <span>{formatPrice(finish?.additionalPence ?? 0)}</span>
+          <span>{finish?.label ?? "Finish unavailable"}</span>
+          <span>{finish ? formatPrice(finish.additionalPence) : "—"}</span>
         </div>
         <div className="summary-row">
           <span>Marker colour</span>
@@ -356,7 +403,7 @@ export function Basket() {
             value={shippingId}
             onChange={(e) => setShippingId(e.target.value)}
           >
-            {(catalog?.shipping ?? SHIPPING).map((s) => (
+            {(catalog?.shipping ?? []).map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label} · {formatPrice(s.pricePence)}
               </option>
@@ -365,8 +412,20 @@ export function Basket() {
         </label>
         <div className="summary-row total">
           <span>{ready ? "Total" : "Indicative total"}</span>
-          <span>{formatPrice(total)}</span>
+          <span>{total === null ? "Unavailable" : formatPrice(total)}</span>
         </div>
+        {!catalog && (
+          <p role="status" className="inline-warning">
+            {catalogError || "Checking the current catalogue…"}
+          </p>
+        )}
+        {catalog && !selectionAvailable && (
+          <p className="inline-warning" role="alert">
+            This design’s size, finish or mode is no longer available, or its
+            physical size has changed. Return to the studio to choose an
+            available option and review the updated artwork.
+          </p>
+        )}
         {!ready && (
           <div className="inline-warning" style={{ marginTop: 20 }}>
             The studio is in physical prototyping. Explore and save your design
@@ -394,6 +453,7 @@ export function Basket() {
             disabled={
               busy ||
               reference ||
+              !selectionAvailable ||
               !proofApproved ||
               !proofLoaded ||
               proofViews.length < 2
@@ -407,7 +467,7 @@ export function Basket() {
         ) : (
           <button
             className="button full"
-            disabled={busy || !!design}
+            disabled={busy || !!design || !selectionAvailable}
             onClick={savePrivate}
           >
             {busy ? (

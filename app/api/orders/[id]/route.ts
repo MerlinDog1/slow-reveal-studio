@@ -1,5 +1,6 @@
 import { type Checkout, type Order } from "@/lib/server/schema";
 import { getRecord } from "@/lib/server/store";
+import { orderArtworkStatus } from "@/lib/server/orders";
 import {
   ApiError,
   api,
@@ -29,6 +30,7 @@ export async function GET(
             mode: order.originalSnapshot.design.mode,
             productId: order.originalSnapshot.design.productId,
             tracking: order.tracking,
+            ...orderArtworkStatus(order),
           }
         : { id, paymentStatus: "pending", reviewStatus: "awaiting-payment" },
     );

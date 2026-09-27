@@ -5,6 +5,7 @@ import {
   FONT_OUTLINE_VERSION,
   MAX_MARKS,
   PRESETS,
+  effectiveGuideWidthMm,
   measureLettering,
   normalizeSettings,
   outlineLettering,
@@ -124,6 +125,38 @@ test("white and transparent source pixels do not become ink", () => {
     assert.equal(g.stats.markCount, 0);
     assert.equal(g.stats.estimatedCompletionMinutes, 0);
   }
+});
+
+test("shared effective guide width matches SVG outlines and preserves narrower paths", () => {
+  const s = settings({ minDiameterMm: 0.3, guideWidthMm: 0.5 });
+  assert.equal(effectiveGuideWidthMm(s), 0.15);
+  assert.equal(effectiveGuideWidthMm({ minDiameterMm: 0.9 }), 0.15);
+  assert.equal(effectiveGuideWidthMm(settings({ guideWidthMm: 0.08 })), 0.08);
+  const geometry = renderImage(image(), s);
+  geometry.paths = [
+    {
+      points: [
+        { x: 20, y: 20 },
+        { x: 30, y: 20 },
+      ],
+      width: 0.06,
+    },
+    {
+      points: [
+        { x: 20, y: 30 },
+        { x: 30, y: 30 },
+      ],
+      width: 0.4,
+    },
+  ];
+  const template = toSvg(geometry, "template");
+  assert.match(template, /<g[^>]*stroke-width="0\.15"/);
+  assert.match(template, /d="M20 20 L30 20"[^>]*stroke-width="0\.06"/);
+  assert.match(template, /d="M20 30 L30 30"[^>]*stroke-width="0\.15"/);
+  assert.match(
+    toSvg(geometry, "finished"),
+    /d="M20 30 L30 30"[^>]*stroke-width="0\.4"/,
+  );
 });
 
 test("physical mark lattice is independent of analysis resolution", () => {

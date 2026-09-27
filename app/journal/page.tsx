@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { getAvailableModes } from "@/lib/mode-availability";
 export const metadata = { title: "Field notes" };
 export default function Journal() {
+  const alternative = getAvailableModes().find((mode) => mode !== "dots");
   return (
     <>
       <SiteHeader />
@@ -41,7 +43,11 @@ export default function Journal() {
             experiments. Each needs a clear, enjoyable physical action before it
             earns a place beside Signature Dots.
           </p>
-          <Link href="/lab/mosaic">Explore the experimental labs</Link>
+          {alternative && (
+            <Link href={`/lab/${alternative}`}>
+              Explore the experimental labs
+            </Link>
+          )}
         </article>
       </main>
       <SiteFooter />

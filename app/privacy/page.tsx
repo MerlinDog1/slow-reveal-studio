@@ -16,6 +16,13 @@ export default function Privacy() {
             reopen them. Remove saved designs from the studio when you finish on
             a shared device.
           </p>
+          <p>
+            Photo and crop advice is calculated on this device. Where your
+            browser supports it, a local face detector can suggest faces to
+            check; it does not identify people. These checks and face locations
+            are not saved or sent to analytics. You can continue when detection
+            is unavailable or the advice does not suit your photograph.
+          </p>
           <h2>When you save a private design</h2>
           <p>
             Choosing “Save a private design” on the review page uploads your
@@ -25,6 +32,14 @@ export default function Privacy() {
             expired designs are unavailable. An administrator cleanup action
             removes unattached expired files; automated scheduling must be
             configured before launch.
+          </p>
+          <h2>If the studio requests another photo</h2>
+          <p>
+            Your private order page lets you upload a replacement only after the
+            studio requests one. Saving it uploads the photo and creates a new
+            private artwork revision. The original paid artwork remains in the
+            order record. You review the new finished artwork and printed guide
+            before the studio can approve that revision for printing.
           </p>
           <h2>Deleting a design</h2>
           <p>

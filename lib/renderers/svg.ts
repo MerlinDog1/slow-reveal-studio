@@ -2,9 +2,17 @@ import {
   normalizeSettings,
   round,
   type RenderGeometry,
+  type RenderSettings,
   type SvgOptions,
 } from "./types";
 import { measureLettering, outlineLettering } from "./fonts";
+
+/** Maximum template outline width for validated settings; narrower paths keep their own width. */
+export function effectiveGuideWidthMm(
+  settings: Pick<RenderSettings, "guideWidthMm" | "minDiameterMm">,
+): number {
+  return Math.min(settings.guideWidthMm ?? 0.15, settings.minDiameterMm / 2);
+}
 
 export function escapeXml(value: string): string {
   return value
@@ -55,7 +63,7 @@ export function toSvg(
   const ink = color(s.inkColor);
   const width = n(geometry.widthMm),
     height = n(geometry.heightMm);
-  const guideWidth = Math.min(s.guideWidthMm ?? 0.15, s.minDiameterMm / 2);
+  const guideWidth = effectiveGuideWidthMm(s);
   const paper =
     typeof options.background === "string"
       ? color(options.background)

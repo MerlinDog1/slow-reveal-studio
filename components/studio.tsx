@@ -42,17 +42,23 @@ import {
   PRODUCTS,
   FINISHES,
   INKS,
+  formatPrice,
   type Product,
   type Finish,
 } from "@/lib/catalog";
 import { REFERENCE_IMAGES } from "@/lib/reference-images";
 import {
   DEFAULT_CROP,
-  analyseImage,
   cropImage,
   loadImage,
   type Crop,
 } from "@/lib/image-processing";
+import {
+  analysePhoto,
+  detectLocalFaces,
+  type PhotoAnalysis,
+  type FaceDetectionResult,
+} from "@/lib/photo-analysis";
 import {
   getLocalProject,
   saveLocalProject,
@@ -87,13 +93,7 @@ const PRESET_NAMES = {
   bold: "Bold",
   portrait: "Fine portrait",
 };
-function money(pence: number) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(pence / 100);
-}
+const DEFAULT_AVAILABLE_MODES: RenderMode[] = ["dots"];
 function Range({
   label,
   value,
@@ -136,13 +136,18 @@ function Range({
 export function Studio({
   lab = false,
   initialMode = "dots",
+  availableModes = DEFAULT_AVAILABLE_MODES,
 }: {
   lab?: boolean;
   initialMode?: RenderMode;
+  availableModes?: RenderMode[];
 }) {
+  const modeOptions = MODES.filter((mode) => availableModes.includes(mode.id));
   const [settings, setSettings] = useState<RenderSettings>({
     ...DEFAULT_SETTINGS,
-    mode: initialMode,
+    mode: availableModes.includes(initialMode)
+      ? initialMode
+      : (modeOptions[0]?.id ?? "dots"),
   });
   const [preset, setPreset] = useState("standard");
   const [crop, setCrop] = useState<Crop>(DEFAULT_CROP);
@@ -154,7 +159,13 @@ export function Studio({
   const [geometry, setGeometry] = useState<RenderGeometry | null>(null);
   const [rendering, setRendering] = useState(false);
   const [renderMs, setRenderMs] = useState(0);
-  const [notes, setNotes] = useState<string[]>([]);
+  const [photoAnalysis, setPhotoAnalysis] = useState<PhotoAnalysis | null>(
+    null,
+  );
+  const [faceDetection, setFaceDetection] = useState<FaceDetectionResult>({
+    status: "unavailable",
+    boxes: [],
+  });
   const [view, setView] = useState<View>("finished");
   const [compare, setCompare] = useState(50);
   const [zoomPreview, setZoomPreview] = useState(false);
@@ -183,12 +194,15 @@ export function Studio({
   const renderId = useRef(0);
   const startTime = useRef(0);
   const sourceUrl = useRef<string | null>(null);
+  const sourceImage = useRef<HTMLImageElement | null>(null);
+  const sourceRequest = useRef(0);
   const [catalogue, setCatalogue] = useState<{
     products: Product[];
     finishes: Finish[];
   } | null>(null);
-  const products = catalogue?.products ?? PRODUCTS;
-  const finishes = catalogue?.finishes ?? FINISHES;
+  const products = catalogue ? catalogue.products : PRODUCTS;
+  const finishes = catalogue ? catalogue.finishes : FINISHES;
+  const modeAvailable = availableModes.includes(settings.mode);
   useEffect(() => {
     fetch("/api/catalog")
       .then((r) => {
@@ -201,7 +215,23 @@ export function Studio({
   }, [initialMode, lab]);
   useEffect(() => {
     if (!catalogue) return;
-    const current = catalogue.products.find((p) => p.id === productId);
+    const current =
+      catalogue.products.find((p) => p.id === productId) ??
+      catalogue.products[0];
+    if (current && current.id !== productId) {
+      setProductId(current.id);
+      setSaved(false);
+      setNotice(
+        "The previous canvas size is unavailable. The first available size is selected for your review.",
+      );
+    }
+    if (
+      !catalogue.finishes.some((finish) => finish.id === finishId) &&
+      catalogue.finishes[0]
+    ) {
+      setFinishId(catalogue.finishes[0].id);
+      setSaved(false);
+    }
     if (!current) return;
     setSettings((s) => {
       const landscape = s.widthMm > s.heightMm;
@@ -215,15 +245,15 @@ export function Studio({
         ? s
         : { ...s, widthMm, heightMm };
     });
-  }, [catalogue, productId]);
+  }, [catalogue, productId, finishId]);
   useEffect(() => {
     if (view === "template")
       track("template_viewed", { mode: settings.mode, productId });
     if (view === "finished")
       track("finished_preview_viewed", { mode: settings.mode, productId });
   }, [view, settings.mode, productId]);
-  const product = products.find((p) => p.id === productId) ?? PRODUCTS[0];
-  const finish = finishes.find((f) => f.id === finishId) ?? FINISHES[0];
+  const product = products.find((p) => p.id === productId);
+  const finish = finishes.find((f) => f.id === finishId);
   const update = useCallback((patch: Partial<RenderSettings>) => {
     setSettings((s) => ({ ...s, ...patch }));
     setSaved(false);
@@ -263,9 +293,11 @@ export function Studio({
   }, []);
   const openBlob = useCallback(
     async (blob: Blob, name: string, refId: string | null = null) => {
+      const request = ++sourceRequest.current;
       const url = URL.createObjectURL(blob);
+      let image: HTMLImageElement;
       try {
-        const image = await loadImage(url);
+        image = await loadImage(url);
         if (image.naturalWidth * image.naturalHeight > 40_000_000)
           throw new Error(
             "Please resize this photograph to 40 megapixels or less.",
@@ -274,8 +306,15 @@ export function Studio({
         URL.revokeObjectURL(url);
         throw e;
       }
+      if (request !== sourceRequest.current) {
+        URL.revokeObjectURL(url);
+        return;
+      }
       if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
       sourceUrl.current = url;
+      sourceImage.current = image;
+      setPhotoAnalysis(null);
+      setFaceDetection({ status: "checking", boxes: [] });
       setSource(url);
       setSourceBlob(blob);
       setSourceName(name);
@@ -284,6 +323,29 @@ export function Studio({
       setSaved(false);
       setError("");
       setRights(false);
+      const faceCanvas = document.createElement("canvas");
+      const faceScale = Math.min(
+        1,
+        512 / Math.max(image.naturalWidth, image.naturalHeight),
+      );
+      faceCanvas.width = Math.max(
+        1,
+        Math.round(image.naturalWidth * faceScale),
+      );
+      faceCanvas.height = Math.max(
+        1,
+        Math.round(image.naturalHeight * faceScale),
+      );
+      faceCanvas
+        .getContext("2d")!
+        .drawImage(image, 0, 0, faceCanvas.width, faceCanvas.height);
+      void detectLocalFaces(
+        faceCanvas,
+        faceCanvas.width,
+        faceCanvas.height,
+      ).then((result) => {
+        if (request === sourceRequest.current) setFaceDetection(result);
+      });
     },
     [],
   );
@@ -310,6 +372,7 @@ export function Studio({
       void restore();
     else if (REFERENCE_IMAGES[0]) void loadReference(REFERENCE_IMAGES[0].id);
     return () => {
+      sourceRequest.current++;
       if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
     };
   }, [loadReference]);
@@ -321,14 +384,21 @@ export function Studio({
     return () => window.removeEventListener("keydown", escape);
   }, []);
   useEffect(() => {
-    if (!source) return;
+    if (!source || !modeAvailable) {
+      setGeometry(null);
+      setRendering(false);
+      return;
+    }
     let stopped = false;
     setRendering(true);
     setGeometry(null);
     const id = ++renderId.current;
     const timer = setTimeout(async () => {
       try {
-        const image = await loadImage(source);
+        const image =
+          sourceImage.current?.src === source
+            ? sourceImage.current
+            : await loadImage(source);
         if (stopped) return;
         const { canvas, pixels } = cropImage(
           image,
@@ -336,7 +406,6 @@ export function Studio({
           settings.widthMm / settings.heightMm,
         );
         setCroppedUrl(canvas.toDataURL("image/jpeg", 0.85));
-        setNotes(analyseImage(pixels, image.naturalWidth, image.naturalHeight));
         startTime.current = performance.now();
         const input = {
           data: pixels.data,
@@ -362,7 +431,50 @@ export function Studio({
       stopped = true;
       clearTimeout(timer);
     };
-  }, [source, crop, settings]);
+  }, [source, crop, settings, modeAvailable]);
+  useEffect(() => {
+    if (!source) return;
+    let stopped = false;
+    // Separate debounce and capped raster keep advice off the rendering worker's critical path.
+    const timer = setTimeout(async () => {
+      try {
+        const image =
+          sourceImage.current?.src === source
+            ? sourceImage.current
+            : await loadImage(source);
+        if (stopped) return;
+        const { pixels } = cropImage(
+          image,
+          crop,
+          settings.widthMm / settings.heightMm,
+          256,
+        );
+        const analysis = analysePhoto(pixels, {
+          sourceWidth: image.naturalWidth,
+          sourceHeight: image.naturalHeight,
+          crop,
+          widthMm: settings.widthMm,
+          heightMm: settings.heightMm,
+          safeMarginMm: settings.safeMarginMm,
+          faces: faceDetection,
+        });
+        if (!stopped) setPhotoAnalysis(analysis);
+      } catch {
+        if (!stopped) setPhotoAnalysis(null);
+      }
+    }, 260);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, [
+    source,
+    crop,
+    settings.widthMm,
+    settings.heightMm,
+    settings.safeMarginMm,
+    faceDetection,
+  ]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 5000);
@@ -421,6 +533,12 @@ export function Studio({
       const project = await getLocalProject();
       if (!project) {
         setNotice("No saved design on this device yet.");
+        return;
+      }
+      if (!availableModes.includes((project.settings as RenderSettings).mode)) {
+        setError(
+          "That saved design uses a mode which is currently unavailable here. Your saved project is unchanged. Choose an available mode and upload or select a photo to start a new design.",
+        );
         return;
       }
       await openBlob(project.image, project.name, project.referenceId ?? null);
@@ -489,6 +607,12 @@ export function Studio({
     setNotice("Preset saved on this device.");
   }
   async function reviewKit() {
+    if (!modeAvailable || !product || !finish) {
+      setError(
+        "Choose an available style, size and finish before reviewing your kit.",
+      );
+      return;
+    }
     if (!sourceBlob || !geometry) return;
     if (!rights && !referenceId) {
       setError("Please confirm you have permission to use this photograph.");
@@ -925,10 +1049,68 @@ export function Studio({
               <div className="photo-advice">
                 <Sparkles size={18} />
                 <div>
-                  <strong>A second pair of eyes</strong>
-                  {notes.map((n) => (
-                    <p key={n}>{n}</p>
-                  ))}
+                  <strong>Photo and crop check</strong>
+                  {photoAnalysis ? (
+                    <>
+                      {photoAnalysis.advice.slice(0, 3).map((advice) => (
+                        <p key={advice.id}>{advice.message}</p>
+                      ))}
+                      <details>
+                        <summary
+                          style={{
+                            cursor: "pointer",
+                            fontSize: 11,
+                            marginTop: 10,
+                          }}
+                        >
+                          More about this check
+                        </summary>
+                        {photoAnalysis.advice.slice(3).map((advice) => (
+                          <p key={advice.id}>{advice.message}</p>
+                        ))}
+                        <p>
+                          Retained source:{" "}
+                          {photoAnalysis.metrics.retainedWidthPixels} ×{" "}
+                          {photoAnalysis.metrics.retainedHeightPixels} pixels ·
+                          about{" "}
+                          {Math.round(
+                            photoAnalysis.metrics.retainedSourceFraction * 100,
+                          )}
+                          % of the original area.
+                        </p>
+                        <p>
+                          {photoAnalysis.faces.status === "available"
+                            ? photoAnalysis.faces.detectedCount
+                              ? `The browser found ${photoAnalysis.faces.detectedCount} possible face${photoAnalysis.faces.detectedCount === 1 ? "" : "s"} in the source. This detector can miss faces or make mistakes; check the crop yourself.`
+                              : "The browser did not detect a face. Faces may still be present; check the crop yourself."
+                            : photoAnalysis.faces.status === "checking"
+                              ? "Checking whether this browser can detect faces…"
+                              : "Face detection is unavailable in this browser. Face count and subject identity have not been assessed; check faces manually."}
+                        </p>
+                        <p>
+                          Analysed on this device. Contrast and edge patterns
+                          suggest areas to inspect; they do not identify your
+                          subject. Advice never prevents you continuing.
+                        </p>
+                      </details>
+                      <button
+                        type="button"
+                        className="text-button"
+                        onClick={() => {
+                          setSafeArea(true);
+                          setView("finished");
+                        }}
+                      >
+                        Show the safe-area guide
+                      </button>
+                    </>
+                  ) : (
+                    <p>
+                      {source
+                        ? "Checking this crop locally…"
+                        : "Add a photo for local resolution, tone and composition advice."}
+                    </p>
+                  )}
                 </div>
               </div>
               <label className="check-label rights">
@@ -958,9 +1140,9 @@ export function Studio({
                 <h2>{MODES.find((m) => m.id === settings.mode)?.name}</h2>
                 <p>Watch something familiar become something you make.</p>
               </div>
-              {lab && (
+              {modeOptions.length > 1 && (
                 <div className="mode-picker">
-                  {MODES.map((m) => (
+                  {modeOptions.map((m) => (
                     <button
                       key={m.id}
                       className={settings.mode === m.id ? "selected" : ""}
@@ -972,6 +1154,12 @@ export function Studio({
                       {m.name}
                     </button>
                   ))}
+                </div>
+              )}
+              {!modeAvailable && (
+                <div className="inline-warning">
+                  This mode is currently unavailable. Choose an available mode
+                  to continue; saved projects remain unchanged.
                 </div>
               )}
               {settings.mode !== "dots" && (
@@ -1423,7 +1611,11 @@ export function Studio({
                       <small>Indicative prototype price</small>
                     </span>
                     <strong>
-                      {money(product.pricePence + finish.additionalPence)}
+                      {product && finish
+                        ? formatPrice(
+                            product.pricePence + finish.additionalPence,
+                          )
+                        : "Unavailable"}
                     </strong>
                   </div>
                   <p className="muted">
@@ -1443,7 +1635,13 @@ export function Studio({
                   <button
                     className="button full"
                     onClick={reviewKit}
-                    disabled={!geometry || !!busy}
+                    disabled={
+                      !geometry ||
+                      !!busy ||
+                      !modeAvailable ||
+                      !product ||
+                      !finish
+                    }
                   >
                     Review your kit
                     <ArrowRight size={17} />

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import sharp from "sharp";
+import { getAvailableModes } from "../mode-availability";
 import { INKS } from "../catalog";
 import { normalizeSettings, RENDERER_VERSION } from "../renderers";
 import { decodeSource, putAsset, removeAsset } from "./assets";
@@ -9,9 +9,15 @@ import { ApiError, digest, newToken, tokenMatches } from "./security";
 import { getRecord, listRecords, putRecord, deleteRecord } from "./store";
 import { sendEmail } from "./email";
 import { deleteUpload, uploadedSource } from "./uploads";
+import { validatePhoto } from "./source-validation";
 
 export async function saveDesign(input: unknown) {
   const parsed = designSchema.parse(input);
+  if (!getAvailableModes().includes(parsed.mode))
+    throw new ApiError(
+      409,
+      "This renderer is awaiting physical validation and is not available for customer designs.",
+    );
   const catalogue = await getCatalogue();
   const { product } = quote(
     catalogue,
@@ -40,32 +46,7 @@ export async function saveDesign(input: unknown) {
     "dataUrl" in parsed.source
       ? decodeSource(parsed.source.dataUrl)
       : await uploadedSource(parsed.source.uploadId, parsed.source.token);
-  let metadata;
-  try {
-    metadata = await sharp(source.bytes, {
-      limitInputPixels: 40_000_000,
-    }).metadata();
-  } catch {
-    throw new ApiError(
-      415,
-      "The image could not be decoded. Choose another photo.",
-    );
-  }
-  if (!metadata.width || !metadata.height || (metadata.pages ?? 1) > 1)
-    throw new ApiError(415, "Choose a single-frame photograph.");
-  if (
-    Math.min(metadata.width, metadata.height) < 32 ||
-    Math.max(metadata.width, metadata.height) /
-      Math.min(metadata.width, metadata.height) >
-      20
-  )
-    throw new ApiError(
-      415,
-      "Choose a photograph with a usable portrait or landscape aspect ratio.",
-    );
-  const warnings = [];
-  if (Math.min(metadata.width, metadata.height) < 600)
-    warnings.push("The source is small. Review fine details before printing.");
+  const warnings = await validatePhoto(source.bytes);
   const id = randomUUID();
   const token = newToken();
   const asset = await putAsset(

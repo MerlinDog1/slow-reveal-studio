@@ -15,6 +15,7 @@ export type UploadTicket = {
   mime: string;
   bytes: number;
   expiresAt: string;
+  scope?: { orderId: string; requestId: string };
 };
 const ticketSchema = z
   .object({
@@ -26,7 +27,10 @@ const ticketSchema = z
       .max(8 * 1024 * 1024),
   })
   .strict();
-export async function createUpload(input: unknown) {
+export async function createUpload(
+  input: unknown,
+  scope?: UploadTicket["scope"],
+) {
   const { mime, bytes } = ticketSchema.parse(input);
   const id = randomUUID();
   const token = newToken();
@@ -37,6 +41,7 @@ export async function createUpload(input: unknown) {
     mime,
     bytes,
     expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
+    ...(scope ? { scope } : {}),
   };
   const url = await signedUploadUrl(ticket.key, mime, bytes);
   await putRecord("uploads", id, ticket, true);
@@ -48,15 +53,22 @@ export async function createUpload(input: unknown) {
     expiresAt: ticket.expiresAt,
   };
 }
-export async function uploadedSource(id: string, token: string) {
+export async function uploadedSource(
+  id: string,
+  token: string,
+  scope?: UploadTicket["scope"],
+  read = readStagedObject,
+) {
   const ticket = await getRecord<UploadTicket>("uploads", id);
   if (
     !ticket ||
     !tokenMatches(token, ticket.tokenHash) ||
-    Date.parse(ticket.expiresAt) < Date.now()
+    Date.parse(ticket.expiresAt) < Date.now() ||
+    ticket.scope?.orderId !== scope?.orderId ||
+    ticket.scope?.requestId !== scope?.requestId
   )
     throw new ApiError(404, "The private upload ticket is invalid or expired.");
-  const bytes = await readStagedObject(ticket.key, ticket.bytes);
+  const bytes = await read(ticket.key, ticket.bytes);
   return decodeSource(`data:${ticket.mime};base64,${bytes.toString("base64")}`);
 }
 export async function deleteUpload(id: string) {

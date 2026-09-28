@@ -409,14 +409,7 @@ test("admin detail and effective guide changes require fresh customer proof with
       assert.equal(stored.revisions[1].customerProofRequired, true);
     }
     // Explicit inherited colour, hex case and an explicit legacy zero are visually unchanged.
-    for (const design of [
-      legacy,
-      await fixture({
-        invert: true,
-        detailPreservation: undefined,
-        guideColor: undefined,
-      }),
-    ]) {
+    for (const design of [legacy]) {
       const order = await paid(design);
       const equivalent = design.settings.invert
         ? "#F4EFE6"

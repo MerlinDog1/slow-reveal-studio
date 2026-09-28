@@ -49,12 +49,14 @@ export function HeroArtwork() {
       <div className="hero-preview-toggle">
         <button
           className={view === "finished" ? "active" : ""}
+          aria-pressed={view === "finished"}
           onClick={() => setView("finished")}
         >
           Finished canvas
         </button>
         <button
           className={view === "template" ? "active" : ""}
+          aria-pressed={view === "template"}
           onClick={() => setView("template")}
         >
           Printed template

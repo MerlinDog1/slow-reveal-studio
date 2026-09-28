@@ -2,7 +2,9 @@
   --canvas: #f4efe6;
   --paper: #fffdf8;
   --ink: #252a25;
-  --muted: #77796d;
+  --muted: #58614f;
+  --control-line: #747f69;
+  --warning-ink: #6e5631;
   --line: #deddd2;
   --green: #2e473c;
   --sand: #dccfb9;
@@ -199,7 +201,7 @@ a svg {
   text-transform: uppercase;
   letter-spacing: 2.2px;
   margin-bottom: 17px;
-  color: #667160;
+  color: var(--muted);
 }
 .home-hero {
   display: grid;
@@ -589,7 +591,7 @@ a svg {
   color: #6a735f;
 }
 .text-button.danger {
-  color: #956a55;
+  color: #864d3c;
   margin-top: 25px;
 }
 .studio-layout {
@@ -854,7 +856,6 @@ a svg {
 }
 .control-tabs button span {
   font-size: 9px;
-  opacity: 0.7;
 }
 .control-tabs button.active {
   border-color: var(--green);
@@ -901,7 +902,7 @@ a svg {
 }
 .preset-card.selected {
   background: #eef0e5;
-  border-color: #7b8b6d;
+  border-color: var(--green);
 }
 .preset-card strong {
   font-size: 11px;
@@ -951,7 +952,7 @@ a svg {
 }
 .small-presets .selected,
 .mode-picker .selected {
-  border-color: #899778;
+  border-color: var(--green);
   background: #e9eddf;
   color: #46533e;
 }
@@ -985,7 +986,7 @@ a svg {
   outline-offset: 3px;
 }
 .ink-choices button.selected > span {
-  outline: 1px solid #7e876e;
+  outline: 2px solid var(--green);
 }
 .ink-choices small {
   font-size: 9px;
@@ -1008,9 +1009,39 @@ a svg {
 .range-field input {
   display: block;
   width: 100%;
-  height: 3px;
+  height: 22px;
+  padding: 0;
+  appearance: none;
+  background: transparent;
   accent-color: var(--green);
   cursor: pointer;
+}
+.range-field input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--control-line);
+}
+.range-field input::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--control-line);
+}
+.range-field input::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -8px;
+  border: 3px solid #faf8f1;
+  border-radius: 50%;
+  background: var(--green);
+}
+.range-field input::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #faf8f1;
+  border-radius: 50%;
+  background: var(--green);
 }
 .tuning summary {
   display: flex;
@@ -1059,7 +1090,7 @@ a svg {
   gap: 9px;
   min-height: 130px;
   padding: 20px 10px;
-  border: 1px dashed #a9b29c;
+  border: 1px dashed var(--control-line);
   background: #f0f2e7;
   border-radius: 4px;
   width: 100%;
@@ -1129,13 +1160,13 @@ a svg {
   width: 100%;
   height: 42px;
   padding: 3px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-line);
   background: transparent;
   cursor: pointer;
 }
 .select-field select {
   width: 100%;
-  border: 1px solid #d4d8c7;
+  border: 1px solid var(--control-line);
   background: #fffdf6;
   padding: 10px 12px;
   border-radius: 3px;
@@ -1157,15 +1188,17 @@ a svg {
 .text-field input,
 .input {
   width: 100%;
-  border: 1px solid #d4d8c7;
+  border: 1px solid var(--control-line);
   background: #fffdf6;
   border-radius: 3px;
   padding: 11px 12px;
   font-size: 12px;
   color: var(--ink);
 }
-.text-field input::placeholder {
-  color: #a7ac9c;
+.text-field input::placeholder,
+.input::placeholder {
+  color: var(--muted);
+  opacity: 1;
   font-size: 11px;
 }
 .price-row {
@@ -1210,7 +1243,7 @@ a svg {
   background: #efe5ce;
   padding: 12px;
   border: 1px solid #dfd0ad;
-  color: #8d7850;
+  color: var(--warning-ink);
   margin-bottom: 20px;
 }
 .toast {
@@ -1241,12 +1274,15 @@ a svg {
   color: white;
   padding: 0;
 }
+.toast button:focus-visible {
+  outline-color: #fff;
+}
 .render-warnings {
   margin: 10px 4%;
   font-size: 12px;
   background: #eee6d2;
   padding: 10px 20px;
-  color: #8a7954;
+  color: var(--warning-ink);
 }
 .render-warnings p {
   margin: 4px 0;
@@ -1259,7 +1295,7 @@ a svg {
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  background: #f9f8f0ed;
+  background: #f9f8f0;
   border-radius: 20px;
   font-size: 10px;
   color: #727e66;
@@ -1285,7 +1321,7 @@ a svg {
   bottom: 0;
   width: 2px;
   background: #fff;
-  box-shadow: 1px 0 4px #0004;
+  box-shadow: 0 0 0 1px var(--green);
   pointer-events: none;
 }
 .comparison-divider span {
@@ -1300,7 +1336,12 @@ a svg {
   background: white;
   border-radius: 50%;
   color: #5b6955;
-  box-shadow: 1px 2px 4px #0002;
+  box-shadow: 0 0 0 1px var(--green);
+}
+.canvas-paper:has(.comparison-range:focus-visible) .comparison-divider span {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #fff;
 }
 .comparison-range {
   position: absolute;
@@ -1315,7 +1356,7 @@ a svg {
   position: absolute;
   bottom: 10px;
   font-size: 9px;
-  background: #f9f8efdd;
+  background: #f9f8ef;
   padding: 3px 7px;
   color: #5f6c54;
   pointer-events: none;
@@ -2383,9 +2424,6 @@ a svg {
   width: 100%;
   margin-top: 30px;
 }
-:root {
-  --muted: #626a5b;
-}
 .control-heading p,
 .muted,
 .privacy-note,
@@ -2413,11 +2451,37 @@ a svg {
 .signature-copy > p,
 .faq-list details p,
 .content-page p,
-.content-page li {
-  color: #626a5b;
+.content-page li,
+.hero-reassurance,
+.hero-side-note,
+.hero-art-caption,
+.manifesto-strip,
+.step-top,
+.kit-list > div span,
+.kit-list svg,
+.faq-list summary span,
+.text-button,
+.icon-button,
+.canvas-placeholder,
+.check-label,
+.control-tabs button,
+.small-presets button,
+.mode-picker button,
+.tuning summary,
+.studio-lab-link,
+.upload-drop,
+.upload-drop span,
+.photo-advice,
+.render-indicator,
+.admin-table th,
+.admin-previews figcaption {
+  color: var(--muted);
 }
+.control-tabs button.active,
 .view-tabs button[aria-selected="true"],
-.view-tabs button[aria-pressed="true"] {
+.view-tabs button[aria-pressed="true"],
+.small-presets .selected,
+.mode-picker .selected {
   color: var(--green);
 }
 @media (max-width: 640px) {
@@ -2476,7 +2540,7 @@ a svg {
 .srs-guide-comparison > article > div:not(.srs-guide-example-label) > figure { max-width: 100%; }
 .srs-guide-section .srs-guide-comparison > article > figure img { max-height: 440px; object-fit: cover; object-position: center; }
 .srs-guide-example-label { display: flex; gap: 14px; align-items: baseline; margin-bottom: 16px; }
-.srs-guide-example-label > span, .srs-guide-index { color: #61705a; font-size: 12px; letter-spacing: 1px; }
+.srs-guide-example-label > span, .srs-guide-index { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
 .srs-guide-example-label h3 { margin: 0; font-size: 16px; }
 .srs-guide-scale { margin: 24px 0 32px; padding: 22px 20px; background: #ebe9df; }
 .srs-guide-scale svg { display: block; width: 100%; height: auto; }
@@ -2498,7 +2562,7 @@ a svg {
 .srs-guide-note > :last-child { margin-bottom: 0; }
 .srs-guide-checklist { list-style: none; counter-reset: guide-step; padding: 0; margin: 32px 0; }
 .srs-guide-checklist li { counter-increment: guide-step; display: grid; grid-template-columns: 34px minmax(180px, .7fr) 1.4fr; gap: 24px; border-top: 1px solid var(--line); padding: 24px 0; }
-.srs-guide-checklist li::before { content: "0" counter(guide-step); color: #61705a; font-size: 12px; padding-top: 3px; }
+.srs-guide-checklist li::before { content: "0" counter(guide-step); color: var(--muted); font-size: 12px; padding-top: 3px; }
 .srs-guide-checklist strong { font-weight: 500; }
 .srs-guide-checklist li > span { color: #59604f; font-size: 15px; }
 .srs-guide-table-wrap { overflow-x: auto; }

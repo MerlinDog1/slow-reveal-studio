@@ -137,6 +137,7 @@ function Range({
       </span>
       <input
         aria-label={label}
+        aria-valuetext={`${Math.round(value * 100) / 100}${suffix}`}
         type="range"
         min={min}
         max={max}
@@ -1376,6 +1377,7 @@ export function Studio({
                 <button
                   key={ref.id}
                   className={`reference-tile ${referenceId === ref.id ? "selected" : ""}`}
+                  aria-pressed={referenceId === ref.id}
                   onClick={() => loadReference(ref.id)}
                   disabled={!!busy}
                 >
@@ -1396,11 +1398,12 @@ export function Studio({
           </div>
         </section>
         <aside className="controls-panel">
-          <div className="control-tabs">
+          <div className="control-tabs" role="group" aria-label="Design steps">
             {["photo", "style", "finish"].map((p, i) => (
               <button
                 key={p}
                 className={panel === p ? "active" : ""}
+                aria-current={panel === p ? "step" : undefined}
                 onClick={() => setPanel(p)}
               >
                 <span>0{i + 1}</span>
@@ -1424,7 +1427,7 @@ export function Studio({
                 ref={fileInput}
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                className="visually-hidden"
+                hidden
                 onChange={(e) => {
                   void upload(e.target.files?.[0]);
                   e.target.value = "";
@@ -1601,12 +1604,17 @@ export function Studio({
                 <p>Watch something familiar become something you make.</p>
               </div>
               {modeOptions.length > 1 && (
-                <div className="mode-picker">
+                <div
+                  className="mode-picker"
+                  role="group"
+                  aria-label="Artwork style"
+                >
                   {modeOptions.map((m) => (
                     <button
                       key={m.id}
                       disabled={!!subjectMask && m.id !== settings.mode}
                       className={settings.mode === m.id ? "selected" : ""}
+                      aria-pressed={settings.mode === m.id}
                       onClick={() => {
                         track("renderer_selected", { mode: m.id, productId });
                         update({ mode: m.id });
@@ -1748,6 +1756,12 @@ export function Studio({
                       <button
                         key={`${p.id}:${p.version}`}
                         className={`preset-card ${Object.entries(p.settings).every(([key, value]) => JSON.stringify(settings[key as keyof RenderSettings]) === JSON.stringify(value)) ? "selected" : ""}`}
+                        aria-pressed={Object.entries(p.settings).every(
+                          ([key, value]) =>
+                            JSON.stringify(
+                              settings[key as keyof RenderSettings],
+                            ) === JSON.stringify(value),
+                        )}
                         onClick={() => choosePublishedPreset(p)}
                       >
                         <strong>{p.name}</strong>
@@ -1769,6 +1783,7 @@ export function Studio({
                   <button
                     key={key}
                     className={`preset-card ${activePreset === key ? "selected" : ""}`}
+                    aria-pressed={activePreset === key}
                     onClick={() => choosePreset(key)}
                   >
                     <span
@@ -1791,6 +1806,7 @@ export function Studio({
                 {(["bold", "portrait"] as const).map((key) => (
                   <button
                     className={activePreset === key ? "selected" : ""}
+                    aria-pressed={activePreset === key}
                     key={key}
                     onClick={() => choosePreset(key)}
                   >
@@ -1800,11 +1816,16 @@ export function Studio({
               </div>
               <div className="control-divider" />
               <h3 className="field-heading">A colour that feels like you</h3>
-              <div className="ink-choices">
+              <div
+                className="ink-choices"
+                role="group"
+                aria-label="Marker colour"
+              >
                 {INKS.map((ink) => (
                   <button
                     key={ink.id}
                     className={inkId === ink.id ? "selected" : ""}
+                    aria-pressed={inkId === ink.id}
                     onClick={() => {
                       setInkId(ink.id);
                       update({ inkColor: ink.color });
@@ -1830,7 +1851,7 @@ export function Studio({
                   label="Contrast"
                   min={0.5}
                   max={2}
-                  step={0.05}
+                  step={0.01}
                   value={settings.contrast}
                   onChange={(contrast) => update({ contrast })}
                 />
@@ -2377,7 +2398,7 @@ export function Studio({
       {panel !== "photo" && (
         <input
           ref={fileInput}
-          className="visually-hidden"
+          hidden
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={(e) => {

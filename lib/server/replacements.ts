@@ -80,6 +80,7 @@ export async function submitReplacement(
   token: string | null,
   input: unknown,
   produce = createProductionPackage,
+  validate = validatePhoto,
 ) {
   let order = await authorizedOrder(id, token);
   const body = replacementSchema.parse(input);
@@ -116,6 +117,14 @@ export async function submitReplacement(
     return { state: "processing" as const, ...orderArtworkStatus(order) };
   }
   await takeQuota(id, "replacement-render", 3, 3600);
+  const source =
+    "dataUrl" in body.source
+      ? decodeSource(body.source.dataUrl)
+      : await uploadedSource(body.source.uploadId, body.source.token, {
+          orderId: id,
+          requestId: body.requestId,
+        });
+  const warnings = await validate(source.bytes);
   const leaseId = randomUUID();
   // Register the staging key before writing it so cron can remove interrupted intake assets.
   const staging = {
@@ -133,19 +142,46 @@ export async function submitReplacement(
     startedAt: new Date().toISOString(),
     source: staging,
   };
-  await replaceOrder(order, { ...order, replacementIntake: claim });
+  try {
+    await replaceOrder(order, { ...order, replacementIntake: claim });
+  } catch (error) {
+    if (!(error instanceof ApiError) || error.status !== 409) throw error;
+    // Another identical request may claim or finish while pixels are validated.
+    // Reconcile once, without claiming again or starting another production job.
+    const fresh = await authorizedOrder(id, token);
+    const saved = fresh.revisions.find(
+      (revision) => revision.submissionId === body.submissionId,
+    );
+    if (
+      saved?.replacementInputHash === inputHash &&
+      saved.replacementRequestId === body.requestId &&
+      fresh.currentRevisionId === saved.id &&
+      fresh.photoRequest?.id === body.requestId &&
+      fresh.photoRequest.revisionId === body.expectedRevisionId &&
+      fresh.photoRequest.submittedRevisionId === saved.id &&
+      ["awaiting-review", "hold", "approved"].includes(fresh.reviewStatus)
+    )
+      return {
+        state: "saved" as const,
+        revisionId: saved.id,
+        ...orderArtworkStatus(fresh),
+      };
+    assertRequest(fresh, body.requestId, body.expectedRevisionId);
+    const pending = fresh.replacementIntake;
+    if (
+      pending?.submissionId === body.submissionId &&
+      pending.inputHash === inputHash &&
+      pending.requestId === body.requestId &&
+      pending.baseRevisionId === body.expectedRevisionId &&
+      Date.parse(pending.startedAt) > Date.now() - 10 * 60_000
+    )
+      return { state: "processing" as const, ...orderArtworkStatus(fresh) };
+    throw error;
+  }
   if (active) await removeAsset(active.source).catch(() => {});
   let production: Package | undefined;
   let committed = false;
   try {
-    const source =
-      "dataUrl" in body.source
-        ? decodeSource(body.source.dataUrl)
-        : await uploadedSource(body.source.uploadId, body.source.token, {
-            orderId: id,
-            requestId: body.requestId,
-          });
-    const warnings = await validatePhoto(source.bytes);
     const asset = await putAsset(staging.key, source.bytes, source.mime);
     const latest = currentRevision(order);
     const design = {

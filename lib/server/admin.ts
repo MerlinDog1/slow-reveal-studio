@@ -56,6 +56,15 @@ export function applyReviewAction(
 ): Order {
   if (
     (action === "approve" || action === "dispatch") &&
+    (currentRevision(order)?.settings ?? order.originalSnapshot.design.settings)
+      .invert
+  )
+    throw new ApiError(
+      409,
+      "Inverted dark-canvas production is not supported. Turn off inversion, regenerate the artwork, then obtain new customer proof approval.",
+    );
+  if (
+    (action === "approve" || action === "dispatch") &&
     !customerProofApproved(order)
   )
     throw new ApiError(
@@ -210,6 +219,11 @@ export async function updateOrder(
       inkColor: base.inkColor,
       ...(body.clearSubjectMask ? { subjectMaskStrength: 0 } : {}),
     });
+    if (settings.invert)
+      throw new ApiError(
+        409,
+        "Inverted dark-canvas production is not supported. Turn off inversion, regenerate the artwork, then obtain new customer proof approval.",
+      );
     const crop = body.crop ?? latest?.crop ?? design.crop;
     await designSubjectMask(design, settings, crop);
     const production = await produce(design, id, settings, crop);
@@ -225,6 +239,7 @@ export async function updateOrder(
       origin: "admin-regeneration",
       customerProofRequired:
         latest?.customerProofRequired ||
+        base.invert !== settings.invert ||
         (base.detailPreservation ?? 0) !== (settings.detailPreservation ?? 0) ||
         effectiveGuideColor(base) !== effectiveGuideColor(settings) ||
         (!!currentMask &&

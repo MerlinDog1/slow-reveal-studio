@@ -2,6 +2,13 @@
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
 
+## Paused checkout checkpoint — 28 September
+
+- Work paused at the user's request after saving the in-progress checkout changes. `npm run typecheck`, `npm test` and `npm run build` pass. The final suite has **157 cases: 155 passed, zero failed, two optional browser checks skipped**. One new test initially compared an explicit undefined property with its JSON-serialized record; the assertion was corrected and the full suite rerun successfully. TypeScript formatting and `git diff --check` pass. The release still generates only Dot Lab by default.
+- New focused checks cover deterministic attempt IDs, bounded browser-state projection, serialized device-storage races and rollback, the complete pre-write production ledger, late-write retention sweeps, source ownership and ambiguous local publication. Provider-free tests do not establish live Stripe idempotency or remote database atomicity.
+- **Unfinished:** dedicated checkout creation/retry/concurrency/provider-failure tests; independent server and migration review; executing migration 005 against PostgreSQL/Supabase; complete browser reload, express-delivery resume, failed-image and uncertain-response checks. The local browser reached the uploaded test design's basket before work was stopped; no complete checkout-recovery browser result is claimed. The temporary tab and development server were closed. No real payment, email or service configuration was changed.
+- Preserve the checkpoint as work in progress and keep checkout disabled. All physical, commercial, legal and live-service gates in BUILD_STATUS remain open.
+
 ## Image intake, paid inversion and accessible controls - 28 September
 
 - Final integrated `npm run typecheck`, `npm test` and `npm run build` passed. The suite has **140 cases: 138 passed, zero failed, two existing opt-in browser checks skipped**. Changed TypeScript formatting and `git diff --check` pass. All 40 production file traces exclude private `.data/` files. Dependencies, lockfile, renderer geometry and generated artwork/PDF artifacts are unchanged. The release build still generates only Dot Lab by default.

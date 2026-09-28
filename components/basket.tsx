@@ -6,8 +6,16 @@ import {
   getLocalProject,
   saveLocalProject,
   deleteLocalProject,
+  rememberPrivateBasketDesign,
+  rememberBasketCheckout,
   type LocalProject,
 } from "@/lib/browser-storage";
+import {
+  privateBasketDesign,
+  pendingBasketCheckout,
+  type PendingBasketCheckout,
+} from "@/lib/browser-checkout";
+import { checkoutAttemptId } from "@/lib/checkout-intent";
 import { INKS, formatPrice, type Product, type Finish } from "@/lib/catalog";
 import { loadImage, cropImage } from "@/lib/image-processing";
 import { hashBlob } from "@/lib/browser-subject-mask";
@@ -36,6 +44,8 @@ function asDataUrl(blob: Blob): Promise<string> {
 }
 export function Basket() {
   const proofIdentity = useRef("");
+  const activeProof = useRef("");
+  const restoredCheckout = useRef(false);
   const [project, setProject] = useState<LocalProject | null>(null);
   const [svg, setSvg] = useState("");
   const [loading, setLoading] = useState(true);
@@ -44,9 +54,16 @@ export function Basket() {
   const [busy, setBusy] = useState(false);
   const [shippingId, setShippingId] = useState<string>("standard");
   const [design, setDesign] = useState<SavedDesign | null>(null);
+  const [pendingCheckout, setPendingCheckout] =
+    useState<PendingBasketCheckout | null>(null);
   const [ready, setReady] = useState(false);
   const [directUploads, setDirectUploads] = useState(false);
-  const [proof, setProof] = useState<string | null>(null);
+  const [proof, setProof] = useState<{
+    url: string;
+    view: string;
+    hash: string;
+    designId: string;
+  } | null>(null);
   const [proofView, setProofView] = useState("finished");
   const [proofApproved, setProofApproved] = useState(false);
   const [proofLoaded, setProofLoaded] = useState(false);
@@ -84,9 +101,14 @@ export function Basket() {
             widthMm: checked.settings.widthMm,
             heightMm: checked.settings.heightMm,
           });
-        const meta = JSON.parse(localStorage.getItem("sr-basket") ?? "{}");
-        setInkId(meta.inkId ?? "black");
-        setReference(!!meta.reference);
+        setInkId(
+          INKS.find(
+            (ink) =>
+              ink.color.toLowerCase() ===
+              checked.settings.inkColor.toLowerCase(),
+          )?.id ?? "black",
+        );
+        setReference(!!checked.referenceId);
         const url = URL.createObjectURL(p.image);
         try {
           const image = await loadImage(url);
@@ -110,14 +132,36 @@ export function Basket() {
               "finished",
             ),
           );
+          const saved = privateBasketDesign(p.privateDesign);
+          const pending = pendingBasketCheckout(p.pendingCheckout);
+          if (
+            (p.privateDesign !== undefined && !saved) ||
+            (p.pendingCheckout !== undefined && (!pending || !saved))
+          )
+            throw new Error("The saved checkout could not be restored.");
           setProject(checked);
+          if (saved)
+            setDesign({
+              ...saved,
+              url: `/design/${saved.id}#token=${saved.token}`,
+            });
+          if (pending) {
+            restoredCheckout.current = true;
+            setPendingCheckout(pending);
+            setShippingId(pending.shippingId);
+            setNotice(
+              "A checkout was started for this design. Review both proofs again to resume the same checkout.",
+            );
+          }
         } finally {
           URL.revokeObjectURL(url);
         }
       })
-      .catch(() =>
+      .catch((e) =>
         setError(
-          "This design could not be opened. Return to the studio and save it again.",
+          e instanceof Error
+            ? e.message
+            : "This saved basket could not be opened. Reload before trying checkout again.",
         ),
       )
       .finally(() => setLoading(false));
@@ -143,8 +187,14 @@ export function Basket() {
         setReady(c.liveCheckoutEnabled === true);
         setDirectUploads(c.directUploads === true);
         setCatalog(c);
-        if (!c.shipping.some((item: { id: string }) => item.id === "standard"))
-          setShippingId(c.shipping[0]?.id ?? "");
+        // Keep a persisted checkout's delivery choice even if the current catalogue changes.
+        setShippingId((current) =>
+          !restoredCheckout.current &&
+          current === "standard" &&
+          !c.shipping.some((item: { id: string }) => item.id === "standard")
+            ? (c.shipping[0]?.id ?? "")
+            : current,
+        );
       })
       .catch((e) => {
         setReady(false);
@@ -155,6 +205,7 @@ export function Basket() {
     if (!design) return;
     let url: string | null = null;
     const controller = new AbortController();
+    activeProof.current = "";
     setProofLoaded(false);
     setProof(null);
     fetch(`/api/designs/${design.id}/preview?view=${proofView}`, {
@@ -172,21 +223,17 @@ export function Basket() {
         const blob = await r.blob();
         if (controller.signal.aborted) return;
         if (proofIdentity.current && proofIdentity.current !== hash) {
-          setProofViews([proofView]);
+          setProofViews([]);
           setProofApproved(false);
           setNotice(
             "The artwork has been updated. Please check both proof views again.",
-          );
-        } else {
-          setProofViews((views) =>
-            views.includes(proofView) ? views : [...views, proofView],
           );
         }
         proofIdentity.current = hash;
         setProofHash(hash);
         url = URL.createObjectURL(blob);
-        setProof(url);
-        setProofLoaded(true);
+        activeProof.current = url;
+        setProof({ url, view: proofView, hash, designId: design.id });
       })
       .catch((e) => {
         if (!controller.signal.aborted) setError(e.message);
@@ -219,6 +266,12 @@ export function Basket() {
   const total = selectionAvailable
     ? product!.pricePence + finish!.additionalPence + shipping!.pricePence
     : null;
+  function chooseProof(view: string) {
+    if (view === proofView) return;
+    activeProof.current = "";
+    setProofLoaded(false);
+    setProofView(view);
+  }
   async function savePrivate() {
     if (!project) return null;
     if (!selectionAvailable) {
@@ -292,11 +345,19 @@ export function Basket() {
       setProofViews([]);
       setProofApproved(false);
       setProofHash("");
-      setDesign(result);
+      const remembered = await rememberPrivateBasketDesign(
+        project.updatedAt,
+        result,
+      );
+      const saved = {
+        ...remembered,
+        url: `/design/${remembered.id}#token=${remembered.token}`,
+      };
+      setDesign(saved);
       setNotice(
         "Your private design is saved. Keep its private link to reopen or delete it.",
       );
-      return result as SavedDesign;
+      return saved;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Saving failed.");
       return null;
@@ -306,6 +367,7 @@ export function Basket() {
   }
   async function checkout() {
     if (
+      !project ||
       !design ||
       !proofApproved ||
       !proofLoaded ||
@@ -320,18 +382,26 @@ export function Basket() {
     }
     const saved = design;
     setBusy(true);
+    setError("");
     track("checkout_started", {
       mode: (project?.settings as RenderSettings)?.mode,
       productId: project?.productId,
       step: "checkout",
     });
     try {
+      const intent = await rememberBasketCheckout(project.updatedAt, saved.id, {
+        attemptId: await checkoutAttemptId(saved.id, proofHash, shippingId),
+        proofHash,
+        shippingId,
+      });
+      setPendingCheckout(intent);
       const analyticsSessionId = getAnalyticsSessionId();
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           designId: saved.id,
+          attemptId: intent.attemptId,
           token: saved.token,
           shippingId,
           proofApproved: true,
@@ -344,6 +414,13 @@ export function Basket() {
       const result = await response.json();
       if (!response.ok)
         throw new Error(result.error ?? "Checkout is unavailable.");
+      if (result.status === "processing") {
+        setNotice(
+          "Your checkout is still being prepared. Wait a moment, then continue to resume the same checkout.",
+        );
+        setBusy(false);
+        return;
+      }
       markAnalyticsJourneyComplete();
       void flushAnalytics();
       window.location.assign(result.url);
@@ -363,6 +440,11 @@ export function Basket() {
       <div className="empty-state">
         <h2>A memory is waiting.</h2>
         <p>Your kit basket is empty. Start with a photograph you love.</p>
+        {error && (
+          <p role="alert" className="inline-warning">
+            {error}
+          </p>
+        )}
         <Link href="/create" className="button">
           Create your canvas
           <ArrowRight size={16} />
@@ -424,6 +506,7 @@ export function Basket() {
           Delivery
           <select
             value={shippingId}
+            disabled={busy || pendingCheckout !== null}
             onChange={(e) => setShippingId(e.target.value)}
           >
             {(catalog?.shipping ?? []).map((s) => (
@@ -433,6 +516,12 @@ export function Basket() {
             ))}
           </select>
         </label>
+        {pendingCheckout && (
+          <p className="fine-print">
+            Delivery is saved with this checkout. Continuing resumes that same
+            attempt.
+          </p>
+        )}
         <div className="summary-row total">
           <span>{ready ? "Total" : "Indicative total"}</span>
           <span>{total === null ? "Unavailable" : formatPrice(total)}</span>
@@ -511,19 +600,47 @@ export function Basket() {
             <div className="view-tabs">
               <button
                 aria-pressed={proofView === "finished"}
-                onClick={() => setProofView("finished")}
+                onClick={() => chooseProof("finished")}
               >
                 Finished
               </button>
               <button
                 aria-pressed={proofView === "template"}
-                onClick={() => setProofView("template")}
+                onClick={() => chooseProof("template")}
               >
                 Template
               </button>
             </div>
             {proof ? (
-              <img src={proof} alt={`Final ${proofView} production proof`} />
+              <img
+                key={proof.url}
+                src={proof.url}
+                alt={`Final ${proof.view} production proof`}
+                onLoad={() => {
+                  if (
+                    activeProof.current !== proof.url ||
+                    proof.view !== proofView ||
+                    proof.designId !== design.id ||
+                    proof.hash !== proofIdentity.current
+                  )
+                    return;
+                  setProofViews((views) =>
+                    views.includes(proof.view) ? views : [...views, proof.view],
+                  );
+                  setProofLoaded(true);
+                }}
+                onError={() => {
+                  if (activeProof.current !== proof.url) return;
+                  setProofLoaded(false);
+                  setProofApproved(false);
+                  setProofViews((views) =>
+                    views.filter((view) => view !== proof.view),
+                  );
+                  setError(
+                    "The proof image could not be displayed. Reload before approving it.",
+                  );
+                }}
+              />
             ) : (
               <p role="status">Preparing the production proof…</p>
             )}

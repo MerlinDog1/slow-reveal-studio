@@ -65,6 +65,7 @@ async function packageStub(
   settings = design.settings,
   _crop = design.crop,
   _expectedProofHash?: string,
+  _lifecycle?: unknown,
 ): Promise<Package> {
   const revisionId = randomUUID(),
     prefix = `orders/${orderId}/${revisionId}`;

@@ -5,15 +5,23 @@ import {
   writeFile,
   readdir,
   unlink,
+  link,
 } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { hasDatabase, localPersistenceAllowed } from "./config";
 import { ApiError } from "./security";
+import type { Checkout, CheckoutAttempt } from "./schema";
 
 export type Collection =
-  "designs" | "checkouts" | "orders" | "events" | "presets" | "uploads";
+  | "designs"
+  | "checkouts"
+  | "orders"
+  | "events"
+  | "presets"
+  | "uploads"
+  | "checkout-attempts";
 export function database() {
   return hasDatabase()
     ? createClient(
@@ -86,6 +94,11 @@ export async function putRecord<T>(
           409,
           "Saved designs are immutable; save a new revision.",
         );
+      if (kind === "checkout-attempts")
+        assertAttemptUpdate(
+          old as unknown as CheckoutAttempt,
+          next as unknown as CheckoutAttempt,
+        );
       if (kind === "presets") {
         for (const key of ["id", "mode", "createdAt"])
           if (!equal(old[key], next[key]))
@@ -109,10 +122,12 @@ export async function putRecord<T>(
       }
       if (
         kind === "checkouts" &&
-        !equal(
+        (!equal(
           { ...old, sessionId: undefined },
           { ...next, sessionId: undefined },
-        )
+        ) ||
+          (old.sessionId !== undefined &&
+            !equal(old.sessionId, next.sessionId)))
       )
         throw new ApiError(409, "Checkout snapshots are immutable.");
       if (kind === "orders") {
@@ -148,15 +163,20 @@ export async function putRecord<T>(
   const file = filename(kind, id);
   await mkdir(path.dirname(file), { recursive: true });
   if (insertOnly) {
+    const temporary = `${file}.${randomUUID()}.tmp`;
     try {
-      await writeFile(file, JSON.stringify(payload), {
+      await writeFile(temporary, JSON.stringify(payload), {
         flag: "wx",
         mode: 0o600,
       });
+      // Publish the completed file atomically so concurrent retries never read partial JSON.
+      await link(temporary, file);
       return true;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
       throw error;
+    } finally {
+      await unlink(temporary).catch(() => {});
     }
   }
   const temporary = `${file}.${randomUUID()}.tmp`;
@@ -199,6 +219,11 @@ export async function listRecords<T>(kind: Collection): Promise<T[]> {
   }
 }
 export async function deleteRecord(kind: Collection, id: string) {
+  if (kind === "checkout-attempts")
+    throw new ApiError(
+      409,
+      "Checkout attempt tombstones must be retained for safe retries and cleanup.",
+    );
   if (kind === "presets")
     throw new ApiError(
       409,
@@ -221,6 +246,163 @@ export async function deleteRecord(kind: Collection, id: string) {
   }
   await unlink(filename(kind, id)).catch((error) => {
     if (error.code !== "ENOENT") throw error;
+  });
+}
+
+const attemptMutable = [
+  "state",
+  "assets",
+  "publishedAt",
+  "stripeStartedAt",
+  "stripeLeaseId",
+  "stripeLeaseAt",
+  "sessionId",
+  "sessionUrl",
+  "closedAt",
+  "cleanupCheckedAt",
+];
+function fixedAttempt(attempt: CheckoutAttempt) {
+  return Object.fromEntries(
+    Object.entries(attempt).filter(([key]) => !attemptMutable.includes(key)),
+  );
+}
+function assertAttemptUpdate(old: CheckoutAttempt, next: CheckoutAttempt) {
+  const equal = (a: unknown, b: unknown) =>
+    JSON.stringify(a) === JSON.stringify(b);
+  if (!equal(fixedAttempt(old), fixedAttempt(next)))
+    throw new ApiError(
+      409,
+      "Checkout attempt identity and payment parameters are immutable.",
+    );
+  for (const key of ["publishedAt", "stripeStartedAt", "sessionId"] as const)
+    if (old[key] !== undefined && old[key] !== next[key])
+      throw new ApiError(409, "Checkout attempt history is immutable.");
+  if (old.assets.length && !equal(old.assets, next.assets))
+    throw new ApiError(409, "Checkout asset ledger is immutable.");
+  const allowed: Record<CheckoutAttempt["state"], CheckoutAttempt["state"][]> =
+    {
+      producing: ["producing", "prepared", "closed"],
+      prepared: ["prepared", "submitting", "closed", "ready"],
+      submitting: ["submitting", "ready", "needs-review", "closed"],
+      ready: ["ready", "closed", "needs-review"],
+      "needs-review": ["needs-review", "ready", "closed"],
+      closed: ["closed"],
+    };
+  if (!allowed[old.state]?.includes(next.state))
+    throw new ApiError(
+      409,
+      "Checkout attempt cannot return to an earlier stage.",
+    );
+}
+
+async function withAttemptLock<T>(
+  id: string,
+  action: () => Promise<T>,
+): Promise<T> {
+  const key = `checkout-attempt:${id}`;
+  const previous = updateLocks.get(key) ?? Promise.resolve();
+  let release!: () => void;
+  const lock = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  updateLocks.set(key, lock);
+  await previous;
+  try {
+    return await action();
+  } finally {
+    release();
+    if (updateLocks.get(key) === lock) updateLocks.delete(key);
+  }
+}
+
+export async function replaceCheckoutAttempt(
+  expected: CheckoutAttempt,
+  replacement: CheckoutAttempt,
+) {
+  assertAttemptUpdate(expected, replacement);
+  const db = database();
+  if (db) {
+    const { data, error } = await db.rpc("studio_replace_checkout_attempt", {
+      attempt_id: expected.id,
+      expected_payload: expected,
+      replacement_payload: replacement,
+    });
+    if (error)
+      throw new ApiError(503, "Could not update the checkout attempt.");
+    if (!data)
+      throw new ApiError(
+        409,
+        "The checkout attempt changed. Retry the same attempt.",
+      );
+    return;
+  }
+  await withAttemptLock(expected.id, async () => {
+    const current = await getRecord<CheckoutAttempt>(
+      "checkout-attempts",
+      expected.id,
+    );
+    if (JSON.stringify(current) !== JSON.stringify(expected))
+      throw new ApiError(
+        409,
+        "The checkout attempt changed. Retry the same attempt.",
+      );
+    await putRecord("checkout-attempts", expected.id, replacement);
+  });
+}
+
+/** The cleanup CAS and checkout publication must be mutually exclusive. */
+export async function publishCheckoutAttempt(
+  expected: CheckoutAttempt,
+  replacement: CheckoutAttempt,
+  checkout: Checkout,
+) {
+  assertAttemptUpdate(expected, replacement);
+  if (
+    expected.state !== "producing" ||
+    replacement.state !== "prepared" ||
+    checkout.id !== expected.orderId ||
+    checkout.attemptId !== expected.id ||
+    checkout.package.snapshotHash !== expected.proofHash ||
+    checkout.amountPence !== expected.amountPence ||
+    checkout.tokenHash !== expected.tokenHash ||
+    !expected.assets.length
+  )
+    throw new ApiError(409, "Checkout publication does not match its attempt.");
+  const db = database();
+  if (db) {
+    const { data, error } = await db.rpc("studio_publish_checkout_attempt", {
+      attempt_id: expected.id,
+      expected_payload: expected,
+      replacement_payload: replacement,
+      checkout_payload: checkout,
+    });
+    if (error) throw new ApiError(503, "Could not publish the checkout.");
+    if (!data)
+      throw new ApiError(
+        409,
+        "The checkout attempt changed. Retry the same attempt.",
+      );
+    return;
+  }
+  await withAttemptLock(expected.id, async () => {
+    const current = await getRecord<CheckoutAttempt>(
+      "checkout-attempts",
+      expected.id,
+    );
+    if (JSON.stringify(current) !== JSON.stringify(expected))
+      throw new ApiError(
+        409,
+        "The checkout attempt changed. Retry the same attempt.",
+      );
+    const inserted = await putRecord("checkouts", checkout.id, checkout, true);
+    if (
+      !inserted &&
+      JSON.stringify(await getRecord<Checkout>("checkouts", checkout.id)) !==
+        JSON.stringify(checkout)
+    )
+      throw new ApiError(409, "A different checkout already owns this order.");
+    // A local crash here is recoverable from the immutable checkout; its assets stay protected.
+    await putRecord("checkout-attempts", expected.id, replacement);
   });
 }
 

@@ -1,3 +1,4 @@
+import { checkoutAttemptId } from "../lib/checkout-intent";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -282,6 +283,11 @@ test("local persistence, checkout gates, immutable payment fulfilment and physic
     );
     await assert.rejects(
       beginCheckout({
+        attemptId: await checkoutAttemptId(
+          design.id,
+          "0".repeat(64),
+          "standard",
+        ),
         designId: design.id,
         token: saved.token,
         shippingId: "standard",
@@ -300,6 +306,11 @@ test("local persistence, checkout gates, immutable payment fulfilment and physic
             "x-real-ip": "isolated-checkout-quota-test",
           },
           body: JSON.stringify({
+            attemptId: await checkoutAttemptId(
+              design.id,
+              "0".repeat(64),
+              "standard",
+            ),
             designId: design.id,
             token: saved.token,
             shippingId: "standard",

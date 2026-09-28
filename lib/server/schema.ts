@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { RenderSettings } from "../renderers/types";
 import type { PrivateAsset } from "./assets";
 import { normalizeSubjectMask } from "../subject-mask";
+import type Stripe from "stripe";
 
 export const cropSchema = z
   .object({
@@ -132,6 +133,49 @@ export type Checkout = {
   sessionId?: string;
   analyticsSessionHash?: string;
   accessKeyId?: string;
+  attemptId?: string;
+};
+/** Durable work identity; capability fragments are reconstructed, never persisted. */
+export type CheckoutAttempt = {
+  id: string;
+  version: 1;
+  orderId: string;
+  designId: string;
+  designTokenHash: string;
+  inputHash: string;
+  proofHash: string;
+  createdAt: string;
+  productionExpiresAt: string;
+  expiresAt: string;
+  accessKeyId: string;
+  tokenHash: string;
+  amountPence: number;
+  shippingId: string;
+  analyticsSessionHash?: string;
+  sourceAssets: PrivateAsset[];
+  origin: string;
+  stripeCredentialHash: string;
+  idempotencyKey: string;
+  stripeParams: Omit<
+    Stripe.Checkout.SessionCreateParams,
+    "success_url" | "cancel_url"
+  >;
+  state:
+    | "producing"
+    | "prepared"
+    | "submitting"
+    | "ready"
+    | "closed"
+    | "needs-review";
+  assets: PrivateAsset[];
+  publishedAt?: string;
+  stripeStartedAt?: string;
+  stripeLeaseId?: string;
+  stripeLeaseAt?: string;
+  sessionId?: string;
+  sessionUrl?: string;
+  closedAt?: string;
+  cleanupCheckedAt?: string;
 };
 export type Revision = {
   id: string;

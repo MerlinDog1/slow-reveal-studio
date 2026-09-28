@@ -1,16 +1,8 @@
 import Stripe from "stripe";
-import { randomUUID } from "node:crypto";
-import { z } from "zod";
-import { getCatalogue, quote } from "./catalog";
-import { authorizedDesign } from "./designs";
-import { launchGates } from "./config";
-import { createProductionPackage } from "./production";
-import { ApiError, digest } from "./security";
+import { ApiError } from "./security";
 import { getRecord, putRecord } from "./store";
 import type { Checkout, Order } from "./schema";
-import { anonymousHash, takeQuota } from "./rate-limit";
 import { recordPaymentAnalytics } from "./analytics";
-import { activeOrderAccessKey, orderAccessToken } from "./order-access";
 import {
   deliverNotification,
   newNotification,
@@ -40,117 +32,7 @@ export function stripeClient() {
     throw new ApiError(503, "Stripe is not configured.");
   return new Stripe(process.env.STRIPE_SECRET_KEY);
 }
-const checkoutSchema = z
-  .object({
-    designId: z.string().uuid(),
-    token: z.string().min(32).max(256),
-    shippingId: z.enum(["standard", "express"]).default("standard"),
-    proofApproved: z.literal(true),
-    proofHash: z.string().regex(/^[a-f0-9]{64}$/),
-    analyticsSessionId: z.string().uuid().optional(),
-    analyticsConsent: z.boolean().optional(),
-  })
-  .strict();
-export async function beginCheckout(input: unknown) {
-  const body = checkoutSchema.parse(input);
-  const gates = launchGates();
-  const catalogue = await getCatalogue();
-  if (gates.some((gate) => !gate.passed) || catalogue.prototype)
-    throw new ApiError(
-      503,
-      "Checkout opens after physical trials and production services are approved. Your design can still be saved.",
-      { gates, catalogueApproved: !catalogue.prototype },
-    );
-  const design = await authorizedDesign(body.designId, body.token);
-  const validatedModes = (
-    process.env.PHYSICALLY_VALIDATED_MODES || "dots"
-  ).split(",");
-  if (!validatedModes.includes(design.mode) || design.settings.invert)
-    throw new ApiError(
-      409,
-      "This mode or inverted substrate is still in physical testing.",
-    );
-  const price = quote(
-    catalogue,
-    design.productId,
-    design.finishId,
-    body.shippingId,
-  );
-  assertProductDimensions(design.settings, price.product);
-  await takeQuota(design.id, "checkout-design", 3, 3600);
-  const orderId = randomUUID();
-  const accessKeyId = activeOrderAccessKey();
-  const token = orderAccessToken(orderId, accessKeyId);
-  const production = await createProductionPackage(
-    design,
-    orderId,
-    design.settings,
-    design.crop,
-    body.proofHash,
-  );
-  const checkout: Checkout = {
-    id: orderId,
-    tokenHash: digest(token),
-    accessKeyId,
-    createdAt: new Date().toISOString(),
-    design: {
-      ...design,
-      email: undefined,
-      source: production.source,
-      subjectMask: production.subjectMask,
-    },
-    package: production,
-    amountPence: price.totalPence,
-    shippingId: body.shippingId,
-    analyticsSessionHash:
-      body.analyticsConsent && body.analyticsSessionId
-        ? anonymousHash(body.analyticsSessionId)
-        : undefined,
-  };
-  await putRecord("checkouts", orderId, checkout, true);
-  const origin = process.env.NEXT_PUBLIC_SITE_URL!;
-  const session = await stripeClient().checkout.sessions.create(
-    {
-      mode: "payment",
-      client_reference_id: orderId,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "gbp",
-            unit_amount: price.itemPence,
-            product_data: {
-              name: `Slow Reveal ${design.mode} · ${price.product.label}`,
-              description: price.finish.label,
-            },
-          },
-        },
-      ],
-      shipping_address_collection: { allowed_countries: ["GB"] },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: "fixed_amount",
-            fixed_amount: {
-              amount: price.shipping.pricePence,
-              currency: "gbp",
-            },
-            display_name: price.shipping.label,
-          },
-        },
-      ],
-      allow_promotion_codes: true,
-      success_url: `${origin}/order/${orderId}#token=${token}`,
-      cancel_url: `${origin}/design/${design.id}#token=${body.token}`,
-      metadata: { orderId, snapshotHash: production.snapshotHash },
-      customer_email: design.email,
-      expires_at: Math.floor(Date.now() / 1000) + 3600,
-    },
-    { idempotencyKey: `checkout-${orderId}` },
-  );
-  await putRecord("checkouts", orderId, { ...checkout, sessionId: session.id });
-  return { url: session.url, orderId, token };
-}
+export { beginCheckout } from "./checkout-attempts";
 /** Called only after signature verification. A browser redirect has no route to this function. */
 export function validatePaidSession(
   session: Stripe.Checkout.Session,

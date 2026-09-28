@@ -1,6 +1,12 @@
 import { removeAsset, type PrivateAsset } from "./assets";
-import type { Design, Checkout, Order } from "./schema";
-import { deleteRecord, getRecord, listRecords, replaceOrder } from "./store";
+import type { Design, Checkout, CheckoutAttempt, Order } from "./schema";
+import {
+  deleteRecord,
+  getRecord,
+  listRecords,
+  replaceCheckoutAttempt,
+  replaceOrder,
+} from "./store";
 import { ApiError } from "./security";
 import { stripeClient } from "./commerce";
 import { type UploadTicket, deleteUpload } from "./uploads";
@@ -14,16 +20,21 @@ import {
 } from "./artwork-assets";
 
 export async function expireUnpaidDesigns() {
-  const [designs, checkouts, orders] = await Promise.all([
+  const [designs, checkouts, orders, attempts] = await Promise.all([
     listRecords<Design>("designs"),
     listRecords<Checkout>("checkouts"),
     listRecords<Order>("orders"),
+    listRecords<CheckoutAttempt>("checkout-attempts"),
   ]);
   const attached = new Set([
     ...checkouts.flatMap(checkoutArtworkAssets).map((asset) => asset.key),
     ...orders
       .filter((o) => !o.dataDeletedAt)
       .flatMap(orderArtworkAssets)
+      .map((asset) => asset.key),
+    ...attempts
+      .filter((attempt) => attempt.state !== "closed")
+      .flatMap((attempt) => [...attempt.sourceAssets, ...attempt.assets])
       .map((asset) => asset.key),
   ]);
   const retainedDesignKeys = new Set(
@@ -70,10 +81,11 @@ export async function eraseOrderArtwork(
     throw new ApiError(409, "Resolve fulfilment before deleting paid artwork.");
   const assets: PrivateAsset[] = orderArtworkAssets(order);
   const unique = new Map(assets.map((a) => [a.key, a]));
-  const [otherOrders, otherCheckouts, designs] = await Promise.all([
+  const [otherOrders, otherCheckouts, designs, attempts] = await Promise.all([
     listRecords<Order>("orders"),
     listRecords<Checkout>("checkouts"),
     listRecords<Design>("designs"),
+    listRecords<CheckoutAttempt>("checkout-attempts"),
   ]);
   const protectedSources = new Set([
     ...otherOrders
@@ -85,6 +97,10 @@ export async function eraseOrderArtwork(
       .flatMap(checkoutArtworkAssets)
       .map((asset) => asset.key),
     ...designs.flatMap(designArtworkAssets).map((asset) => asset.key),
+    ...attempts
+      .filter((attempt) => attempt.state !== "closed" && attempt.orderId !== id)
+      .flatMap((attempt) => [...attempt.sourceAssets, ...attempt.assets])
+      .map((asset) => asset.key),
   ]);
   // Mark before deleting: concurrent readers fail closed while erasure is in progress.
   const erasedAt = new Date().toISOString();
@@ -120,7 +136,94 @@ export async function eraseOrderArtwork(
   };
 }
 
+/** Close before sweeping; the same CAS fences checkout publication by late workers. */
+export async function cleanupCheckoutAttempts() {
+  const attempts = await listRecords<CheckoutAttempt>("checkout-attempts");
+  let checkoutAttemptsClosed = 0;
+  let checkoutAttemptAssetsSwept = 0;
+  let checkoutAttemptAssetsProtected = 0;
+  for (let attempt of attempts) {
+    if (
+      attempt.state === "producing" &&
+      Date.parse(attempt.productionExpiresAt) <= Date.now()
+    ) {
+      const closed: CheckoutAttempt = {
+        ...attempt,
+        state: "closed",
+        closedAt: new Date().toISOString(),
+      };
+      try {
+        await replaceCheckoutAttempt(attempt, closed);
+        attempt = closed;
+        checkoutAttemptsClosed++;
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 409) continue;
+        throw error;
+      }
+    }
+    if (attempt.state !== "closed") continue;
+    // Recheck durable ownership after closure. A local crash or ambiguous DB
+    // response can leave a published checkout even if its attempt looks unfinished.
+    const [checkouts, orders, designs, currentAttempts] = await Promise.all([
+      listRecords<Checkout>("checkouts"),
+      listRecords<Order>("orders"),
+      listRecords<Design>("designs"),
+      listRecords<CheckoutAttempt>("checkout-attempts"),
+    ]);
+    const current = currentAttempts.find((item) => item.id === attempt.id);
+    if (!current || current.state !== "closed") continue;
+    const protectedKeys = new Set(
+      [
+        ...checkouts.flatMap(checkoutArtworkAssets),
+        ...orders
+          .filter((order) => !order.dataDeletedAt)
+          .flatMap(orderArtworkAssets),
+        ...designs.flatMap(designArtworkAssets),
+        ...currentAttempts
+          .filter((item) => item.state !== "closed")
+          .flatMap((item) => [...item.sourceAssets, ...item.assets]),
+        ...current.sourceAssets,
+      ].map((asset) => asset.key),
+    );
+    for (const asset of new Map(
+      current.assets.map((item) => [item.key, item]),
+    ).values()) {
+      const parts = asset.key.split("/");
+      const ownedOutput =
+        parts.length === 4 &&
+        parts[0] === "orders" &&
+        parts[1] === current.orderId &&
+        /^[a-f0-9-]{36}$/.test(parts[2]) &&
+        /^[a-zA-Z0-9_.-]+$/.test(parts[3]) &&
+        parts[3] !== "." &&
+        parts[3] !== "..";
+      if (!ownedOutput || protectedKeys.has(asset.key)) {
+        checkoutAttemptAssetsProtected++;
+        continue;
+      }
+      await removeAsset(asset);
+      checkoutAttemptAssetsSwept++;
+    }
+    // Keep the tombstone and its complete ledger. A request already in storage
+    // may finish after this sweep, so every later run must sweep these keys again.
+    try {
+      await replaceCheckoutAttempt(current, {
+        ...current,
+        cleanupCheckedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.status !== 409) throw error;
+    }
+  }
+  return {
+    checkoutAttemptsClosed,
+    checkoutAttemptAssetsSwept,
+    checkoutAttemptAssetsProtected,
+  };
+}
+
 export async function runRetention() {
+  const checkoutAttemptCleanup = await cleanupCheckoutAttempts();
   const [uploads, events, checkouts, orders, designs] = await Promise.all([
     listRecords<UploadTicket>("uploads"),
     listRecords<AnalyticsRecord>("events"),
@@ -180,6 +283,34 @@ export async function runRetention() {
       checkoutsForManualReview++;
       continue;
     }
+    if (await getRecord<Order>("orders", checkout.id)) continue;
+    const attempts = await listRecords<CheckoutAttempt>("checkout-attempts");
+    const attempt = attempts.find((item) =>
+      checkout.attemptId
+        ? item.id === checkout.attemptId
+        : item.orderId === checkout.id,
+    );
+    if (attempt && attempt.state !== "closed") {
+      if (
+        attempt.orderId !== checkout.id ||
+        (attempt.sessionId && attempt.sessionId !== checkout.sessionId) ||
+        (attempt.stripeLeaseAt &&
+          Date.parse(attempt.stripeLeaseAt) > Date.now() - 90_000)
+      ) {
+        checkoutsForManualReview++;
+        continue;
+      }
+      try {
+        await replaceCheckoutAttempt(attempt, {
+          ...attempt,
+          state: "closed",
+          closedAt: new Date().toISOString(),
+        });
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 409) continue;
+        throw error;
+      }
+    }
     const protectedKeys = new Set([
       ...checkouts
         .filter((c) => c.id !== checkout.id)
@@ -190,6 +321,10 @@ export async function runRetention() {
         .flatMap(orderArtworkAssets)
         .map((asset) => asset.key),
       ...designs.flatMap(designArtworkAssets).map((asset) => asset.key),
+      ...attempts
+        .filter((item) => item.id !== attempt?.id && item.state !== "closed")
+        .flatMap((item) => [...item.sourceAssets, ...item.assets])
+        .map((asset) => asset.key),
     ]);
     for (const asset of packageAssets(checkout.package))
       if (!protectedKeys.has(asset.key)) await removeAsset(asset);
@@ -198,6 +333,7 @@ export async function runRetention() {
   }
   return {
     ...(await expireUnpaidDesigns()),
+    ...checkoutAttemptCleanup,
     stagedUploadsDeleted,
     analyticsBatchesDeleted,
     abandonedCheckoutsDeleted,

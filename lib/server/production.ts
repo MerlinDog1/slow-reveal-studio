@@ -17,6 +17,11 @@ import { ApiError, digest } from "./security";
 import { designSubjectMask } from "./subject-masks";
 import { createProductionKit, packageFileDescriptor } from "./production-kit";
 
+export interface ProductionLifecycle {
+  /** Persist this complete output ledger before any private object is written. */
+  beforeWrite(assets: PrivateAsset[]): Promise<void>;
+}
+
 /** A fixed 1000px analysis raster is shared with the editor; final geometry remains in mm. */
 export async function cropRaster(
   bytes: Buffer,
@@ -115,6 +120,7 @@ export async function createProductionPackage(
   settings = design.settings,
   crop = design.crop,
   expectedProofHash?: string,
+  lifecycle?: ProductionLifecycle,
 ): Promise<Package> {
   const { geometry, source, cropped, subjectMask } = await renderDesign(
     design,
@@ -279,44 +285,64 @@ export async function createProductionPackage(
     ),
   );
   const base = `orders/${orderId}/${revisionId}`;
+  const output = (name: string, bytes: Buffer, mime: string) => ({
+    asset: {
+      key: `${base}/${name}`,
+      mime,
+      bytes: bytes.byteLength,
+      sha256: digest(bytes),
+    },
+    body: bytes,
+  });
+  const sourceFile = output(
+    `original.${originalExtension}`,
+    source,
+    design.source.mime,
+  );
+  const maskFile = subjectMaskBytes
+    ? output("subject-mask.json", subjectMaskBytes, "application/json")
+    : undefined;
+  const templateFile = output(
+    "template.svg",
+    Buffer.from(template),
+    "image/svg+xml",
+  );
+  const finishedFile = output(
+    "finished.svg",
+    Buffer.from(finished),
+    "image/svg+xml",
+  );
+  const archiveFile = output(
+    `${prefix}.zip`,
+    await archive.generateAsync({
+      type: "nodebuffer",
+      compression: "DEFLATE",
+      compressionOptions: { level: 4 },
+    }),
+    "application/zip",
+  );
+  const planned = [
+    sourceFile,
+    ...(maskFile ? [maskFile] : []),
+    templateFile,
+    finishedFile,
+    archiveFile,
+  ];
+  // Register all keys and exact bytes, including a PUT whose remote success may
+  // be hidden by a transport error. The caller owns durable cleanup/recovery.
+  await lifecycle?.beforeWrite(planned.map(({ asset }) => ({ ...asset })));
   const written: PrivateAsset[] = [];
-  const write = async (key: string, bytes: Buffer, mime: string) => {
-    const asset = await putAsset(key, bytes, mime);
+  const write = async (file: (typeof planned)[number]) => {
+    const asset = await putAsset(file.asset.key, file.body, file.asset.mime);
     written.push(asset);
     return asset;
   };
   try {
-    const privateSource = await write(
-      `${base}/original.${originalExtension}`,
-      source,
-      design.source.mime,
-    );
-    const privateMask = subjectMaskBytes
-      ? await write(
-          `${base}/subject-mask.json`,
-          subjectMaskBytes,
-          "application/json",
-        )
-      : undefined;
-    const templateSvg = await write(
-      `${base}/template.svg`,
-      Buffer.from(template),
-      "image/svg+xml",
-    );
-    const finishedSvg = await write(
-      `${base}/finished.svg`,
-      Buffer.from(finished),
-      "image/svg+xml",
-    );
-    const zipped = await write(
-      `${base}/${prefix}.zip`,
-      await archive.generateAsync({
-        type: "nodebuffer",
-        compression: "DEFLATE",
-        compressionOptions: { level: 4 },
-      }),
-      "application/zip",
-    );
+    const privateSource = await write(sourceFile);
+    const privateMask = maskFile ? await write(maskFile) : undefined;
+    const templateSvg = await write(templateFile);
+    const finishedSvg = await write(finishedFile);
+    const zipped = await write(archiveFile);
     return {
       archive: zipped,
       templateSvg,

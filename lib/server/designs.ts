@@ -9,7 +9,13 @@ import {
   type PrivateAsset,
 } from "./assets";
 import { getCatalogue, quote } from "./catalog";
-import { designSchema, type Design, type Checkout, type Order } from "./schema";
+import {
+  designSchema,
+  type Design,
+  type Checkout,
+  type CheckoutAttempt,
+  type Order,
+} from "./schema";
 import { ApiError, digest, newToken, tokenMatches } from "./security";
 import { getRecord, listRecords, putRecord, deleteRecord } from "./store";
 import { sendEmail } from "./email";
@@ -144,9 +150,13 @@ export async function deleteDesign(id: string, token: string | null) {
   const design = await authorizedDesign(id, token);
   const checkouts = await listRecords<Checkout>("checkouts");
   const orders = await listRecords<Order>("orders");
+  const attempts = (
+    await listRecords<CheckoutAttempt>("checkout-attempts")
+  ).filter((attempt) => attempt.state !== "closed");
   if (
     checkouts.some((item) => item.design.id === id) ||
-    orders.some((item) => item.originalSnapshot.design.id === id)
+    orders.some((item) => item.originalSnapshot.design.id === id) ||
+    attempts.some((attempt) => attempt.designId === id)
   )
     throw new ApiError(
       409,
@@ -162,6 +172,10 @@ export async function deleteDesign(id: string, token: string | null) {
       ...otherDesigns
         .filter((other) => other.id !== id)
         .flatMap(designArtworkAssets),
+      ...attempts.flatMap((attempt) => [
+        ...attempt.sourceAssets,
+        ...attempt.assets,
+      ]),
     ].map((asset) => asset.key),
   );
   await Promise.all(

@@ -1696,8 +1696,8 @@ export function Studio({
               )}
               {settings.mode !== "dots" && (
                 <div className="inline-warning">
-                  Experimental study. This mode is available in the lab only
-                  until physical completion has been tested.
+                  Experimental study. Explore previews and prototype templates;
+                  physical kits are not yet approved for sale.
                 </div>
               )}
               {settings.mode === "fibonacci" && (

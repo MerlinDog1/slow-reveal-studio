@@ -16,13 +16,13 @@ import {
   CanvasChoiceSection,
 } from "@/components/making-guides";
 import { trustedPublicOrigin } from "@/lib/public-origin";
-import { getAvailableModes } from "@/lib/mode-availability";
+import { getPreviewModes } from "@/lib/mode-availability";
 
 export const metadata = {
   alternates: trustedPublicOrigin() ? { canonical: "/" } : undefined,
 };
 export default function Home() {
-  const availableModes = getAvailableModes();
+  const availableModes = getPreviewModes();
   return (
     <>
       <SiteHeader />

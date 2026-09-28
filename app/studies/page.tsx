@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import marketing from "@/public/marketing/manifest.json";
-import { getAvailableModes } from "@/lib/mode-availability";
+import { getPreviewModes } from "@/lib/mode-availability";
 
 export const metadata = {
   title: "Studies in making",
@@ -82,7 +82,7 @@ const studies = [
   ],
 ];
 export default function Studies() {
-  const availableModes = getAvailableModes();
+  const availableModes = getPreviewModes();
   const visibleStudies = studies.filter(([file]) => {
     if (file.startsWith("mosaic-")) return availableModes.includes("mosaic");
     if (file.startsWith("contour-")) return availableModes.includes("contour");

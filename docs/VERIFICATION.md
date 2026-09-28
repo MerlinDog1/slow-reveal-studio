@@ -2,6 +2,13 @@
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
 
+## Hosted prototype modes — 28 September
+
+- Public preview access is separate from customer-design eligibility. The explicit prototype flag, together with checkout explicitly disabled, enables all six active modes in the editor, catalogue and generated lab pages. Retired Contour and Stipple routes remain excluded.
+- Policy regressions exercise strict flag combinations, missing checkout configuration, approved-mode fallback and unchanged customer eligibility. Provider-free server regressions verify that unapproved alternate-mode customer saves return 409 without persisting their photograph and checkout returns 503 before production or payment-provider work.
+- Existing renderer algorithms, physical-approval checks, webhook handling and paid snapshots are unchanged. Private server saving and production services remain separate launch gates.
+- `npm run typecheck`, `npm test` and `npm run build` passed: 201 tests total, 199 passed, zero failed and two existing optional browser checks skipped. The build used `PUBLIC_PROTOTYPE_MODES_ENABLED=true`, `LIVE_CHECKOUT_ENABLED=false` and `PHYSICAL_VALIDATION_APPROVED=false`; its prerender manifest contains all six active lab routes. All 40 traced function bundles exclude private `.data` files. `git diff --check` passed.
+
 ## Colour Fibonacci Spiral — 28 September
 
 - Renderer 1.7.0 adds eight- and sixteen-colour choices alongside single ink. Colour tests verify identical golden-angle sites, real clear gaps, bounds, deterministic palette assignments, blank white/transparent handling, preserved monochrome geometry, exact circle-area statistics, light-canvas enforcement and improved average linear-colour error from neighbouring pen mixtures. Historical single-ink snapshots with unused palette settings retain their SVGs and single-ink guides.

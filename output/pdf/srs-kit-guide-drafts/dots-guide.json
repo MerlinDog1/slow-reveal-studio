@@ -1,0 +1,88 @@
+{
+  "version": "srs-kit-guide/1.0.0",
+  "rendererVersion": "slow-reveal-geometry/1.3.0",
+  "status": "draft-for-physical-trial",
+  "mode": "dots",
+  "dimensions": {
+    "widthMm": 400,
+    "heightMm": 500
+  },
+  "title": "Fill the circles",
+  "steps": [
+    {
+      "title": "Find a small area",
+      "body": "Choose a few outlined circles. The spaces between them are part of the image."
+    },
+    {
+      "title": "Fill each circle",
+      "body": "Use the trial marker to fill inside each circular boundary. Keep separate circles separate."
+    },
+    {
+      "title": "Follow the changing sizes",
+      "body": "Fill the shape that is printed, including the smaller circles. Do not turn every mark into the same size."
+    },
+    {
+      "title": "Compare and record",
+      "body": "Compare the filled area with the digital reference. Record guide visibility, control and any marks that join."
+    }
+  ],
+  "materials": [
+    {
+      "id": "canvas",
+      "label": "Printed canvas: 400 x 500 mm; substrate and finish require trial approval.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "marker-ink",
+      "label": "Mode-appropriate marker for single ink #1e1e1c; tip, SKU, lot and quantity unassigned.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "making-guide",
+      "label": "Printed making guide and colour key; this draft still requires a physical comprehension trial.",
+      "assignmentStatus": "unresolved"
+    }
+  ],
+  "legend": [
+    {
+      "id": "ink",
+      "index": null,
+      "color": "#1e1e1c",
+      "usedCellCount": 0
+    }
+  ],
+  "warnings": [
+    "Draft for physical trials. This guide does not approve a product, material combination or production setting.",
+    "Digital colour swatches are references, not verified matches to physical marker ink.",
+    "Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.",
+    "Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples."
+  ],
+  "sample": {
+    "circleIndices": [
+      5439,
+      5440,
+      5441,
+      5524,
+      5525,
+      5526,
+      5527,
+      5612,
+      5613,
+      5614,
+      5701,
+      5702,
+      5703,
+      5704,
+      5791,
+      5792
+    ],
+    "cellIndices": [],
+    "pathIndices": [],
+    "boundsMm": {
+      "x": 190.1859,
+      "y": 239.3361,
+      "width": 19.5603,
+      "height": 21.4923
+    }
+  }
+}

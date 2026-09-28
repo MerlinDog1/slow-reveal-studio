@@ -1,0 +1,112 @@
+{
+  "version": "srs-kit-guide/1.0.0",
+  "rendererVersion": "slow-reveal-geometry/1.3.0",
+  "status": "draft-for-physical-trial",
+  "mode": "mosaic",
+  "dimensions": {
+    "widthMm": 400,
+    "heightMm": 500
+  },
+  "title": "Fill the cells",
+  "steps": [
+    {
+      "title": "Check the key first",
+      "body": "For numbered cells, match the printed number to the key on page 2. The operator must first assign and test the physical markers."
+    },
+    {
+      "title": "Fill within each cell",
+      "body": "Fill the outlined cell with its assigned colour. In a single-ink design, use the selected ink for every cell."
+    },
+    {
+      "title": "Keep the blank spaces",
+      "body": "Leave areas without cells unmarked. Blank paper is not an extra numbered marker colour."
+    },
+    {
+      "title": "Compare and record",
+      "body": "Compare a small filled area with the digital reference. Record number readability, colour matching and coverage."
+    }
+  ],
+  "materials": [
+    {
+      "id": "canvas",
+      "label": "Printed canvas: 400 x 500 mm; substrate and finish require trial approval.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "marker-1",
+      "label": "Marker matching key 1 (#1e1e1c); SKU, lot and quantity unassigned.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "marker-2",
+      "label": "Marker matching key 2 (#445e7c); SKU, lot and quantity unassigned.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "marker-4",
+      "label": "Marker matching key 4 (#b97a68); SKU, lot and quantity unassigned.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "making-guide",
+      "label": "Printed making guide and colour key; this draft still requires a physical comprehension trial.",
+      "assignmentStatus": "unresolved"
+    }
+  ],
+  "legend": [
+    {
+      "id": "1",
+      "index": 1,
+      "color": "#1e1e1c",
+      "usedCellCount": 3268
+    },
+    {
+      "id": "2",
+      "index": 2,
+      "color": "#445e7c",
+      "usedCellCount": 190
+    },
+    {
+      "id": "3",
+      "index": 3,
+      "color": "#7b8b77",
+      "usedCellCount": 0
+    },
+    {
+      "id": "4",
+      "index": 4,
+      "color": "#b97a68",
+      "usedCellCount": 147
+    }
+  ],
+  "warnings": [
+    "Draft for physical trials. This guide does not approve a product, material combination or production setting.",
+    "Digital colour swatches are references, not verified matches to physical marker ink.",
+    "Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.",
+    "Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples."
+  ],
+  "sample": {
+    "circleIndices": [],
+    "cellIndices": [
+      1690,
+      1691,
+      1742,
+      1743,
+      1744,
+      1745,
+      1796,
+      1797,
+      1798,
+      1799,
+      1851,
+      1852
+    ],
+    "pathIndices": [],
+    "boundsMm": {
+      "x": 184.3,
+      "y": 234.3,
+      "width": 31.4,
+      "height": 31.4
+    }
+  }
+}

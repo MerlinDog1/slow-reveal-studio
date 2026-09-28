@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 1,
+  "kitGuideVersion": "srs-kit-guide/1.0.0",
+  "rendererVersion": "slow-reveal-geometry/1.3.0",
+  "pdfVersion": "slow-reveal-raster-pdf/1.0.0",
+  "runtime": {
+    "node": "v24.13.1",
+    "sharp": {
+      "aom": "3.15.1",
+      "archive": "3.8.9",
+      "cairo": "1.18.6",
+      "cgif": "0.5.4",
+      "exif": "0.6.26",
+      "expat": "2.8.5",
+      "ffi": "3.8.0",
+      "fontconfig": "2.18.3",
+      "freetype": "2.14.3",
+      "fribidi": "1.0.17",
+      "glib": "2.90.0",
+      "harfbuzz": "14.5.0",
+      "heif": "1.23.5",
+      "highway": "1.4.0",
+      "imagequant": "2.4.1",
+      "lcms": "2.19.1",
+      "mozjpeg": "0826579",
+      "pango": "1.58.2",
+      "pixman": "0.46.4",
+      "png": "1.6.58",
+      "proxy-libintl": "0.5",
+      "rsvg": "2.63.2",
+      "tiff": "4.7.2",
+      "uhdr": "2.0.2",
+      "vips": "8.18.7",
+      "webp": "1.6.0",
+      "xml2": "2.15.4",
+      "zlib-ng": "2.3.3",
+      "sharp": "0.35.5"
+    }
+  },
+  "status": "draft-for-physical-trial",
+  "physicalValidation": "NOT PERFORMED",
+  "command": "npm run kit-guides",
+  "source": {
+    "id": "portrait",
+    "file": "/references/portrait.jpg",
+    "author": "Joe Gardner",
+    "source": "https://unsplash.com/photos/man-wearing-black-hat-6p8ngTH1bUI",
+    "downloadUrl": "https://images.unsplash.com/photo-1532123675048-773bd75df1b4?auto=format&fit=max&fm=jpg&q=85&w=1400",
+    "license": "Unsplash License",
+    "licenseUrl": "https://unsplash.com/license",
+    "licenseVerifiedAt": "2026-09-27",
+    "usage": "Renderer laboratory fixture; not a customer result or product endorsement",
+    "modifications": "Resized JPEG derivative at 1400px width, aspect ratio preserved, quality 85",
+    "width": 1400,
+    "height": 2100,
+    "bytes": 538963,
+    "sha256": "c539da5c8e48addde1dde35005e93c5d91ed732839c072e7f02eb1ff3f123393"
+  },
+  "sourceCrop": "EXIF-oriented centre-cover 800x1000 pixels, flattened white",
+  "page": {
+    "widthMm": 210,
+    "heightMm": 297,
+    "dpi": 300,
+    "count": 8,
+    "widthPx": 2480,
+    "heightPx": 3508
+  },
+  "modes": [
+    {
+      "mode": "dots",
+      "firstPage": 1,
+      "lastPage": 2,
+      "geometry": {
+        "file": "output/pdf/srs-kit-guide-drafts/dots-geometry.json",
+        "bytes": 793658,
+        "sha256": "bae0690750aad14157a21958c058e746788a1edbc18a7eeaaa534ae7bf493f7d",
+        "mime": "application/json"
+      },
+      "model": {
+        "file": "output/pdf/srs-kit-guide-drafts/dots-guide.json",
+        "bytes": 2489,
+        "sha256": "2da2e2c18a66ea5329697154d56a1c1d461dec500f589f8dfacaf291e7181910",
+        "mime": "application/json"
+      }
+    },
+    {
+      "mode": "mosaic",
+      "firstPage": 3,
+      "lastPage": 4,
+      "geometry": {
+        "file": "output/pdf/srs-kit-guide-drafts/mosaic-geometry.json",
+        "bytes": 569604,
+        "sha256": "2f67b42cd231b94f164bf48d75469e456170882fa21f943390834756518cded9",
+        "mime": "application/json"
+      },
+      "model": {
+        "file": "output/pdf/srs-kit-guide-drafts/mosaic-guide.json",
+        "bytes": 3085,
+        "sha256": "1995ff026c3e546ec0252e7648529f4d0b79ed2d858721ded9f1342cf39ce72f",
+        "mime": "application/json"
+      }
+    },
+    {
+      "mode": "contour",
+      "firstPage": 5,
+      "lastPage": 6,
+      "geometry": {
+        "file": "output/pdf/srs-kit-guide-drafts/contour-geometry.json",
+        "bytes": 60038,
+        "sha256": "fae77be4b25dad416a972f4843a44eee44f6cdae8dcfe2d3e9cfc223b397e658",
+        "mime": "application/json"
+      },
+      "model": {
+        "file": "output/pdf/srs-kit-guide-drafts/contour-guide.json",
+        "bytes": 2359,
+        "sha256": "c1870925d6bb801e452026c59fb055782ef4001013f48c0719c104650156c095",
+        "mime": "application/json"
+      }
+    },
+    {
+      "mode": "line-amplification",
+      "firstPage": 7,
+      "lastPage": 8,
+      "geometry": {
+        "file": "output/pdf/srs-kit-guide-drafts/line-amplification-geometry.json",
+        "bytes": 260473,
+        "sha256": "aebdece926443eea9461a15d185769b4918c1122f2ec0cf843e7a54aa4ed2fe4",
+        "mime": "application/json"
+      },
+      "model": {
+        "file": "output/pdf/srs-kit-guide-drafts/line-amplification-guide.json",
+        "bytes": 2850,
+        "sha256": "c227b70689dcc0526c22401f47c798fa422d00eab408d1d153e9f49a11b1edbe",
+        "mime": "application/json"
+      }
+    }
+  ],
+  "pdf": {
+    "file": "output/pdf/srs-kit-guide-drafts.pdf",
+    "bytes": 3787985,
+    "sha256": "ab855f2034333e090f39db55e42b0853ccbd7a3dccb2e81aeb0d2498a5e70a71",
+    "mime": "application/pdf"
+  },
+  "sources": [
+    {
+      "file": "scripts/build-kit-guide-examples.ts",
+      "sha256": "ce914bdd574da7b0c11cd797acaebbeac424d07d32c0c07b8823fd66e774ccc5"
+    },
+    {
+      "file": "lib/kit-guide.ts",
+      "sha256": "08b8a8858dae21b2d5eae45c8fa417bb55d5cfc870c58663186c9afb5415992a"
+    },
+    {
+      "file": "lib/kit-guide-svg.ts",
+      "sha256": "9e04d0cec48d4fec7624f7c34cd9825db4059a0b66339767026003c48f8b6ceb"
+    },
+    {
+      "file": "lib/artwork-pdf.ts",
+      "sha256": "0789e2d26c6250858f9ba769c8faa4147b23e3b41269ce3c087ba385cdbabfd4"
+    },
+    {
+      "file": "lib/renderers/fonts.ts",
+      "sha256": "dbc8f3b1d1194651c76ec1f4205c2161d12116f5373b598eb083214084656c92"
+    },
+    {
+      "file": "lib/renderers/types.ts",
+      "sha256": "4a01c79c5599704d9f48420f395847ba7aa99e7c7b08025ef961cbf4d447434b"
+    },
+    {
+      "file": "lib/renderers/index.ts",
+      "sha256": "520fd37d216deee24aa806cd3567cee12263126913cf5c0a4b1b9fb05ac0bdc9"
+    },
+    {
+      "file": "lib/renderers/modes.ts",
+      "sha256": "015bbe6b791375d84f69801bb8a5102de7499429733d3b34bc9680c38b5d5644"
+    },
+    {
+      "file": "lib/renderers/sampling.ts",
+      "sha256": "7c5e9e9f34bc5620384afb654b0077616d3e15ead2687dfa9475b4d8d0cfb2c5"
+    },
+    {
+      "file": "lib/renderers/font-data.json",
+      "sha256": "72d7eb28c8a1e9829c0e3767bc689500db9287ace838ec623931805e270c9495"
+    },
+    {
+      "file": "lib/renderers/svg.ts",
+      "sha256": "989cafc9516f574b5ac9d5ca3692258486f876da2a110a37acf1748041bab3ff"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256": "a86f3ffc077bda2cfe266220df8072d2ba3f365e4cc5cb9567ba03548ef5ced9"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/dots-geometry.json",
+      "bytes": 793658,
+      "sha256": "bae0690750aad14157a21958c058e746788a1edbc18a7eeaaa534ae7bf493f7d",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/dots-guide.json",
+      "bytes": 2489,
+      "sha256": "2da2e2c18a66ea5329697154d56a1c1d461dec500f589f8dfacaf291e7181910",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/dots-guide.txt",
+      "bytes": 1703,
+      "sha256": "f574db0ad620ee910a1eefe3d113e8d8b77bf4af2d95e60876a9c4226306bdd0",
+      "mime": "text/plain"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/dots-page-1.svg",
+      "bytes": 362900,
+      "sha256": "2e4d86b5a12d06bc7bc5fee65b81c7c9ba602e478c988f7cd7eea0aa1726b746",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/dots-page-2.svg",
+      "bytes": 363982,
+      "sha256": "f83abbc7b24de24a3a360798f1d5b862455ac3ce514bb487a56000a25af19f06",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/mosaic-geometry.json",
+      "bytes": 569604,
+      "sha256": "2f67b42cd231b94f164bf48d75469e456170882fa21f943390834756518cded9",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/mosaic-guide.json",
+      "bytes": 3085,
+      "sha256": "1995ff026c3e546ec0252e7648529f4d0b79ed2d858721ded9f1342cf39ce72f",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/mosaic-guide.txt",
+      "bytes": 2083,
+      "sha256": "7946f1038aeb9ac992fdb61f14de6690356ce08107fe0a2bcad4bfda5def0fd1",
+      "mime": "text/plain"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/mosaic-page-1.svg",
+      "bytes": 383456,
+      "sha256": "4fb5ddda77983b4a808a37f8b0f33a2dc9cce39ddc2ac6f2e2e61ccd82fccfb6",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/mosaic-page-2.svg",
+      "bytes": 432727,
+      "sha256": "921266eaad2f1cca916f5bb4033e4b3c6ae9fc874f388b352f523054e23c05fd",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/contour-geometry.json",
+      "bytes": 60038,
+      "sha256": "fae77be4b25dad416a972f4843a44eee44f6cdae8dcfe2d3e9cfc223b397e658",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/contour-guide.json",
+      "bytes": 2359,
+      "sha256": "c1870925d6bb801e452026c59fb055782ef4001013f48c0719c104650156c095",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/contour-guide.txt",
+      "bytes": 1732,
+      "sha256": "f5fd1c890e41961099335a38b941a73811ae06eab65bff76a82f6294a0e58799",
+      "mime": "text/plain"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/contour-page-1.svg",
+      "bytes": 382572,
+      "sha256": "ac29b520b9e25ddfbad6dcee82f37f1fcd8ada4d19ee8f320a19d47f62b2d4e6",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/contour-page-2.svg",
+      "bytes": 364610,
+      "sha256": "84a99d8e5ca5df6234ee5ad67056e74dc828b7993bc74518022fc2dd0070bcbc",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/line-amplification-geometry.json",
+      "bytes": 260473,
+      "sha256": "aebdece926443eea9461a15d185769b4918c1122f2ec0cf843e7a54aa4ed2fe4",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/line-amplification-guide.json",
+      "bytes": 2850,
+      "sha256": "c227b70689dcc0526c22401f47c798fa422d00eab408d1d153e9f49a11b1edbe",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/line-amplification-guide.txt",
+      "bytes": 1994,
+      "sha256": "f4439eaa067047eebb666fc485196ce029faa3fa8ab1f19f85fcf65413c8e435",
+      "mime": "text/plain"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/line-amplification-page-1.svg",
+      "bytes": 411345,
+      "sha256": "0459a97ed8a379e7082e2f2083130ee6052edc6e57d74e540dc651f07ac4569c",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts/line-amplification-page-2.svg",
+      "bytes": 387584,
+      "sha256": "7d06f685046da1bb1cb5b329c45f1b0532cfa91fee37ffcf3059492cd3f927ce",
+      "mime": "image/svg+xml"
+    },
+    {
+      "file": "output/pdf/srs-kit-guide-drafts.pdf",
+      "bytes": 3787985,
+      "sha256": "ab855f2034333e090f39db55e42b0853ccbd7a3dccb2e81aeb0d2498a5e70a71",
+      "mime": "application/pdf"
+    }
+  ]
+}

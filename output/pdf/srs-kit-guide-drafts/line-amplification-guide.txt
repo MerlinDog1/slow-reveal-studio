@@ -1,0 +1,32 @@
+SLOW REVEAL STUDIO - DRAFT FOR PHYSICAL TRIAL
+Fill the horizontal strips
+400 x 500 mm artwork. Guide status: draft-for-physical-trial.
+
+MAKING TRIAL
+1. Use a ruler or straight edge
+A ruler or straight edge is required for this activity. Align it with the long horizontal edge of a printed strip.
+2. Fill the outlined strip
+Fill between the two printed boundaries. Follow the changing strip thickness; do not replace it with one thin centre line.
+3. Keep the interruptions
+Leave blank gaps between strips unmarked. Move the straight edge carefully and observe any dragging or smearing during the trial.
+4. Compare and record
+Compare with the digital reference. Record ruler handling, edge control and whether the narrow strips are comfortable to fill.
+
+DIGITAL COLOUR KEY
+Single ink: #1e1e1c. Physical marker assignment unresolved.
+Leave unmarked canvas unmarked; it is not an additional numbered colour.
+
+OPERATOR: PACKING REQUIREMENTS - NOT PACKING CONFIRMATION
+[ ] Printed canvas: 400 x 500 mm; substrate and finish require trial approval.
+[ ] Mode-appropriate marker for single ink #1e1e1c; tip, SKU, lot and quantity unassigned.
+[ ] Printed making guide and colour key; this draft still requires a physical comprehension trial.
+[ ] Ruler / straight edge: required for every Line Amplification kit.
+
+UNRESOLVED BEFORE PHYSICAL APPROVAL
+Draft for physical trials. This guide does not approve a product, material combination or production setting.
+Digital colour swatches are references, not verified matches to physical marker ink.
+Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.
+Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.
+Line Amplification remains a research activity until ruler and completion trials pass.
+
+srs-kit-guide/1.0.0; renderer slow-reveal-geometry/1.3.0. No order identity or personal lettering is included in this guide.

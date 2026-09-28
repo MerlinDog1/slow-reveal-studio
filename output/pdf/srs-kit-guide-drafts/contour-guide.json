@@ -1,0 +1,75 @@
+{
+  "version": "srs-kit-guide/1.0.0",
+  "rendererVersion": "slow-reveal-geometry/1.3.0",
+  "status": "draft-for-physical-trial",
+  "mode": "contour",
+  "dimensions": {
+    "widthMm": 400,
+    "heightMm": 500
+  },
+  "title": "Trace the paths",
+  "steps": [
+    {
+      "title": "Find one guide path",
+      "body": "Start with a short section and follow the printed route. Separate paths remain separate."
+    },
+    {
+      "title": "Trace along the guide",
+      "body": "Use the trial marker to follow the path. The finished reference shows the intended line, not a filled region."
+    },
+    {
+      "title": "Keep the open spaces",
+      "body": "Do not fill between paths or connect their ends unless the printed guide already connects them."
+    },
+    {
+      "title": "Compare and record",
+      "body": "Compare the traced section with the digital reference. Record control, line width and where the guide remains visible."
+    }
+  ],
+  "materials": [
+    {
+      "id": "canvas",
+      "label": "Printed canvas: 400 x 500 mm; substrate and finish require trial approval.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "marker-ink",
+      "label": "Mode-appropriate marker for single ink #1e1e1c; tip, SKU, lot and quantity unassigned.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "making-guide",
+      "label": "Printed making guide and colour key; this draft still requires a physical comprehension trial.",
+      "assignmentStatus": "unresolved"
+    }
+  ],
+  "legend": [
+    {
+      "id": "ink",
+      "index": null,
+      "color": "#1e1e1c",
+      "usedCellCount": 0
+    }
+  ],
+  "warnings": [
+    "Draft for physical trials. This guide does not approve a product, material combination or production setting.",
+    "Digital colour swatches are references, not verified matches to physical marker ink.",
+    "Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.",
+    "Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples."
+  ],
+  "sample": {
+    "circleIndices": [],
+    "cellIndices": [],
+    "pathIndices": [
+      7,
+      15,
+      18
+    ],
+    "boundsMm": {
+      "x": 176.4661,
+      "y": 160.9286,
+      "width": 96.1098,
+      "height": 105.4368
+    }
+  }
+}

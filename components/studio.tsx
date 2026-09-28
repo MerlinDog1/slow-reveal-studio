@@ -2260,8 +2260,10 @@ export function Studio({
                     )}
                   </div>
                   <p className="fine-print">
-                    PDF and PNG: 150 dpi. Print at 100% scale. Production
-                    samples require review before printing.
+                    Artwork PDF and PNG: 150 dpi. Print at 100% scale. The full
+                    package also includes a separate A4 making guide, colour key
+                    and packing checklist, all drafts for physical trials.
+                    Materials and instructions require review before use.
                   </p>
                   {settings.mode === "dots" && (
                     <p className="fine-print">

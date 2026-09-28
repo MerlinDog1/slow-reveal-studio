@@ -1,0 +1,30 @@
+SLOW REVEAL STUDIO - DRAFT FOR PHYSICAL TRIAL
+Fill the circles
+400 x 500 mm artwork. Guide status: draft-for-physical-trial.
+
+MAKING TRIAL
+1. Find a small area
+Choose a few outlined circles. The spaces between them are part of the image.
+2. Fill each circle
+Use the trial marker to fill inside each circular boundary. Keep separate circles separate.
+3. Follow the changing sizes
+Fill the shape that is printed, including the smaller circles. Do not turn every mark into the same size.
+4. Compare and record
+Compare the filled area with the digital reference. Record guide visibility, control and any marks that join.
+
+DIGITAL COLOUR KEY
+Single ink: #1e1e1c. Physical marker assignment unresolved.
+Leave unmarked canvas unmarked; it is not an additional numbered colour.
+
+OPERATOR: PACKING REQUIREMENTS - NOT PACKING CONFIRMATION
+[ ] Printed canvas: 400 x 500 mm; substrate and finish require trial approval.
+[ ] Mode-appropriate marker for single ink #1e1e1c; tip, SKU, lot and quantity unassigned.
+[ ] Printed making guide and colour key; this draft still requires a physical comprehension trial.
+
+UNRESOLVED BEFORE PHYSICAL APPROVAL
+Draft for physical trials. This guide does not approve a product, material combination or production setting.
+Digital colour swatches are references, not verified matches to physical marker ink.
+Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.
+Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.
+
+srs-kit-guide/1.0.0; renderer slow-reveal-geometry/1.3.0. No order identity or personal lettering is included in this guide.

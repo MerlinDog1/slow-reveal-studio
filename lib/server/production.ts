@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import JSZip from "jszip";
-import { jsPDF } from "jspdf";
+import { createArtworkPdf, ARTWORK_PDF_VERSION } from "../artwork-pdf";
 import { randomUUID } from "node:crypto";
 import {
   renderImage,
@@ -15,6 +15,7 @@ import { getAsset, putAsset, removeAsset, type PrivateAsset } from "./assets";
 import type { Crop, Design, Package } from "./schema";
 import { ApiError, digest } from "./security";
 import { designSubjectMask } from "./subject-masks";
+import { createProductionKit, packageFileDescriptor } from "./production-kit";
 
 /** A fixed 1000px analysis raster is shared with the editor; final geometry remains in mm. */
 export async function cropRaster(
@@ -157,25 +158,24 @@ export async function createProductionPackage(
     .flatten({ background: "#ffffff" })
     .jpeg({ quality: 90 })
     .toBuffer();
-  const pdf = new jsPDF({
-    orientation:
-      geometry.widthMm > geometry.heightMm ? "landscape" : "portrait",
-    unit: "mm",
-    format: [geometry.widthMm, geometry.heightMm],
-    compress: true,
-  });
-  pdf.addImage(
-    new Uint8Array(png),
-    "PNG",
-    0,
-    0,
-    geometry.widthMm,
-    geometry.heightMm,
-    undefined,
-    "FAST",
+  const pdfBytes = Buffer.from(
+    createArtworkPdf({
+      pages: [png],
+      widthMm: geometry.widthMm,
+      heightMm: geometry.heightMm,
+      dpi: 300,
+      contentSha256: digest(png),
+    }),
   );
-  const pdfBytes = Buffer.from(pdf.output("arraybuffer"));
   const revisionId = randomUUID();
+  const kit = await createProductionKit(geometry, {
+    orderId,
+    revisionId,
+    snapshotHash,
+    productId: design.productId,
+    finishId: design.finishId,
+    inkId: design.inkId,
+  });
   const prefix = `${orderId}_${design.mode}_${geometry.widthMm}x${geometry.heightMm}mm_${design.inkId}`;
   const originalExtension =
     design.source.mime === "image/png"
@@ -198,6 +198,7 @@ export async function createProductionPackage(
     mode: design.mode,
     dimensionsMm: { width: geometry.widthMm, height: geometry.heightMm },
     dpi: 300,
+    pdfFormatVersion: ARTWORK_PDF_VERSION,
     bleedMm: 0,
     safeMarginMm: settings.safeMarginMm,
     guideWidthMm: effectiveGuideWidthMm(settings),
@@ -212,6 +213,7 @@ export async function createProductionPackage(
       design.mode === "line-amplification"
         ? ["canvas", "markers", "instructions", "ruler / straight edge"]
         : ["canvas", "mode-appropriate markers", "instructions"],
+    kitGuide: kit.manifest,
     warnings: [
       ...geometry.warnings,
       "Physical UV-print and pen approval is required before printing.",
@@ -220,9 +222,21 @@ export async function createProductionPackage(
     ],
     stats: geometry.stats,
     files: {
-      templateSvg: { sha256: digest(template) },
-      templatePng: { sha256: digest(png) },
-      templatePdf: { sha256: digest(pdfBytes) },
+      templateSvg: packageFileDescriptor(
+        `production/${prefix}_template.svg`,
+        "image/svg+xml",
+        Buffer.from(template),
+      ),
+      templatePng: packageFileDescriptor(
+        `production/${prefix}_template.png`,
+        "image/png",
+        png,
+      ),
+      templatePdf: packageFileDescriptor(
+        `production/${prefix}_template.pdf`,
+        "application/pdf",
+        pdfBytes,
+      ),
     },
   };
   const archive = new JSZip();
@@ -238,6 +252,7 @@ export async function createProductionPackage(
   archive.file(`production/${prefix}_template.svg`, template);
   archive.file(`production/${prefix}_template.png`, png);
   archive.file(`production/${prefix}_template.pdf`, pdfBytes);
+  for (const file of kit.files) archive.file(file.path, file.data);
   archive.file("manifest.json", JSON.stringify(manifest, null, 2));
   archive.file(
     "render-settings.json",

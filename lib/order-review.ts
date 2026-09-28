@@ -24,6 +24,33 @@ export function orderReviewDetails(order: Order) {
   const settings = revision?.settings ?? order.originalSnapshot.design.settings;
   const artwork = revision?.package ?? order.originalSnapshot.package;
   const manifest = artwork.manifest;
+  const guide =
+    manifest.kitGuide && typeof manifest.kitGuide === "object"
+      ? (manifest.kitGuide as Record<string, unknown>)
+      : undefined;
+  const guideFiles =
+    guide?.files && typeof guide.files === "object"
+      ? (guide.files as Record<string, unknown>)
+      : undefined;
+  const guidePresent =
+    guide?.status === "draft-for-physical-trial" &&
+    guide.pages === 2 &&
+    typeof guide.version === "string" &&
+    /^srs-kit-guide\/[0-9.]+$/.test(guide.version) &&
+    ["makingGuidePdf", "guideModel", "packingListJson"].every((key) => {
+      const file = guideFiles?.[key];
+      if (!file || typeof file !== "object") return false;
+      const entry = file as Record<string, unknown>;
+      return (
+        typeof entry.path === "string" &&
+        entry.path.startsWith("kit/") &&
+        typeof entry.sha256 === "string" &&
+        /^[a-f0-9]{64}$/.test(entry.sha256) &&
+        typeof entry.bytes === "number" &&
+        Number.isSafeInteger(entry.bytes) &&
+        entry.bytes > 0
+      );
+    });
   const stats =
     manifest.stats && typeof manifest.stats === "object"
       ? (manifest.stats as Record<string, unknown>)
@@ -44,6 +71,9 @@ export function orderReviewDetails(order: Order) {
       ),
     ),
     kit: strings(manifest.kit),
+    kitGuide: guidePresent
+      ? { version: guide!.version as string, pages: 2 }
+      : undefined,
     warnings: [
       ...new Set([
         ...strings(manifest.warnings),

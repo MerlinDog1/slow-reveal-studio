@@ -93,26 +93,26 @@ export async function exportArtwork(
       await svgToPng(svg, width, height, dpi),
       `${stem}_${variant}_${dpi}dpi.png`,
     );
-  const { jsPDF } = await import("jspdf");
-  const makePdf = async (markup: string) => {
+  const { createArtworkPdf } = await import("./artwork-pdf");
+  const makePdf = async (
+    markup: string,
+    outputVariant: "finished" | "template",
+  ) => {
     const png = await svgToPng(markup, width, height, dpi);
     const buffer = new Uint8Array(await png.arrayBuffer());
-    const pdf = new jsPDF({
-      orientation:
-        geometry.widthMm > geometry.heightMm ? "landscape" : "portrait",
-      unit: "mm",
-      format: [geometry.widthMm, geometry.heightMm],
-      compress: true,
+    const pdf = createArtworkPdf({
+      pages: [buffer],
+      widthMm: geometry.widthMm,
+      heightMm: geometry.heightMm,
+      dpi,
+      contentSha256: await hashBlob(png),
+      title: `Slow Reveal Studio ${geometry.mode} ${outputVariant}`,
+      subject: "Prototype artwork - physical validation required",
     });
-    pdf.addImage(buffer, "PNG", 0, 0, geometry.widthMm, geometry.heightMm);
-    pdf.setProperties({
-      title: `Slow Reveal Studio ${geometry.mode} ${variant}`,
-      subject: "Prototype template — physical validation required",
-    });
-    return pdf.output("blob");
+    return new Blob([pdf], { type: "application/pdf" });
   };
   if (format === "pdf")
-    return downloadBlob(await makePdf(svg), `${stem}_${variant}.pdf`);
+    return downloadBlob(await makePdf(svg, variant), `${stem}_${variant}.pdf`);
   const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
   const template = toSvg(geometry, "template", { background: false }),
@@ -122,7 +122,7 @@ export async function exportArtwork(
     "production/template.png",
     await svgToPng(template, width, height, dpi),
   );
-  zip.file("production/template.pdf", await makePdf(template));
+  zip.file("production/template.pdf", await makePdf(template, "template"));
   zip.file(
     "preview/finished.png",
     await svgToPng(
@@ -148,6 +148,9 @@ export async function exportArtwork(
   );
   zip.file("geometry.json", JSON.stringify(geometry));
   if (maskJson) zip.file("source/subject-mask.json", maskJson);
+  const { prototypeKitFiles } = await import("./prototype-kit");
+  const kit = await prototypeKitFiles(geometry, svgToPng);
+  for (const file of kit.files) zip.file(file.path, file.blob);
   zip.file(
     "manifest.json",
     JSON.stringify(
@@ -164,6 +167,7 @@ export async function exportArtwork(
         requestedGuideColor: geometry.settings.guideColor ?? null,
         status: "prototype-not-approved-for-print",
         stats: geometry.stats,
+        kitGuide: kit.manifest,
         ...(maskHash
           ? {
               subjectMask: {
@@ -179,7 +183,7 @@ export async function exportArtwork(
   );
   zip.file(
     "READ-ME.txt",
-    "Prototype artwork. Print PDF at actual size (100%), never fit to page. Confirm dimensions with a ruler. Canvas, guides, marker coverage and physical completion must be tested before accepting paid orders. SVG is resolution independent; production template PNG and raster PDF are 150 dpi. The smaller finished PNG preview is 50 dpi. PNG physical dimensions are subject to pixel and pixels-per-metre rounding. This download is local and is not a paid order.",
+    "Prototype artwork. Print the artwork PDF at actual size (100%), never fit to page. Confirm dimensions with a ruler. Canvas, guides, marker coverage and physical completion must be tested before accepting paid orders. SVG is resolution independent; production template PNG and raster PDF are 150 dpi. The smaller finished PNG preview is 50 dpi. The separate A4 making guide is a 300 dpi draft for physical trials, with an exact palette key and unconfirmed packing requirements. PNG physical dimensions are subject to pixel and pixels-per-metre rounding. PDF metadata uses a fixed reproducibility date, not a print, purchase or approval date. Reproducible PDF bytes require identical raster pixels and dependency versions; browser and server rasterizers can differ. This download is local and is not a paid order.",
   );
   downloadBlob(
     await zip.generateAsync({ type: "blob" }),

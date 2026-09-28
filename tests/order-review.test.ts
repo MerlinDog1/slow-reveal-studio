@@ -94,3 +94,50 @@ test("operator review follows current revision text, warnings, kit and source ra
     "Original photo small",
   ]);
 });
+
+test("making-guide availability follows the current immutable package and requires manifest file evidence", () => {
+  const guide = {
+    version: "srs-kit-guide/1.0.0",
+    status: "draft-for-physical-trial",
+    pages: 2,
+    files: Object.fromEntries(
+      ["makingGuidePdf", "guideModel", "packingListJson"].map((key) => [
+        key,
+        { path: `kit/${key}`, bytes: 123, sha256: "a".repeat(64) },
+      ]),
+    ),
+  };
+  const order = {
+    currentRevisionId: "current",
+    originalSnapshot: {
+      design: { settings: DEFAULT_SETTINGS, warnings: [] },
+      package: { manifest: { kitGuide: guide } },
+    },
+    revisions: [
+      { id: "current", settings: DEFAULT_SETTINGS, package: { manifest: {} } },
+    ],
+  } as unknown as Order;
+  assert.equal(orderReviewDetails(order).kitGuide, undefined);
+  order.revisions[0].package.manifest.kitGuide = guide;
+  assert.deepEqual(orderReviewDetails(order).kitGuide, {
+    version: "srs-kit-guide/1.0.0",
+    pages: 2,
+  });
+  for (const change of [
+    { status: "approved" },
+    { pages: 0 },
+    { files: {} },
+    { version: "invented" },
+  ]) {
+    order.revisions[0].package.manifest.kitGuide = { ...guide, ...change };
+    assert.equal(orderReviewDetails(order).kitGuide, undefined);
+  }
+  order.revisions[0].package.manifest.kitGuide = {
+    ...guide,
+    files: {
+      ...guide.files,
+      makingGuidePdf: { path: "kit/guide.pdf", bytes: 0, sha256: "missing" },
+    },
+  };
+  assert.equal(orderReviewDetails(order).kitGuide, undefined);
+});

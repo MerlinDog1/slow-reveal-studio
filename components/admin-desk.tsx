@@ -534,6 +534,24 @@ export function AdminDesk({
                       revision.
                     </p>
                   )}
+                  <h3>Making guide and packing checklist</h3>
+                  {review.kitGuide ? (
+                    <p>
+                      This revision&apos;s production package includes a
+                      two-page A4 making guide, colour key and packing checklist
+                      ({review.kitGuide.version}). They are drafts for physical
+                      trials. Check the instructions, marker assignments and
+                      required kit items before production; no materials or
+                      packing are confirmed by generating these files.
+                    </p>
+                  ) : (
+                    <p>
+                      This revision has no making-guide files recorded in its
+                      manifest. Regenerate a new revision to include the current
+                      draft instructions and packing checklist; the paid
+                      original stays unchanged.
+                    </p>
+                  )}
                   {Boolean(review.settings.palette?.length) && (
                     <p>
                       Palette:{" "}

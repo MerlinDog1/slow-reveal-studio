@@ -1,4 +1,8 @@
-import { toSvg, type RenderGeometry } from "@/lib/renderers";
+import {
+  toSvg,
+  effectiveGuideColor,
+  type RenderGeometry,
+} from "@/lib/renderers";
 import { withPngResolution } from "@/lib/png-resolution";
 import { hashBlob } from "@/lib/browser-subject-mask";
 import {
@@ -155,6 +159,9 @@ export async function exportArtwork(
         rasterDpi: dpi,
         previewRasterDpi: dpi / 3,
         vector: "SVG in millimetres",
+        detailPreservation: geometry.settings.detailPreservation ?? 0,
+        effectiveGuideColor: effectiveGuideColor(geometry.settings),
+        requestedGuideColor: geometry.settings.guideColor ?? null,
         status: "prototype-not-approved-for-print",
         stats: geometry.stats,
         ...(maskHash

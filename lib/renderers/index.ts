@@ -26,7 +26,7 @@ import {
 } from "../subject-mask";
 
 export * from "./types";
-export { toSvg, effectiveGuideWidthMm } from "./svg";
+export { toSvg, effectiveGuideWidthMm, effectiveGuideColor } from "./svg";
 export {
   FONT_OUTLINE_VERSION,
   SUPPORTED_TEXT_CHARACTERS,

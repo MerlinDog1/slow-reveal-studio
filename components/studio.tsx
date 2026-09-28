@@ -40,6 +40,7 @@ import {
   RENDERER_VERSION,
   renderImage,
   toSvg,
+  effectiveGuideColor,
   type RenderGeometry,
   type RenderMode,
   type RenderSettings,
@@ -833,7 +834,7 @@ export function Studio({
   function choosePreset(key: keyof typeof PRESET_NAMES) {
     setPreset(key);
     track("preset_selected", { mode: settings.mode, productId, preset: key });
-    update(PRESETS[key]);
+    update({ ...PRESETS[key], detailPreservation: 0, guideColor: undefined });
   }
   function choosePublishedPreset(preset: PublishedPreset) {
     try {
@@ -938,11 +939,14 @@ export function Studio({
     }
   }
   const activePreset =
-    Object.entries(PRESETS).find(([, p]) =>
-      Object.entries(p).every(
-        ([key, value]) => settings[key as keyof RenderSettings] === value,
-      ),
-    )?.[0] ?? "custom";
+    (settings.detailPreservation ?? 0) === 0 &&
+    settings.guideColor === undefined
+      ? (Object.entries(PRESETS).find(([, p]) =>
+          Object.entries(p).every(
+            ([key, value]) => settings[key as keyof RenderSettings] === value,
+          ),
+        )?.[0] ?? "custom")
+      : "custom";
   const templateView = view === "template";
   const svg = useMemo(
     () =>
@@ -1899,6 +1903,25 @@ export function Studio({
                       value={settings.density}
                       onChange={(density) => update({ density })}
                     />
+                    {settings.mode === "dots" && (
+                      <>
+                        <Range
+                          label="Detail preservation"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={settings.detailPreservation ?? 0}
+                          onChange={(detailPreservation) =>
+                            update({ detailPreservation })
+                          }
+                        />
+                        <p className="field-note">
+                          Sample a smaller area around each dot to retain fine
+                          tonal features. Higher values can also reveal grain or
+                          busy backgrounds; compare both previews.
+                        </p>
+                      </>
+                    )}
                     <Range
                       label="Highlight threshold"
                       min={0}
@@ -1915,6 +1938,36 @@ export function Studio({
                       value={settings.guideOpacity}
                       onChange={(guideOpacity) => update({ guideOpacity })}
                     />
+                    <label className="check-label">
+                      <input
+                        type="checkbox"
+                        checked={settings.guideColor === undefined}
+                        onChange={(e) =>
+                          update({
+                            guideColor: e.target.checked
+                              ? undefined
+                              : effectiveGuideColor(settings),
+                          })
+                        }
+                      />
+                      Match guide to marker colour
+                    </label>
+                    {settings.guideColor !== undefined && (
+                      <label className="select-field">
+                        Guide colour
+                        <input
+                          type="color"
+                          value={settings.guideColor}
+                          onChange={(e) =>
+                            update({ guideColor: e.target.value })
+                          }
+                        />
+                        <span className="field-note">
+                          {settings.guideColor} · Template only. Test printed
+                          visibility and marker coverage.
+                        </span>
+                      </label>
+                    )}
                     <Range
                       label="Safe margin"
                       min={0}
@@ -1962,6 +2015,8 @@ export function Studio({
                               update({
                                 palette: undefined,
                                 cellShape: undefined,
+                                guideColor: undefined,
+                                detailPreservation: 0,
                                 ...presetSettings(p.settings),
                               });
                             }

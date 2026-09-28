@@ -24,7 +24,7 @@ export interface ModeContext {
   subjectMask?: (u: number, v: number) => number;
 }
 
-/** Area averages preserve dark features; a wider neighbourhood restores local contrast. */
+/** Distinct physical scales govern Dots detail sampling and broad edge emphasis. */
 function darknessAt(c: ModeContext, x: number, y: number): number {
   const { tone, bounds: b, pitch, settings: s } = c;
   const u = (x - b.x) / b.width,
@@ -33,7 +33,14 @@ function darknessAt(c: ModeContext, x: number, y: number): number {
     rv = (pitch * 0.3) / b.height;
   const local = tone.sample(u, v, ru, rv);
   const surround = tone.sample(u, v, ru * 3, rv * 3);
-  return clamp(local + (local - surround) * s.edgeEmphasis);
+  const detail = s.mode === "dots" ? (s.detailPreservation ?? 0) : 0;
+  // A convex blend can retain a narrow dark or light feature lost in the wider
+  // average. It is not a face detector or denoiser and may also retain grain.
+  // Skip fine sampling at zero to preserve the previous renderer's exact math.
+  const focused = detail
+    ? local + detail * (tone.sample(u, v, ru * 0.4, rv * 0.4) - local)
+    : local;
+  return clamp(focused + (local - surround) * s.edgeEmphasis);
 }
 
 export function renderDots(c: ModeContext): Circle[] {

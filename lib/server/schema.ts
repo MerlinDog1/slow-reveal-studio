@@ -28,10 +28,15 @@ export const settingsSchema = z.object({
   gamma: z.number().min(0.2).max(4),
   threshold: z.number().min(0).max(0.95),
   edgeEmphasis: z.number().min(0).max(2),
+  detailPreservation: z.number().min(0).max(1).optional(),
   density: z.number().min(0.25).max(3),
   invert: z.boolean(),
   inkColor: z.string().regex(/^#[0-9a-f]{6}$/i),
   guideOpacity: z.number().min(0.05).max(1),
+  guideColor: z
+    .string()
+    .regex(/^#[0-9a-f]{6}$/i)
+    .optional(),
   safeMarginMm: z.number().min(0).max(100),
   guideWidthMm: z.number().min(0.05).max(0.5).optional(),
   autoExposure: z.boolean().optional(),

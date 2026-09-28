@@ -14,6 +14,17 @@ export function effectiveGuideWidthMm(
   return Math.min(settings.guideWidthMm ?? 0.15, settings.minDiameterMm / 2);
 }
 
+/** Resolve template colour before or after the renderer's default inverted-ink mapping. */
+export function effectiveGuideColor(
+  settings: Pick<RenderSettings, "guideColor" | "inkColor" | "invert">,
+): string {
+  const selectedInk = color(settings.inkColor).toLowerCase();
+  return color(
+    settings.guideColor ??
+      (settings.invert && selectedInk === "#1e1e1c" ? "#f4efe6" : selectedInk),
+  ).toLowerCase();
+}
+
 export function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -60,7 +71,8 @@ export function toSvg(
   )
     throw new Error("Geometry exceeds the export mark limit.");
   const finished = variant === "finished";
-  const ink = color(s.inkColor);
+  // Guide colour changes only template ink, including outlined labels and text.
+  const ink = finished ? color(s.inkColor) : effectiveGuideColor(s);
   const width = n(geometry.widthMm),
     height = n(geometry.heightMm);
   const guideWidth = effectiveGuideWidthMm(s);

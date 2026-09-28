@@ -21,6 +21,18 @@ SVG width and height carry `mm` units and the viewBox uses the same physical coo
 
 The proposed minimums, gaps and guide settings are engineering defaults, **not material-tested production limits**. Easy, Standard and Detailed change physical workload. Completion estimates use provisional per-mark and filled-area constants and are not customer promises.
 
+### Fine detail sampling (renderer 1.3.0)
+
+`detailPreservation` is a Dots-only lab control from 0 to 1, defaulting to 0 for new and legacy designs. Let `local` be the existing area average at +/-0.30 physical pitches, `fine` the smaller average at +/-0.12 pitches, and `surround` the existing +/-0.90-pitch average. Dots uses `clamp(local + detailPreservation * (fine - local) + (local - surround) * edgeEmphasis)`, followed by the manual mask, threshold and physical mark limits. At zero the fine sample is skipped and the prior arithmetic is unchanged; captured renderer 1.2 primitive hashes remain identical across all four modes. Other modes ignore this parameter.
+
+The detail term is a convex blend between two spatial averages; it can retain a narrow light or dark feature lost in the wider average. Edge emphasis remains a separate broad-neighbourhood term. It is not semantic face enhancement, denoising or a guarantee of likeness. Smaller samples can also retain grain, sharpening artefacts and distracting background texture. Built-in customer presets keep the zero default pending representative human and physical review. See the reproducible eight-photo comparison in `docs/detail-preservation-study.json` and its contact sheet; measured geometry differences do not establish artistic or physical improvement.
+
+### Independent template colour (renderer 1.3.0)
+
+`guideColor` optionally supplies a six-digit hexadecimal template colour. Omission inherits the normalized finished ink, including the light-ink default for inverted artwork. The lab can return to inheritance with **Match guide to marker colour**. Custom guide colour affects every template primitive, outlined Mosaic number and personalised text; finished ink/palette, geometry, opacity and line width are unchanged. This is an RGB preview/export parameter, not an ICC-managed colour, white-ink spot plate or proof of marker coverage.
+
+Local/private designs and local/published presets preserve these settings. Applying a preset without a custom guide resets inheritance rather than retaining the previous design's guide colour. Prototype and server manifests record requested/effective guide colour and canonical detail strength. Administrator changes to detail strength or effective guide colour require a new customer proof; paid originals remain immutable. Older saved renderer versions continue to require explicit rebuild review.
+
 ### Manual subject selection (renderer 1.2.0)
 
 Dots accepts a separate private `SubjectMask` input from `lib/subject-mask.ts`. The lab provides keep/remove brushes, undo, a keyboard drawing cursor, overlay and feathering; Apply commits an independent snapshot and Cancel discards the draft. This is manually painted selection, not automatic semantic segmentation. Other modes do not support active masking.

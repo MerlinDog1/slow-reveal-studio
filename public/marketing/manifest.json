@@ -51,7 +51,7 @@
       "requiredCaption": "Digital rendering · simulated completion",
       "generatedAt": "2026-09-27",
       "tool": "shared TypeScript renderer + Sharp layout",
-      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
       "sourceImages": [
         "/references/black-dog.jpg"
       ],
@@ -63,7 +63,7 @@
         "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
       },
       "geometryFile": "/marketing/digital/dots-progression-geometry.json",
-      "geometrySha256": "c7edf2d3e239062b17deaaca98fc6adfdebf92c3cfacd728a367ba851b114f94",
+      "geometrySha256": "279fe6b9d681e1c29567afc3c9033e1362749c67debdffa05b93686a73b1b2fe",
       "deterministic": true,
       "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
       "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
@@ -391,7 +391,7 @@
       "requiredCaption": "Digital rendering · simulated completion",
       "generatedAt": "2026-09-27",
       "tool": "shared TypeScript renderer + Sharp layout",
-      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
       "sourceImages": [
         "/references/building.jpg"
       ],
@@ -403,7 +403,7 @@
         "sha256": "05c60cadc1dc41cea1ba4759d8f85763b2cd4b7675c4bc6ff29252380c25844e"
       },
       "geometryFile": "/marketing/digital/mosaic-progression-geometry.json",
-      "geometrySha256": "c49f57c5fefda508d891e260124da5ac5ed7db7150f4e6e38e686009e60f4df1",
+      "geometrySha256": "5289971b39f548143c3c73da08061bc339e329e87e2c9239fcc18d4746b131aa",
       "deterministic": true,
       "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art. Palette: #1e1e1c, #68442f, #7b8b77, #c6a25a; template numbers map in that order.",
       "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
@@ -444,7 +444,7 @@
       "requiredCaption": "Digital rendering · simulated completion",
       "generatedAt": "2026-09-27",
       "tool": "shared TypeScript renderer + Sharp layout",
-      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
       "sourceImages": [
         "/references/vehicle.jpg"
       ],
@@ -456,7 +456,7 @@
         "sha256": "5ff93fa03c053613f17e62138d844bdb8cdc3ad796cd72842732b60d6e235a36"
       },
       "geometryFile": "/marketing/digital/contour-progression-geometry.json",
-      "geometrySha256": "dbf47a6212d1f9a8298386ae966844a73b3e38b9861e7361ddf8fdaea651c5e1",
+      "geometrySha256": "97867c2827646445b4695f646ac98b4db31d53e9511123b71804a54a9a1d6161",
       "deterministic": true,
       "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
       "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
@@ -579,7 +579,7 @@
       "requiredCaption": "Digital rendering · screen colours are illustrative",
       "generatedAt": "2026-09-27",
       "tool": "shared TypeScript renderer + Sharp layout",
-      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
       "sourceImages": [
         "/references/black-dog.jpg"
       ],
@@ -591,7 +591,7 @@
         "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
       },
       "geometryFile": "/marketing/digital/colour-options-geometry.json",
-      "geometrySha256": "c7edf2d3e239062b17deaaca98fc6adfdebf92c3cfacd728a367ba851b114f94",
+      "geometrySha256": "279fe6b9d681e1c29567afc3c9033e1362749c67debdffa05b93686a73b1b2fe",
       "palette": [
         {
           "id": "black",

@@ -11,7 +11,7 @@ import {
 import { getRecord, replaceOrder } from "./store";
 import { ApiError } from "./security";
 import { createProductionPackage } from "./production";
-import { normalizeSettings } from "../renderers";
+import { effectiveGuideColor, normalizeSettings } from "../renderers";
 import { designSubjectMask } from "./subject-masks";
 import {
   currentRevision,
@@ -225,6 +225,8 @@ export async function updateOrder(
       origin: "admin-regeneration",
       customerProofRequired:
         latest?.customerProofRequired ||
+        (base.detailPreservation ?? 0) !== (settings.detailPreservation ?? 0) ||
+        effectiveGuideColor(base) !== effectiveGuideColor(settings) ||
         (!!currentMask &&
           (body.clearSubjectMask === true ||
             (base.subjectMaskStrength ?? 0) !==

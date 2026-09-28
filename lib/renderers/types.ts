@@ -24,10 +24,14 @@ export interface RenderSettings {
   /** Minimum darkness retained, from 0 to 0.95. */
   threshold: number;
   edgeEmphasis: number;
+  /** Dots-only blend toward a smaller physical sampling area; 0 preserves legacy sampling. */
+  detailPreservation?: number;
   density: number;
   invert: boolean;
   inkColor: string;
   guideOpacity: number;
+  /** Optional template colour; omission inherits the selected ink colour. */
+  guideColor?: string;
   safeMarginMm: number;
   guideWidthMm?: number;
   /** Bounded highlight normalization for dark, non-flat photographs. */
@@ -107,7 +111,7 @@ export interface SvgOptions {
   title?: string;
 }
 
-export const RENDERER_VERSION = "slow-reveal-geometry/1.2.0";
+export const RENDERER_VERSION = "slow-reveal-geometry/1.3.0";
 export const MAX_MARKS = 60_000;
 export const DEFAULT_SETTINGS: RenderSettings = {
   mode: "dots",
@@ -121,6 +125,7 @@ export const DEFAULT_SETTINGS: RenderSettings = {
   gamma: 1,
   threshold: 0.04,
   edgeEmphasis: 0.25,
+  detailPreservation: 0,
   density: 1,
   invert: false,
   inkColor: "#1e1e1c",
@@ -198,6 +203,10 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
       settings.subjectMaskStrength === undefined
         ? 0
         : settings.subjectMaskStrength,
+    detailPreservation:
+      settings.detailPreservation === undefined
+        ? 0
+        : settings.detailPreservation,
   };
   const modes: RenderMode[] = [
     "dots",
@@ -217,6 +226,7 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
     ["gamma", 0.2, 4],
     ["threshold", 0, 0.95],
     ["edgeEmphasis", 0, 2],
+    ["detailPreservation", 0, 1],
     ["density", 0.25, 3],
     ["guideOpacity", 0.05, 1],
     ["safeMarginMm", 0, 100],
@@ -241,6 +251,14 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
   if (!/^#[0-9a-f]{6}$/i.test(s.inkColor))
     throw new Error("Ink colour must be a six-digit hexadecimal colour.");
   s.inkColor = s.inkColor.toLowerCase();
+  if (s.guideColor !== undefined) {
+    if (
+      typeof s.guideColor !== "string" ||
+      !/^#[0-9a-f]{6}$/i.test(s.guideColor)
+    )
+      throw new Error("Guide colour must be a six-digit hexadecimal colour.");
+    s.guideColor = s.guideColor.toLowerCase();
+  }
   if (
     s.cellShape !== undefined &&
     !["square", "rounded", "hexagon"].includes(s.cellShape)

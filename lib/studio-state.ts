@@ -185,6 +185,7 @@ export function validateRestorableProject(
       key !== "guideWidthMm" &&
       key !== "autoExposure" &&
       key !== "subjectMaskStrength" &&
+      key !== "detailPreservation" &&
       raw[key] === undefined
     )
       throw new Error(
@@ -352,6 +353,8 @@ export function applyStudioPreset(
     ...current,
     palette: undefined,
     cellShape: undefined,
+    guideColor: undefined,
+    detailPreservation: 0,
     ...presetSettings(preset.settings as RenderSettings),
   });
 }

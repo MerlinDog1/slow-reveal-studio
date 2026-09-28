@@ -237,3 +237,70 @@ test("damaged local preset storage cannot crash the studio or apply arbitrary fi
   assert.equal("source" in safe, false);
   assert.equal("widthMm" in safe, false);
 });
+
+test("renderer controls survive restoration and presets without retaining a previous custom guide", () => {
+  const saved = {
+    ...project(),
+    settings: {
+      ...DEFAULT_SETTINGS,
+      detailPreservation: 0.65,
+      guideColor: "#927461",
+    },
+  };
+  const restored = validateRestorableProject(saved, ["dots"]).project;
+  assert.equal(restored.settings.detailPreservation, 0.65);
+  assert.equal(restored.settings.guideColor, "#927461");
+  const [local] = parseLocalPresets([
+    { name: "Fine pale guides", settings: saved.settings },
+  ]);
+  assert.equal(local.settings.detailPreservation, 0.65);
+  assert.equal(local.settings.guideColor, "#927461");
+  const base = {
+    id: "fine",
+    name: "Fine pale guides",
+    description: "",
+    version: 1,
+    mode: "dots" as const,
+    rendererVersion: RENDERER_VERSION,
+  };
+  const [published] = parsePublishedPresets(
+    { presets: [{ ...base, settings: presetSettings(local.settings) }] },
+    "dots",
+  );
+  assert.equal(
+    applyStudioPreset(DEFAULT_SETTINGS, published).guideColor,
+    "#927461",
+  );
+  const legacy = { ...DEFAULT_SETTINGS };
+  delete legacy.detailPreservation;
+  const old = validateRestorableProject(
+    {
+      ...project(),
+      rendererVersion: "slow-reveal-geometry/1.2.0",
+      settings: legacy,
+    },
+    ["dots"],
+  );
+  assert.equal(old.needsRendererReview, true);
+  assert.equal(old.project.settings.detailPreservation, 0);
+  assert.equal(old.project.settings.guideColor, undefined);
+  const inherited = applyStudioPreset(saved.settings, {
+    ...base,
+    settings: presetSettings(legacy),
+  });
+  assert.equal(inherited.detailPreservation, 0);
+  assert.equal(inherited.guideColor, undefined);
+  for (const settings of [
+    { ...legacy, detailPreservation: 2 },
+    { ...legacy, guideColor: "url(secret)" },
+  ]) {
+    assert.throws(() =>
+      validateRestorableProject({ ...project(), settings }, ["dots"]),
+    );
+    assert.deepEqual(parseLocalPresets([{ name: "Invalid", settings }]), []);
+    assert.deepEqual(
+      parsePublishedPresets({ presets: [{ ...base, settings }] }, "dots"),
+      [],
+    );
+  }
+});

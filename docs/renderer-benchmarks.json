@@ -1,6 +1,6 @@
 {
-  "rendererVersion": "slow-reveal-geometry/1.2.0",
-  "generatedAt": "2026-09-28T05:06:10.450Z",
+  "rendererVersion": "slow-reveal-geometry/1.3.0",
+  "generatedAt": "2026-09-28T05:32:53.481Z",
   "command": "node --import tsx tests/benchmark-renderers.ts",
   "settings": {
     "mode": "dots",
@@ -14,6 +14,7 @@
     "gamma": 1,
     "threshold": 0.04,
     "edgeEmphasis": 0.25,
+    "detailPreservation": 0,
     "density": 1,
     "invert": false,
     "inkColor": "#1e1e1c",
@@ -33,14 +34,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 11464,
       "estimatedCompletionMinutes": 534,
-      "renderMs": 152.4,
+      "renderMs": 177.6,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4,
       "tonalCorrelation12x16": 0.9975,
       "exposureScale": 1.797,
       "deterministic": true,
-      "geometrySha256": "225dfe68319bceaf7b75d03032aefb99643d3b3e1711dd501a31e6f0184aeaa4",
+      "geometrySha256": "69bd6b2a78032866ed3439caae9e7d21a410d0f3b9d5471cf9cc3e7971d91ad0",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
         "This photo is dark. Try a tighter crop or increase brightness.",
@@ -53,14 +54,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 11269,
       "estimatedCompletionMinutes": 355,
-      "renderMs": 130.9,
+      "renderMs": 126.4,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.435,
       "tonalCorrelation12x16": 0.9993,
       "exposureScale": 1,
       "deterministic": true,
-      "geometrySha256": "a8d8f415e07d0db18364064a0eb2a5d06661d72dc827e634921406617bc66ee1",
+      "geometrySha256": "227966004f50673c772f959e501e558f8aa9ec1bbc9ce2e2192daff788d5c979",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
       ]
@@ -71,14 +72,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 11718,
       "estimatedCompletionMinutes": 460,
-      "renderMs": 116.2,
+      "renderMs": 133.9,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4,
       "tonalCorrelation12x16": 0.9992,
       "exposureScale": 1,
       "deterministic": true,
-      "geometrySha256": "4f70976bdc5438d1f250415714112bccfd26040d7b8f4a3448941b9b3b2c3c5b",
+      "geometrySha256": "2e22531d8d139f442c10175bdcc136e447fc901f07caadbe0b300e8b63c315bd",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
       ]
@@ -89,14 +90,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 11600,
       "estimatedCompletionMinutes": 524,
-      "renderMs": 147.3,
+      "renderMs": 104.9,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4,
       "tonalCorrelation12x16": 0.9961,
       "exposureScale": 2.4148,
       "deterministic": true,
-      "geometrySha256": "4cb361d882b0ebef84802e7f29067dec1291a4cc4425760523bc62915a826600",
+      "geometrySha256": "08e733d8e1c7add33c9187f57359d2e8c48c9f9badb0649a7a67550f72f3f2a0",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
         "This photo is dark. Try a tighter crop or increase brightness.",
@@ -109,14 +110,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 10840,
       "estimatedCompletionMinutes": 434,
-      "renderMs": 124.1,
+      "renderMs": 143.8,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4081,
       "tonalCorrelation12x16": 0.9979,
       "exposureScale": 1,
       "deterministic": true,
-      "geometrySha256": "f38bbdf417ccfe0902531b099a3755aa8762f5b9b36a4e41951984be775c9b54",
+      "geometrySha256": "8fde90e405dfd9ba0606210d4fa85539b2ca81877de882ea989a1309acc30a89",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
       ]
@@ -127,14 +128,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 10066,
       "estimatedCompletionMinutes": 408,
-      "renderMs": 118,
+      "renderMs": 132.5,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4,
       "tonalCorrelation12x16": 0.9971,
       "exposureScale": 1,
       "deterministic": true,
-      "geometrySha256": "9265ea30542006aebcc0d4363af39a63f1d6172cefb816bd81dc0779712a475f",
+      "geometrySha256": "f21c4f287762a6e910bdbef1f97c470a5240aa1a0c277c3e651f266586079700",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
       ]
@@ -145,14 +146,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 11723,
       "estimatedCompletionMinutes": 493,
-      "renderMs": 112.4,
+      "renderMs": 119.7,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4,
       "tonalCorrelation12x16": 0.9995,
       "exposureScale": 1,
       "deterministic": true,
-      "geometrySha256": "f99482758b9ba6d9aa09f5b80a1bac587afe38ae0e1fe090a48eb8adf3a8ab89",
+      "geometrySha256": "aa2b012a0968cbe48aabdd2c6e6a32c7ba0600ca9c23d141eb033f3230179402",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
       ]
@@ -163,14 +164,14 @@
       "crop": "centre cover 800×1000; original framing is intentionally retained as far as the 4:5 crop permits",
       "markCount": 11707,
       "estimatedCompletionMinutes": 472,
-      "renderMs": 135.5,
+      "renderMs": 141.4,
       "minDiameterMm": 0.9,
       "maxDiameterMm": 3.8,
       "minimumClearGapMm": 0.4,
       "tonalCorrelation12x16": 0.9997,
       "exposureScale": 1,
       "deterministic": true,
-      "geometrySha256": "72eb3befe79b07a5229b87ee165bd9f9422ba66dc36ff0015c2303df01e36be0",
+      "geometrySha256": "11e60729b79ffd978b0444e34d2b388e100fed5e439547551f4243b90ec3f5e7",
       "warnings": [
         "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests."
       ]

@@ -25,6 +25,8 @@ For each case save canonical settings, crop, input checksum, renderer version, m
 
 For manual Dots masks, retain the canonical private selection checksum, feather and strength with each case. Compare strength 0/0.5/1, full/empty/feathered selections, inversion and cropped subjects. Synthetic mask invariants are automated; a representative eight-photo manual-selection comparison and user usability study have not been run. Keep raw selection data private.
 
+For the Dots `detailPreservation` control, run `node --import tsx scripts/build-detail-study.ts`. The recorded [24-case digital study](detail-preservation-study.json) compares 0/0.5/1 across all eight fixed photos at 400 x 500 mm, retaining settings, source hashes, geometry measurements and a [contact sheet](detail-preservation-study.png). Examine both narrow subject features and unwanted grain/background texture. It does not substitute for the blind human scores or physical sessions below, and customer presets retain zero by default. Guide-colour review must compare the template against unchanged finished ink, then measure printed visibility/coverage on the intended substrate.
+
 ## Acceptance evidence
 
 | Area | Proposed target / invariant | Evidence needed |

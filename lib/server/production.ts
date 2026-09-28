@@ -8,6 +8,7 @@ import {
   normalizeSettings,
   RENDERER_VERSION,
   effectiveGuideWidthMm,
+  effectiveGuideColor,
 } from "../renderers";
 import type { RenderSettings, RenderGeometry } from "../renderers/types";
 import { getAsset, putAsset, removeAsset, type PrivateAsset } from "./assets";
@@ -189,6 +190,9 @@ export async function createProductionPackage(
     sourceSha256: design.source.sha256,
     subjectMaskSha256: design.subjectMask?.sha256,
     subjectMaskStrength: settings.subjectMaskStrength ?? 0,
+    detailPreservation: geometry.settings.detailPreservation ?? 0,
+    requestedGuideColor: settings.guideColor ?? null,
+    effectiveGuideColor: effectiveGuideColor(geometry.settings),
     snapshotHash,
     rendererVersion: RENDERER_VERSION,
     mode: design.mode,

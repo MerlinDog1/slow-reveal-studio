@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { PreviewDialog } from "@/components/preview-dialog";
+import { PreviewViewport } from "@/components/preview-viewport";
 import { SubjectMaskEditor } from "@/components/subject-mask-editor";
 import { hashBlob } from "@/lib/browser-subject-mask";
 import { assertSubjectMaskBinding, type SubjectMask } from "@/lib/subject-mask";
@@ -41,11 +42,18 @@ import {
   renderImage,
   toSvg,
   effectiveGuideColor,
+  isOpticalMode,
+  usesOpticalColour,
   type RenderGeometry,
   type RenderMode,
   type RenderSettings,
 } from "@/lib/renderers";
 import { INKS, formatPrice } from "@/lib/catalog";
+import { MOSAIC_MARKER_PALETTE } from "@/lib/mosaic-palette";
+import {
+  OPTICAL_MARKER_PALETTE,
+  defaultOpticalPalette,
+} from "@/lib/optical-palette";
 import {
   parseStudioCatalogue,
   productDimensions,
@@ -84,19 +92,29 @@ type View = "finished" | "template" | "original" | "compare";
 const MODES: { id: RenderMode; name: string; description: string }[] = [
   { id: "dots", name: "Signature Dots", description: "One dot at a time." },
   {
+    id: "fibonacci",
+    name: "Fibonacci Spiral",
+    description: "Sunflower spirals. A picture in every dot.",
+  },
+  {
     id: "mosaic",
     name: "Mosaic Fill",
     description: "Small shapes. A bigger picture.",
   },
   {
-    id: "contour",
-    name: "Contour Trace",
-    description: "Follow the lines that matter.",
-  },
-  {
     id: "line-amplification",
     name: "Line Study",
     description: "An experiment in rhythm.",
+  },
+  {
+    id: "colour-blend",
+    name: "Colour Blend",
+    description: "Separate dots. Blended colour.",
+  },
+  {
+    id: "tv-weave",
+    name: "TV Weave",
+    description: "Colour in every little dash.",
   },
 ];
 const PRESET_NAMES = {
@@ -160,11 +178,16 @@ export function Studio({
   availableModes?: RenderMode[];
 }) {
   const modeOptions = MODES.filter((mode) => availableModes.includes(mode.id));
+  const startingMode = availableModes.includes(initialMode)
+    ? initialMode
+    : (modeOptions[0]?.id ?? "dots");
   const [settings, setSettings] = useState<RenderSettings>({
     ...DEFAULT_SETTINGS,
-    mode: availableModes.includes(initialMode)
-      ? initialMode
-      : (modeOptions[0]?.id ?? "dots"),
+    ...PRESETS.standard,
+    mode: startingMode,
+    ...(isOpticalMode(startingMode)
+      ? { palette: defaultOpticalPalette() }
+      : {}),
   });
   const [preset, setPreset] = useState("standard");
   const [crop, setCrop] = useState<Crop>(DEFAULT_CROP);
@@ -980,83 +1003,86 @@ export function Studio({
     </div>
   ) : null;
   const artworkPreview = (
-    <>
-      <div
-        className="canvas-paper"
-        style={
-          {
-            aspectRatio: `${settings.widthMm}/${settings.heightMm}`,
-            "--art-ratio": settings.widthMm / settings.heightMm,
-          } as CSSProperties
-        }
-      >
-        {view === "original" && croppedUrl ? (
+    <div
+      className="canvas-paper"
+      style={
+        {
+          aspectRatio: `${settings.widthMm}/${settings.heightMm}`,
+          "--art-ratio": settings.widthMm / settings.heightMm,
+        } as CSSProperties
+      }
+    >
+      {view === "original" && croppedUrl ? (
+        <img
+          className="artwork-image"
+          src={croppedUrl}
+          alt={`Cropped original: ${sourceName}`}
+        />
+      ) : geometry ? (
+        <div
+          className="rendered-svg"
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      ) : (
+        <div className="canvas-placeholder">
+          <Layers size={32} />
+          <p>
+            {source
+              ? "Finding the picture in the dots…"
+              : "A photograph. A little possibility."}
+          </p>
+          <button className="button" onClick={() => fileInput.current?.click()}>
+            Choose a photo
+          </button>
+        </div>
+      )}
+      {view === "compare" && croppedUrl && geometry && (
+        <>
           <img
-            className="artwork-image"
+            className="comparison-image"
             src={croppedUrl}
-            alt={`Cropped original: ${sourceName}`}
+            alt="Original photograph for comparison"
+            style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}
           />
-        ) : geometry ? (
-          <div
-            className="rendered-svg"
-            dangerouslySetInnerHTML={{ __html: svg }}
-          />
-        ) : (
-          <div className="canvas-placeholder">
-            <Layers size={32} />
-            <p>
-              {source
-                ? "Finding the picture in the dots…"
-                : "A photograph. A little possibility."}
-            </p>
-            <button
-              className="button"
-              onClick={() => fileInput.current?.click()}
-            >
-              Choose a photo
-            </button>
+          <div className="comparison-divider" style={{ left: `${compare}%` }}>
+            <span>↔</span>
           </div>
-        )}
-        {view === "compare" && croppedUrl && geometry && (
-          <>
-            <img
-              className="comparison-image"
-              src={croppedUrl}
-              alt="Original photograph for comparison"
-              style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}
-            />
-            <div className="comparison-divider" style={{ left: `${compare}%` }}>
-              <span>↔</span>
-            </div>
-            <input
-              aria-label="Original and artwork comparison position"
-              className="comparison-range"
-              type="range"
-              min={0}
-              max={100}
-              value={compare}
-              onChange={(e) => setCompare(Number(e.target.value))}
-            />
-            <span className="compare-label left">Original</span>
-            <span className="compare-label right">Finished</span>
-          </>
-        )}
-        {(rendering || busy) && (
-          <div className="render-indicator" role="status">
-            <LoaderCircle size={16} className="spin" />
-            {busy || "Rendering"}
-          </div>
-        )}
-      </div>
-      <span className="dimension-line">
-        {settings.widthMm / 10} × {settings.heightMm / 10} cm ·{" "}
-        {view === "template"
-          ? "Your printed guide"
-          : view === "original"
-            ? "Your starting point"
-            : "Your finished canvas"}
-      </span>
+          <span className="compare-label left">Original</span>
+          <span className="compare-label right">Finished</span>
+        </>
+      )}
+      {(rendering || busy) && (
+        <div className="render-indicator" role="status">
+          <LoaderCircle size={16} className="spin" />
+          {busy || "Rendering"}
+        </div>
+      )}
+    </div>
+  );
+  const artworkCaption = (
+    <>
+      {settings.widthMm / 10} × {settings.heightMm / 10} cm ·{" "}
+      {view === "template"
+        ? "Your printed guide"
+        : view === "original"
+          ? "Your starting point"
+          : "Your finished canvas"}
     </>
+  );
+  const magnifiedPreview = (
+    <PreviewViewport
+      aspectRatio={settings.widthMm / settings.heightMm}
+      caption={artworkCaption}
+      enabled={!!geometry || !!croppedUrl}
+      resetKey={`${sourceSha256}:${settings.widthMm}:${settings.heightMm}`}
+      comparison={
+        view === "compare"
+          ? { value: compare, onChange: setCompare }
+          : undefined
+      }
+    >
+      {artworkPreview}
+    </PreviewViewport>
   );
 
   return (
@@ -1067,7 +1093,25 @@ export function Studio({
         title={`Enlarged ${view} preview`}
         onClose={() => setZoomPreview(false)}
       >
-        <div className="canvas-stage">{artworkPreview}</div>
+        <div
+          className="preview-dialog-views"
+          role="group"
+          aria-label="Enlarged preview type"
+        >
+          {(["original", "finished", "template", "compare"] as View[]).map(
+            (v) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={view === v}
+                onClick={() => setView(v)}
+              >
+                {v[0].toUpperCase() + v.slice(1)}
+              </button>
+            ),
+          )}
+        </div>
+        {magnifiedPreview}
       </PreviewDialog>
       <PreviewDialog
         open={maskEditorOpen}
@@ -1309,7 +1353,7 @@ export function Studio({
             id="artwork-preview"
             role="tabpanel"
             aria-labelledby={`preview-tab-${view}`}
-            className={`canvas-stage ${dragging ? "dragging" : ""}`}
+            className={`preview-stage ${dragging ? "dragging" : ""}`}
             onDragOver={(e) => {
               e.preventDefault();
               setDragging(true);
@@ -1321,7 +1365,7 @@ export function Studio({
               void upload(e.dataTransfer.files[0]);
             }}
           >
-            {artworkPreview}
+            {magnifiedPreview}
           </div>
           <div className="preview-bottom">
             <span>
@@ -1617,7 +1661,26 @@ export function Studio({
                       aria-pressed={settings.mode === m.id}
                       onClick={() => {
                         track("renderer_selected", { mode: m.id, productId });
-                        update({ mode: m.id });
+                        update({
+                          mode: m.id,
+                          ...(isOpticalMode(m.id)
+                            ? {
+                                palette: isOpticalMode(settings.mode)
+                                  ? (settings.palette ??
+                                    defaultOpticalPalette())
+                                  : defaultOpticalPalette(),
+                                invert: false,
+                              }
+                            : m.id === "fibonacci" &&
+                                settings.mode !== "fibonacci"
+                              ? {
+                                  palette: isOpticalMode(settings.mode)
+                                    ? settings.palette
+                                    : undefined,
+                                  invert: false,
+                                }
+                              : {}),
+                        });
                       }}
                     >
                       {m.name}
@@ -1636,6 +1699,13 @@ export function Studio({
                   Experimental study. This mode is available in the lab only
                   until physical completion has been tested.
                 </div>
+              )}
+              {settings.mode === "fibonacci" && (
+                <p className="fine-print">
+                  {settings.palette
+                    ? "Follow the sunflower spirals, filling each numbered dot with its matching pen. Step back to see the colours blend. Keep the white gaps."
+                    : "Follow the sunflower spirals, filling each circle with one ink. Larger dots create shadows; smaller dots reveal the light. Keep the spaces between them."}
+                </p>
               )}
               {settings.mode === "dots" && (lab || subjectMask) && (
                 <div className="subject-selection-controls">
@@ -1687,24 +1757,37 @@ export function Studio({
                   <div className="control-divider" />
                 </div>
               )}
-              {lab && settings.mode === "mosaic" && (
+              {((lab && settings.mode === "mosaic") ||
+                isOpticalMode(settings.mode) ||
+                settings.mode === "fibonacci") && (
                 <>
-                  <label className="select-field">
-                    Cell shape
-                    <select
-                      value={settings.cellShape ?? "rounded"}
-                      onChange={(e) =>
-                        update({
-                          cellShape: e.target.value as
-                            "square" | "rounded" | "hexagon",
-                        })
-                      }
-                    >
-                      <option value="rounded">Rounded squares</option>
-                      <option value="square">Squares</option>
-                      <option value="hexagon">Hexagons</option>
-                    </select>
-                  </label>
+                  {settings.mode === "mosaic" && (
+                    <label className="select-field">
+                      Cell shape
+                      <select
+                        value={settings.cellShape ?? "rounded"}
+                        onChange={(e) =>
+                          update({
+                            cellShape: e.target.value as
+                              "square" | "rounded" | "hexagon",
+                          })
+                        }
+                      >
+                        <option value="rounded">Rounded squares</option>
+                        <option value="square">Squares</option>
+                        <option value="hexagon">Hexagons</option>
+                      </select>
+                    </label>
+                  )}
+                  {isOpticalMode(settings.mode) && (
+                    <p className="fine-print">
+                      {settings.mode === "colour-blend"
+                        ? "Fill the numbered dots"
+                        : "Fill the short numbered dashes"}{" "}
+                      one colour at a time. Step back to see neighbouring
+                      colours blend. Leave the white gaps unmarked.
+                    </p>
+                  )}
                   <label className="select-field">
                     Marker palette
                     <select
@@ -1715,26 +1798,70 @@ export function Studio({
                           palette:
                             n === 1
                               ? undefined
-                              : [
-                                  "#1e1e1c",
-                                  "#68442f",
-                                  "#b97a68",
-                                  "#c6a25a",
-                                  "#354e3b",
-                                  "#445e7c",
-                                  "#a49b84",
-                                  "#dbccb4",
-                                ].slice(0, n),
+                              : (settings.mode === "mosaic"
+                                  ? MOSAIC_MARKER_PALETTE
+                                  : OPTICAL_MARKER_PALETTE
+                                ).slice(0, n),
+                          ...(settings.mode === "fibonacci" && n > 1
+                            ? { invert: false }
+                            : {}),
                         });
                       }}
                     >
-                      <option value="1">Monochrome</option>
-                      <option value="2">Two colours</option>
-                      <option value="4">Four colours</option>
-                      <option value="6">Six colours</option>
+                      {!isOpticalMode(settings.mode) && (
+                        <option value="1">Monochrome</option>
+                      )}
+                      {settings.mode === "mosaic" && (
+                        <>
+                          <option value="2">Two colours</option>
+                          <option value="4">Four colours</option>
+                          <option value="6">Six colours</option>
+                        </>
+                      )}
                       <option value="8">Eight colours</option>
+                      <option value="16">16 colours</option>
+                      {settings.mode === "mosaic" && (
+                        <option value="32">32 colours</option>
+                      )}
+                      {settings.mode !== "mosaic" &&
+                        settings.palette &&
+                        ![8, 16].includes(settings.palette.length) && (
+                          <option value={settings.palette.length}>
+                            {settings.palette.length} colours (saved palette)
+                          </option>
+                        )}
                     </select>
                   </label>
+                  {settings.palette && (
+                    <>
+                      <ol
+                        className="mosaic-colour-key"
+                        aria-label={
+                          settings.mode === "mosaic"
+                            ? "Mosaic colour key"
+                            : "Marker colour key"
+                        }
+                      >
+                        {settings.palette.map((colour, index) => (
+                          <li
+                            key={colour}
+                            aria-label={`Colour ${index + 1}: ${colour}`}
+                          >
+                            <span
+                              className="mosaic-colour-chip"
+                              style={{ backgroundColor: colour }}
+                              aria-hidden="true"
+                            />
+                            <span>{index + 1}</span>
+                          </li>
+                        ))}
+                      </ol>
+                      <p className="fine-print">
+                        Match each template number to this colour key. Blank
+                        canvas stays unmarked.
+                      </p>
+                    </>
+                  )}
                 </>
               )}
               <h3 className="field-heading">How would you like to make it?</h3>
@@ -1793,10 +1920,10 @@ export function Studio({
                     <strong>{PRESET_NAMES[key]}</strong>
                     <small>
                       {i === 0
-                        ? "Fewer, bolder dots"
+                        ? "A gentle starting point"
                         : i === 1
-                          ? "A lovely balance"
-                          : "For the little details"}
+                          ? "More of the little details"
+                          : "Our finest detail"}
                     </small>
                     {activePreset === key && <Check size={14} />}
                   </button>
@@ -1815,7 +1942,11 @@ export function Studio({
                 ))}
               </div>
               <div className="control-divider" />
-              <h3 className="field-heading">A colour that feels like you</h3>
+              <h3 className="field-heading">
+                {usesOpticalColour(settings)
+                  ? "Lettering and guide colour"
+                  : "A colour that feels like you"}
+              </h3>
               <div
                 className="ink-choices"
                 role="group"
@@ -1882,7 +2013,11 @@ export function Studio({
                 {lab && (
                   <>
                     <Range
-                      label="Dot spacing"
+                      label={
+                        isOpticalMode(settings.mode)
+                          ? "Mark spacing"
+                          : "Dot spacing"
+                      }
                       min={2}
                       max={10}
                       step={0.1}
@@ -1891,7 +2026,11 @@ export function Studio({
                       onChange={(spacingMm) => update({ spacingMm })}
                     />
                     <Range
-                      label="Minimum diameter"
+                      label={
+                        isOpticalMode(settings.mode)
+                          ? "Minimum mark width"
+                          : "Minimum diameter"
+                      }
                       min={0.5}
                       max={3}
                       step={0.1}
@@ -1900,7 +2039,11 @@ export function Studio({
                       onChange={(minDiameterMm) => update({ minDiameterMm })}
                     />
                     <Range
-                      label="Maximum diameter"
+                      label={
+                        isOpticalMode(settings.mode)
+                          ? "Maximum mark size"
+                          : "Maximum diameter"
+                      }
                       min={1}
                       max={8}
                       step={0.1}
@@ -1971,7 +2114,9 @@ export function Studio({
                           })
                         }
                       />
-                      Match guide to marker colour
+                      {usesOpticalColour(settings)
+                        ? "Match guide to lettering colour"
+                        : "Match guide to marker colour"}
                     </label>
                     {settings.guideColor !== undefined && (
                       <label className="select-field">
@@ -2007,14 +2152,16 @@ export function Studio({
                       value={settings.guideWidthMm ?? 0.15}
                       onChange={(guideWidthMm) => update({ guideWidthMm })}
                     />
-                    <label className="check-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.invert}
-                        onChange={(e) => update({ invert: e.target.checked })}
-                      />
-                      Invert tones (experimental)
-                    </label>
+                    {!usesOpticalColour(settings) && (
+                      <label className="check-label">
+                        <input
+                          type="checkbox"
+                          checked={settings.invert}
+                          onChange={(e) => update({ invert: e.target.checked })}
+                        />
+                        Invert tones (experimental)
+                      </label>
+                    )}
                     <button className="text-button" onClick={savePreset}>
                       <Save size={14} />
                       Save this preset

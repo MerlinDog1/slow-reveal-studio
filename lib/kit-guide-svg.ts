@@ -1,7 +1,11 @@
 import { buildKitGuide, KIT_GUIDE_PAGE, type KitGuideModel } from "./kit-guide";
 import { measureLettering, outlineLettering } from "./renderers/fonts";
 import { escapeXml, toSvg } from "./renderers/svg";
-import { type RenderGeometry } from "./renderers/types";
+import {
+  supportsPalette,
+  isOpticalMode,
+  type RenderGeometry,
+} from "./renderers/types";
 
 const INK = "#222522",
   MUTED = "#59615a",
@@ -63,6 +67,7 @@ function shell(
   page: number,
   title: string,
   content: string,
+  pageCount = 2,
 ) {
   const header = [
     label("SLOW REVEAL STUDIO / MAKING TRIAL", 14, 16, 2.8, MUTED),
@@ -86,7 +91,7 @@ function shell(
     '<path d="M14 279 H196" stroke="#d8dcd7" stroke-width="0.25"/>',
     label(`${model.version} | ${model.rendererVersion}`, 14, 284, 2.3, MUTED),
     label(
-      `A4 guide, not the production template | ${page} / 2`,
+      `A4 guide, not the production template | ${page} / ${pageCount}`,
       14,
       288,
       2.3,
@@ -140,7 +145,7 @@ function examplePanels(geometry: RenderGeometry, model: KitGuideModel) {
       ),
     );
     parts.push(
-      `<rect x="${x}" y="${y}" width="88" height="62" fill="${geometry.settings.invert ? "#1e1e1c" : "#f8f5ef"}" stroke="#d8dcd7" stroke-width="0.25"/>`,
+      `<rect x="${x}" y="${y}" width="88" height="62" fill="${isOpticalMode(geometry.mode) ? "#ffffff" : geometry.settings.invert ? "#1e1e1c" : "#f8f5ef"}" stroke="#d8dcd7" stroke-width="0.25"/>`,
     );
     parts.push(
       `<g data-guide-example="${variant}" data-scale="${scale}" transform="translate(${tx} ${ty}) scale(${scale}) translate(${-b.x} ${-b.y})">${body}</g>`,
@@ -164,7 +169,11 @@ function examplePanels(geometry: RenderGeometry, model: KitGuideModel) {
   return parts.join("");
 }
 
-function makingPage(geometry: RenderGeometry, model: KitGuideModel) {
+function makingPage(
+  geometry: RenderGeometry,
+  model: KitGuideModel,
+  pageCount = 2,
+) {
   const parts = [
     paragraph(
       "For the trial participant: work on a small area first. The operator must supply and approve the trial materials before use.",
@@ -185,15 +194,21 @@ function makingPage(geometry: RenderGeometry, model: KitGuideModel) {
   if (y > 178)
     throw new Error("Kit guide making instructions exceed the sample area.");
   parts.push(examplePanels(geometry, model));
-  return shell(model, 1, model.title, parts.join(""));
+  return shell(model, 1, model.title, parts.join(""), pageCount);
 }
 
-function keyPage(model: KitGuideModel) {
+function keyPage(
+  model: KitGuideModel,
+  separatePacking = false,
+  legend = model.legend,
+  page = 2,
+  pageCount = 2,
+) {
   const parts = [label("DIGITAL COLOUR KEY", 14, 66, 3.7)];
   parts.push(
     label(
-      model.mode === "mosaic"
-        ? "Key / selected colour / cells in this artwork"
+      supportsPalette(model.mode)
+        ? `Key / selected colour / ${model.mode === "mosaic" ? "cells" : "marks"} in this artwork`
         : "Selected artwork ink",
       14,
       73,
@@ -202,11 +217,11 @@ function keyPage(model: KitGuideModel) {
     ),
   );
   let y = 80;
-  for (const entry of model.legend) {
+  for (const entry of legend) {
     parts.push(
       `<rect x="14" y="${y - 3.4}" width="7" height="5.8" rx="0.5" fill="${entry.color}" stroke="#9caaa0" stroke-width="0.2"/>`,
     );
-    const text = `${entry.index === null ? "Single ink" : `Key ${entry.id}`}  ${entry.color}${model.mode === "mosaic" ? `  |  ${entry.usedCellCount} cells${entry.usedCellCount ? "" : " (unused)"}` : ""}`;
+    const text = `${entry.index === null ? "Single ink" : `Key ${entry.id}`}  ${entry.color}${supportsPalette(model.mode) ? `  |  ${entry.usedCellCount} ${model.mode === "mosaic" ? "cells" : "marks"}${entry.usedCellCount ? "" : " (unused)"}` : ""}`;
     parts.push(label(text, 25, y + 0.8, 3.4));
     y += 8;
   }
@@ -221,8 +236,18 @@ function keyPage(model: KitGuideModel) {
     4.2,
   );
   parts.push(keyNote.svg);
-  y = Math.max(120, keyNote.nextY + 9);
-  parts.push(label("OPERATOR: PACKING REQUIREMENTS", 14, y, 3.7));
+  if (separatePacking)
+    return shell(model, page, "Colour key", parts.join(""), pageCount);
+  parts.push(packingSection(model, Math.max(120, keyNote.nextY + 9)));
+  return shell(model, 2, "Colour key & trial materials", parts.join(""));
+}
+
+function packingSection(
+  model: KitGuideModel,
+  y: number,
+  materials = model.materials,
+) {
+  const parts = [label("OPERATOR: PACKING REQUIREMENTS", 14, y, 3.7)];
   y += 6;
   parts.push(
     label(
@@ -234,7 +259,7 @@ function keyPage(model: KitGuideModel) {
     ),
   );
   y += 8;
-  for (const item of model.materials) {
+  for (const item of materials) {
     parts.push(
       `<rect x="14" y="${y - 2.5}" width="3" height="3" fill="none" stroke="#59615a" stroke-width="0.3"/>`,
     );
@@ -256,11 +281,36 @@ function keyPage(model: KitGuideModel) {
       4.2,
     ).svg,
   );
-  return shell(model, 2, "Colour key & trial materials", parts.join(""));
+  return parts.join("");
 }
 
-/** Two portable A4 SVGs; all text is the renderer's deterministic outlined lettering. */
+/** Paginate larger palettes without shrinking their keys or packing checklists. */
 export function kitGuidePages(geometry: RenderGeometry): string[] {
   const model = buildKitGuide(geometry);
-  return [makingPage(geometry, model), keyPage(model)];
+  if (model.legend.length <= 8)
+    return [makingPage(geometry, model), keyPage(model)];
+  const keyPageCount = Math.ceil(model.legend.length / 16);
+  const packingPageCount = Math.ceil(model.materials.length / 18);
+  const pageCount = 1 + keyPageCount + packingPageCount;
+  return [
+    makingPage(geometry, model, pageCount),
+    ...Array.from({ length: keyPageCount }, (_, i) =>
+      keyPage(
+        model,
+        true,
+        model.legend.slice(i * 16, (i + 1) * 16),
+        i + 2,
+        pageCount,
+      ),
+    ),
+    ...Array.from({ length: packingPageCount }, (_, i) =>
+      shell(
+        model,
+        2 + keyPageCount + i,
+        "Trial materials",
+        packingSection(model, 66, model.materials.slice(i * 18, (i + 1) * 18)),
+        pageCount,
+      ),
+    ),
+  ];
 }

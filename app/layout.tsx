@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · Slow Reveal Studio",
   },
   description:
-    "Turn a meaningful photograph into a guided canvas you complete by hand. Explore dots, mosaic and contour art in the Slow Reveal Studio.",
+    "Turn a meaningful photograph into a guided canvas you complete by hand. Explore dots, mosaic and line art in the Slow Reveal Studio.",
   icons: { icon: "/favicon.svg" },
   ...(publicOrigin
     ? {

@@ -27,28 +27,32 @@ export default function Home() {
     <>
       <SiteHeader />
       <main>
-        <section className="home-hero">
+        <section className="home-hero home-hero-colour">
           <div className="hero-copy">
             <span className="eyebrow">
-              <span className="little-line" />A slower kind of making
+              <span className="little-line" />A little time. A little wonder.
             </span>
             <h1>
-              Made from
+              One little dot.
               <br />
-              your photo.
-              <br />
-              <em>Finished by you.</em>
+              <em>
+                A whole new
+                <br />
+                picture.
+              </em>
             </h1>
             <p>
-              That face. That place. That feeling.
-              <br />
-              Turn a photograph you love into a guided canvas you bring to life,
-              one little mark at a time.
+              Start with a photograph you love. Add a little colour, a little
+              patience, and a moment to yourself. Watch something wonderful come
+              together, one dot at a time.
             </p>
             <Link href="/create" className="button">
               Create your own
               <ArrowUpRight size={18} />
             </Link>
+            <a className="colour-hero-how" href="#how-it-works">
+              Discover the lovely part <ArrowRight size={16} />
+            </a>
             <div className="hero-reassurance">
               <span>
                 <Check size={14} />
@@ -149,19 +153,29 @@ export default function Home() {
             </Link>
             {availableModes.length > 1 && (
               <div className="mode-links">
+                {availableModes.includes("fibonacci") && (
+                  <Link href="/lab/fibonacci">
+                    Fibonacci Spiral <ArrowUpRight size={14} />
+                  </Link>
+                )}
                 {availableModes.includes("mosaic") && (
                   <Link href="/lab/mosaic">
                     Mosaic studies <ArrowUpRight size={14} />
                   </Link>
                 )}
-                {availableModes.includes("contour") && (
-                  <Link href="/lab/contour">
-                    Contour studies <ArrowUpRight size={14} />
-                  </Link>
-                )}
                 {availableModes.includes("line-amplification") && (
                   <Link href="/lab/line-amplification">
                     Line studies <ArrowUpRight size={14} />
+                  </Link>
+                )}
+                {availableModes.includes("colour-blend") && (
+                  <Link href="/lab/colour-blend">
+                    Colour Blend <ArrowUpRight size={14} />
+                  </Link>
+                )}
+                {availableModes.includes("tv-weave") && (
+                  <Link href="/lab/tv-weave">
+                    TV Weave <ArrowUpRight size={14} />
                   </Link>
                 )}
               </div>

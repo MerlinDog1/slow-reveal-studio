@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ACTIVE_RENDER_MODES, RENDER_MODES } from "@/lib/mode-availability";
 import {
   DEFAULT_SETTINGS,
   PRESETS,
@@ -14,7 +15,6 @@ import {
   type PresetVersion,
 } from "@/lib/preset-types";
 
-const modes: RenderMode[] = ["dots", "mosaic", "contour", "line-amplification"];
 const initialSettings = JSON.stringify(
   presetSettings(DEFAULT_SETTINGS),
   null,
@@ -441,7 +441,10 @@ export function AdminPresets({
               disabled={Boolean(selected)}
               onChange={(event) => setMode(event.target.value as RenderMode)}
             >
-              {modes.map((item) => (
+              {RENDER_MODES.filter(
+                (item) =>
+                  ACTIVE_RENDER_MODES.includes(item) || selected?.mode === item,
+              ).map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>

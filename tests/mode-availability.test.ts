@@ -21,14 +21,14 @@ test("production never exposes experimental modes merely because they are listed
     ["dots"],
   );
 });
-test("production exposes only known, explicitly physically approved alternatives", () => {
+test("production exposes only active, explicitly physically approved alternatives", () => {
   assert.deepEqual(
     getAvailableModes({
       NODE_ENV: "production",
       PHYSICAL_VALIDATION_APPROVED: "true",
       PHYSICALLY_VALIDATED_MODES: "mosaic, contour,mosaic,unknown",
     }),
-    ["dots", "mosaic", "contour"],
+    ["dots", "mosaic"],
   );
   assert.deepEqual(
     getAvailableModes({
@@ -40,12 +40,42 @@ test("production exposes only known, explicitly physically approved alternatives
   );
   assert.deepEqual(getAvailableModes({}), ["dots"]);
 });
-test("local development still offers every lab without pretending to approve physical products", () => {
+test("local development offers active labs and keeps Contour and Stipple retired even when it was approved", () => {
   assert.deepEqual(
     getAvailableModes({
       NODE_ENV: "development",
       PHYSICAL_VALIDATION_APPROVED: "false",
     }),
-    RENDER_MODES,
+    [
+      "dots",
+      "mosaic",
+      "line-amplification",
+      "colour-blend",
+      "tv-weave",
+      "fibonacci",
+    ],
+  );
+  assert.deepEqual(
+    getAvailableModes({
+      NODE_ENV: "development",
+      PHYSICAL_VALIDATION_APPROVED: "true",
+      PHYSICALLY_VALIDATED_MODES: "contour,stipple",
+    }),
+    [
+      "dots",
+      "mosaic",
+      "line-amplification",
+      "colour-blend",
+      "tv-weave",
+      "fibonacci",
+    ],
+  );
+  assert.deepEqual(
+    getAvailableModes({
+      NODE_ENV: "production",
+      PHYSICAL_VALIDATION_APPROVED: "true",
+      PHYSICALLY_VALIDATED_MODES: "contour,stipple",
+    }),
+    ["dots"],
   );
 });

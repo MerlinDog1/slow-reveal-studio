@@ -538,7 +538,7 @@ export function AdminDesk({
                   {review.kitGuide ? (
                     <p>
                       This revision&apos;s production package includes a
-                      two-page A4 making guide, colour key and packing checklist
+                      A4 making guide, colour key and packing checklist
                       ({review.kitGuide.version}). They are drafts for physical
                       trials. Check the instructions, marker assignments and
                       required kit items before production; no materials or

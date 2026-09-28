@@ -166,19 +166,54 @@ test("physical mark lattice is independent of analysis resolution", () => {
   assert.equal(small.stats.effectiveSpacingMm, large.stats.effectiveSpacingMm);
 });
 
-test("easy and detailed presets change physical workload", () => {
+test("Easy, Standard and Detailed progressively increase Dots and Mosaic detail within physical bounds", () => {
   const source = image(100, 100, () => 90);
-  const easy = renderImage(source, settings(PRESETS.easy));
-  const detailed = renderImage(source, settings(PRESETS.detailed));
-  assert.ok(detailed.stats.markCount > easy.stats.markCount * 2);
-  assert.ok(
-    detailed.stats.estimatedCompletionMinutes >
-      easy.stats.estimatedCompletionMinutes,
-  );
-  assert.ok(
-    Math.max(...easy.circles.map((c) => c.r)) >
-      Math.max(...detailed.circles.map((c) => c.r)),
-  );
+  for (const mode of ["dots", "mosaic"] as const) {
+    const levels = [PRESETS.easy, PRESETS.standard, PRESETS.detailed].map(
+      (preset) => renderImage(source, settings({ ...preset, mode })),
+    );
+    for (const [i, geometry] of levels.entries()) {
+      if (i > 0) {
+        assert.ok(
+          geometry.stats.markCount > levels[i - 1].stats.markCount * 1.5,
+        );
+        assert.ok(
+          geometry.stats.estimatedCompletionMinutes >
+            levels[i - 1].stats.estimatedCompletionMinutes,
+        );
+        assert.ok(
+          geometry.stats.effectiveSpacingMm <
+            levels[i - 1].stats.effectiveSpacingMm,
+        );
+        assert.ok(
+          geometry.stats.effectiveMaxDiameterMm <
+            levels[i - 1].stats.effectiveMaxDiameterMm,
+        );
+      }
+      assert.ok(geometry.stats.markCount <= MAX_MARKS);
+      const s = geometry.settings;
+      for (const dot of geometry.circles) {
+        assert.ok(dot.r * 2 >= s.minDiameterMm - 0.0001);
+        assert.ok(dot.x - dot.r >= s.safeMarginMm - 0.0001);
+        assert.ok(dot.y - dot.r >= s.safeMarginMm - 0.0001);
+        assert.ok(dot.x + dot.r <= s.widthMm - s.safeMarginMm + 0.0001);
+        assert.ok(dot.y + dot.r <= s.heightMm - s.safeMarginMm + 0.0001);
+      }
+      assertCircleGaps(geometry.circles, geometry.stats.effectiveSpacingMm);
+      for (const cell of geometry.cells) {
+        assert.ok(
+          cell.x >= s.safeMarginMm - 0.0001 &&
+            cell.y >= s.safeMarginMm - 0.0001,
+        );
+        assert.ok(cell.x + cell.width <= s.widthMm - s.safeMarginMm + 0.0001);
+        assert.ok(cell.y + cell.height <= s.heightMm - s.safeMarginMm + 0.0001);
+      }
+      assert.equal(
+        toSvg(JSON.parse(JSON.stringify(geometry)), "template"),
+        toSvg(geometry, "template"),
+      );
+    }
+  }
 });
 
 test("source tone changes dot area monotonically without changing physical centres", () => {

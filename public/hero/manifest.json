@@ -1,0 +1,64 @@
+{
+  "title": "A little wild colour",
+  "rendererVersion": "slow-reveal-geometry/1.7.0",
+  "mode": "colour-blend",
+  "markCount": 52312,
+  "paletteDescription": "Sixteen colours matched to this source image; physical marker matching unvalidated.",
+  "palette": [
+    "#182127",
+    "#722f22",
+    "#e52c18",
+    "#b92117",
+    "#ec6a28",
+    "#d4a725",
+    "#efd053",
+    "#b6a984",
+    "#124867",
+    "#17779b",
+    "#289bbe",
+    "#397471",
+    "#eee2cf",
+    "#8d8076",
+    "#f59a42",
+    "#a9c1bb"
+  ],
+  "source": {
+    "file": "/hero/macaw-source.png",
+    "sha256": "dd68cdf868876824252e90466623fd5a86128b0ef749f7898084d4ffe03a2496",
+    "generated": true,
+    "tool": "built-in image_gen",
+    "prompt": "/hero/PROMPT.md"
+  },
+  "isPhysicalProductEvidence": false,
+  "reproduction": "node --import tsx scripts/build-hero.ts",
+  "files": {
+    "macaw-geometry.json": {
+      "sha256": "e2b803fd82a4fefe56a7c92799dfda306a5666fc7bbf31a71009a708a16e13ce",
+      "bytes": 5511027
+    },
+    "macaw-dots.json": {
+      "sha256": "7f48381f7c8840680202bf60b8f87bb20bbc62a755fdeb5e04c20368d00e1415",
+      "bytes": 1982772
+    },
+    "macaw-finished.svg": {
+      "sha256": "13cb3bbb84dc9371b2e8eb8f1c3db6bbf26942b0da01297407f0da3446cc47e3",
+      "bytes": 4752038
+    },
+    "macaw-template.svg": {
+      "sha256": "3d3a5308a850144791e186aa4f414d4ca177bed18918d84a4d3251423257938a",
+      "bytes": 40923325
+    },
+    "macaw-source.webp": {
+      "sha256": "6281f41e43331110a201f5c16a34e9b830fcbce40c9e211b6a8f4aafb09303ef",
+      "bytes": 166118
+    },
+    "macaw-finished.webp": {
+      "sha256": "cc970e864ec9daa0a35c273fa86d173502cd4eb74e9d902a28ae6f6b52ce2379",
+      "bytes": 1827872
+    },
+    "macaw-template.webp": {
+      "sha256": "f0f6264c169911d642182d2fa337e62c7ffe04c9a44aa4df069bcb570a9ee59c",
+      "bytes": 967352
+    }
+  }
+}

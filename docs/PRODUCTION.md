@@ -38,7 +38,7 @@ Preserve the true original file type; names here are examples. Include source an
 
 Store originals and production files privately. Issue short-lived URLs only after owner/admin authorisation. Never log image bytes, signing tokens or customer details. Production staff receive the minimum access needed. Deletion must reconcile active orders, documented retention and access revocation, including signed URL expiry and backups. Do not put a private original in a public preview bucket.
 
-New archives also contain a revision-bound draft making guide, exact Mosaic colour key and unconfirmed packing records under `kit/`, with file hashes in the manifest. See [KIT_GUIDES.md](KIT_GUIDES.md) for the two-page A4 format, four activity instructions, deterministic PDF contract and reproducible eight-page example pack. These documents support physical trials; they do not approve materials, instructions or packing. Supplier/SKU/lot/quantity assignments remain unresolved, and every Lines checklist requires a ruler. Legacy paid packages remain immutable.
+New archives also contain a revision-bound draft making guide, exact Mosaic colour key and unconfirmed packing records under `kit/`, with file hashes in the manifest. See [KIT_GUIDES.md](KIT_GUIDES.md) for the A4 format (two to five pages, depending on the Mosaic palette and used markers), four activity instructions, deterministic PDF contract and reproducible eight-page example pack. These documents support physical trials; they do not approve materials, instructions or packing. Supplier/SKU/lot/quantity assignments remain unresolved, and every Lines checklist requires a ruler. Legacy paid packages remain immutable.
 
 ## Review and handoff checklist
 

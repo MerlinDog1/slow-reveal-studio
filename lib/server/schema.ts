@@ -1,5 +1,6 @@
 import { z } from "zod";
-import type { RenderSettings } from "../renderers/types";
+import { MAX_PALETTE_COLOURS } from "../mosaic-palette";
+import { RENDER_MODE_IDS, type RenderSettings } from "../renderers/types";
 import type { PrivateAsset } from "./assets";
 import { normalizeSubjectMask } from "../subject-mask";
 import type Stripe from "stripe";
@@ -18,7 +19,7 @@ export const cropSchema = z
   })
   .strict();
 export const settingsSchema = z.object({
-  mode: z.enum(["dots", "mosaic", "contour", "line-amplification"]),
+  mode: z.enum(RENDER_MODE_IDS),
   widthMm: z.number().positive().max(1500),
   heightMm: z.number().positive().max(1500),
   spacingMm: z.number().min(0.5).max(30),
@@ -55,7 +56,7 @@ export const settingsSchema = z.object({
   palette: z
     .array(z.string().regex(/^#[0-9a-f]{6}$/i))
     .min(2)
-    .max(8)
+    .max(MAX_PALETTE_COLOURS)
     .optional(),
   cellShape: z.enum(["square", "rounded", "hexagon"]).optional(),
 });
@@ -80,7 +81,7 @@ export const subjectMaskSchema = z.unknown().transform((input, context) => {
 });
 export const designSchema = z
   .object({
-    mode: z.enum(["dots", "mosaic", "contour", "line-amplification"]),
+    mode: z.enum(RENDER_MODE_IDS),
     productId: z.string().max(40),
     finishId: z.string().max(40),
     inkId: z.string().max(40),

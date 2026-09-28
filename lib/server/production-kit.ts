@@ -6,7 +6,7 @@ import {
   kitGuideText,
   KIT_GUIDE_PAGE,
 } from "../kit-guide";
-import type { RenderGeometry } from "../renderers";
+import { supportsPalette, type RenderGeometry } from "../renderers";
 import { digest } from "./security";
 
 type KitContext = {
@@ -40,13 +40,15 @@ export async function createProductionKit(
   const guide = buildKitGuide(geometry);
   const geometrySha256 = digest(JSON.stringify(geometry));
   const pages = kitGuidePages(geometry);
-  if (pages.length !== 2)
-    throw new Error("The making guide must contain two A4 pages.");
+  if (pages.length < 2 || pages.length > 5)
+    throw new Error(
+      "The making guide must contain between two and five A4 pages.",
+    );
   const dpi = 300;
   const widthPx = Math.round((KIT_GUIDE_PAGE.widthMm / 25.4) * dpi);
   const heightPx = Math.round((KIT_GUIDE_PAGE.heightMm / 25.4) * dpi);
   const rasters: Buffer[] = [];
-  // Render sequentially to bound peak raster memory for the two A4 pages.
+  // Render sequentially to bound peak raster memory for the A4 pages.
   for (const svg of pages) {
     const rasterSvg = svg.replace(/<svg\b[^>]*>/, (tag) =>
       tag
@@ -129,7 +131,7 @@ export async function createProductionKit(
     "DIGITAL COLOUR KEY - PHYSICAL MARKERS MUST BE ASSIGNED",
     ...guide.legend.map(
       (entry) =>
-        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}: ${entry.color}${geometry.mode === "mosaic" ? `; ${entry.usedCellCount} cells` : ""}. Marker SKU and quantity unassigned.`,
+        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}: ${entry.color}${supportsPalette(geometry.mode) ? `; ${entry.usedCellCount} ${geometry.mode === "mosaic" ? "cells" : "marks"}` : ""}. Marker SKU and quantity unassigned.`,
     ),
     "",
     "UNRESOLVED",
@@ -154,16 +156,16 @@ export async function createProductionKit(
       mime: "text/plain; charset=utf-8",
       data: Buffer.from(kitGuideText(guide)),
     },
-    guidePage1: {
-      path: "kit/making-guide-page-1.svg",
-      mime: "image/svg+xml",
-      data: Buffer.from(pages[0]),
-    },
-    guidePage2: {
-      path: "kit/making-guide-page-2.svg",
-      mime: "image/svg+xml",
-      data: Buffer.from(pages[1]),
-    },
+    ...Object.fromEntries(
+      pages.map((svg, i) => [
+        `guidePage${i + 1}`,
+        {
+          path: `kit/making-guide-page-${i + 1}.svg`,
+          mime: "image/svg+xml",
+          data: Buffer.from(svg),
+        },
+      ]),
+    ),
     packingListJson: {
       path: "kit/packing-list.json",
       mime: "application/json",

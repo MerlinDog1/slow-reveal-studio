@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { RENDER_MODE_IDS } from "@/lib/renderers/types";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, LoaderCircle, Trash2 } from "lucide-react";
 import {
@@ -83,12 +84,7 @@ export function Basket() {
     getLocalProject("basket")
       .then(async (p) => {
         if (!p) return;
-        const validated = validateRestorableProject(p, [
-          "dots",
-          "mosaic",
-          "contour",
-          "line-amplification",
-        ]);
+        const validated = validateRestorableProject(p, [...RENDER_MODE_IDS]);
         if (validated.needsRendererReview)
           throw new Error(
             "Reopen this design in the studio and review it with the current renderer before checkout.",
@@ -485,6 +481,10 @@ export function Basket() {
                 mosaic: "Colour Mosaic",
                 contour: "Contour",
                 "line-amplification": "Line Amplification",
+                "colour-blend": "Colour Blend",
+                "tv-weave": "TV Weave",
+                stipple: "Stipple Art",
+                fibonacci: "Fibonacci Spiral",
               }[(project.settings as RenderSettings).mode]
             }{" "}
             · {(project.settings as RenderSettings).widthMm / 10} ×{" "}

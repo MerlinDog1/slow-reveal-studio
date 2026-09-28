@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Studio } from "@/components/studio";
 import { getAvailableModes } from "@/lib/mode-availability";
+import type { RenderMode } from "@/lib/renderers/types";
 export const dynamicParams = false;
 export function generateStaticParams() {
   return getAvailableModes().map((mode) => ({
@@ -19,7 +20,7 @@ export default async function Lab({
     <Studio
       lab
       availableModes={availableModes}
-      initialMode={mode as "dots" | "mosaic" | "contour" | "line-amplification"}
+      initialMode={mode as RenderMode}
     />
   );
 }

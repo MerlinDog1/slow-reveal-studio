@@ -63,18 +63,18 @@ const neutral = () =>
     minDiameterMm: 0.3,
   });
 
-test("missing and zero detail preserve exact renderer1.2 primitives in every mode", () => {
+test("missing and zero detail preserve exact renderer1.2 primitives in every legacy mode", () => {
   // Captured from 7ed5e92 before introducing the new control. Settings/version
   // metadata intentionally is not part of this geometry compatibility contract.
-  const hashes: Record<RenderMode, string> = {
+  const hashes = {
     dots: "ae8a19e8eeeb031911d15d6c32b88f6155f0feb0cb1a715d8590036fdb9df9d0",
     mosaic: "122023433f1cf350b53895f208b1cf6da0092dd1e1430bfd41fefdda6ba94757",
     contour: "e17270100bc8ace87bd6c38b621393b98f03a3731a6e7eda51cbb0fa8103808a",
     "line-amplification":
       "68a80f5164c964f7a3576405407afcde361bd0551db8d084ba2d26aa21b7018b",
-  };
+  } satisfies Partial<Record<RenderMode, string>>;
   const photo = image((x, y) => (x * 17 + y * 23 + (x ^ y) * 5) % 256);
-  for (const mode of Object.keys(hashes) as RenderMode[]) {
+  for (const mode of Object.keys(hashes) as (keyof typeof hashes)[]) {
     const oldSettings = settings({ mode });
     delete oldSettings.detailPreservation;
     const legacy = renderImage(photo, oldSettings);

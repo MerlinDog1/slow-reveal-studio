@@ -1,4 +1,4 @@
-import type { RenderMode } from "./renderers";
+import { RENDER_MODE_IDS, type RenderMode } from "./renderers/types";
 
 export const ANALYTICS_EVENTS = [
   "builder_opened",
@@ -45,7 +45,7 @@ export const ANALYTICS_PRESETS = [
   "bold",
   "portrait",
 ] as const;
-const MODES: RenderMode[] = ["dots", "mosaic", "contour", "line-amplification"];
+const MODES: readonly RenderMode[] = RENDER_MODE_IDS;
 
 export interface AnalyticsFields {
   mode?: RenderMode;

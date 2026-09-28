@@ -1,5 +1,6 @@
 import {
   normalizeSettings,
+  usesOpticalColour,
   round,
   type RenderGeometry,
   type RenderSettings,
@@ -62,7 +63,13 @@ export function toSvg(
 ): string {
   if (variant !== "finished" && variant !== "template")
     throw new Error("Choose finished or template output.");
-  const s = normalizeSettings(geometry.settings);
+  const s = normalizeSettings(
+    geometry.mode === "fibonacci" &&
+      geometry.circles.length &&
+      !geometry.cells.length
+      ? { ...geometry.settings, palette: undefined }
+      : geometry.settings,
+  );
   if (geometry.widthMm !== s.widthMm || geometry.heightMm !== s.heightMm)
     throw new Error("Geometry dimensions do not match the saved settings.");
   if (
@@ -71,6 +78,9 @@ export function toSvg(
   )
     throw new Error("Geometry exceeds the export mark limit.");
   const finished = variant === "finished";
+  // Desktop SVG importers can misread zero-radius rectangle primitives.
+  // Lines use independent closed curves with explicit styles and no group inheritance.
+  const lineCurves = geometry.mode === "line-amplification";
   // Guide colour changes only template ink, including outlined labels and text.
   const ink = finished ? color(s.inkColor) : effectiveGuideColor(s);
   const width = n(geometry.widthMm),
@@ -79,21 +89,24 @@ export function toSvg(
   const paper =
     typeof options.background === "string"
       ? color(options.background)
-      : s.invert
-        ? "#1e1e1c"
-        : "#f8f5ef";
+      : usesOpticalColour(s) && !geometry.circles.length
+        ? "#ffffff"
+        : s.invert
+          ? "#1e1e1c"
+          : "#f8f5ef";
   const title =
     options.title ?? `Slow Reveal Studio ${geometry.mode} ${variant}`;
   const chunks = [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}mm" height="${height}mm" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeXml(title)}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg"${lineCurves ? ' version="1.1"' : ""} width="${width}mm" height="${height}mm" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeXml(title)}">`,
     `<title>${escapeXml(title)}</title>`,
     `<metadata>${escapeXml(JSON.stringify({ renderer: geometry.version, mode: geometry.mode, units: "mm", variant }))}</metadata>`,
   ];
   if (options.background !== false)
     chunks.push(`<rect width="${width}" height="${height}" fill="${paper}"/>`);
-  chunks.push(
-    `<g fill="${finished ? ink : "none"}" stroke="${finished ? "none" : ink}" stroke-width="${n(guideWidth)}"${finished ? "" : ` opacity="${n(s.guideOpacity)}"`}>`,
-  );
+  if (!lineCurves)
+    chunks.push(
+      `<g fill="${finished ? ink : "none"}" stroke="${finished ? "none" : ink}" stroke-width="${n(guideWidth)}"${finished ? "" : ` opacity="${n(s.guideOpacity)}"`}>`,
+    );
   for (const dot of geometry.circles) {
     // Inset outline places the entire guide inside the filled mark boundary.
     const radius = finished ? dot.r : Math.max(0.01, dot.r - guideWidth / 2);
@@ -101,6 +114,17 @@ export function toSvg(
   }
   for (const cell of geometry.cells) {
     const fill = finished && cell.color ? ` fill="${color(cell.color)}"` : "";
+    if (lineCurves) {
+      const inset = finished ? 0 : guideWidth / 2;
+      const x = cell.x + inset,
+        y = cell.y + inset;
+      const right = x + Math.max(0.01, cell.width - inset * 2),
+        bottom = y + Math.max(0.01, cell.height - inset * 2);
+      chunks.push(
+        `<path d="M ${n(x)} ${n(y)} L ${n(right)} ${n(y)} L ${n(right)} ${n(bottom)} L ${n(x)} ${n(bottom)} Z" fill="${finished ? (cell.color ? color(cell.color) : ink) : "none"}" stroke="${finished ? "none" : ink}" stroke-width="${n(guideWidth)}" stroke-linejoin="miter" opacity="${finished ? "1" : n(s.guideOpacity)}"/>`,
+      );
+      continue;
+    }
     if (cell.points) {
       // Scale the polygon inwards to keep outline ink within the intended mark.
       const cx = cell.x + cell.width / 2,
@@ -142,7 +166,7 @@ export function toSvg(
       );
     }
   }
-  chunks.push("</g>");
+  if (!lineCurves) chunks.push("</g>");
   for (const path of geometry.paths) {
     if (path.points.length < 2) continue;
     if (path.points.length > 200000)

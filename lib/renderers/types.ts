@@ -1,6 +1,25 @@
 import { validateLettering } from "./fonts";
+import { MAX_PALETTE_COLOURS } from "../mosaic-palette";
+import { defaultOpticalPalette } from "../optical-palette";
 
-export type RenderMode = "dots" | "mosaic" | "contour" | "line-amplification";
+export const RENDER_MODE_IDS = [
+  "dots",
+  "mosaic",
+  "contour",
+  "line-amplification",
+  "colour-blend",
+  "tv-weave",
+  "stipple",
+  "fibonacci",
+] as const;
+export type RenderMode = (typeof RENDER_MODE_IDS)[number];
+export const isOpticalMode = (mode: RenderMode) =>
+  mode === "colour-blend" || mode === "tv-weave";
+export const supportsPalette = (mode: RenderMode) =>
+  mode === "mosaic" || mode === "fibonacci" || isOpticalMode(mode);
+export const usesOpticalColour = (
+  s: Pick<RenderSettings, "mode" | "palette">,
+) => isOpticalMode(s.mode) || (s.mode === "fibonacci" && !!s.palette);
 
 export interface PersonalizedText {
   value: string;
@@ -111,7 +130,7 @@ export interface SvgOptions {
   title?: string;
 }
 
-export const RENDERER_VERSION = "slow-reveal-geometry/1.3.0";
+export const RENDERER_VERSION = "slow-reveal-geometry/1.7.0";
 export const MAX_MARKS = 60_000;
 export const DEFAULT_SETTINGS: RenderSettings = {
   mode: "dots",
@@ -138,16 +157,6 @@ export const DEFAULT_SETTINGS: RenderSettings = {
 
 export const PRESETS = {
   easy: {
-    spacingMm: 6.4,
-    minDiameterMm: 1.8,
-    maxDiameterMm: 5.9,
-    contrast: 1.2,
-    gamma: 1,
-    edgeEmphasis: 0.15,
-    density: 1,
-    threshold: 0.07,
-  },
-  standard: {
     spacingMm: 4.2,
     minDiameterMm: 0.9,
     maxDiameterMm: 3.8,
@@ -157,7 +166,7 @@ export const PRESETS = {
     density: 1,
     threshold: 0.04,
   },
-  detailed: {
+  standard: {
     spacingMm: 2.8,
     minDiameterMm: 0.7,
     maxDiameterMm: 2.4,
@@ -166,6 +175,16 @@ export const PRESETS = {
     edgeEmphasis: 0.35,
     density: 1,
     threshold: 0.035,
+  },
+  detailed: {
+    spacingMm: 2,
+    minDiameterMm: 0.5,
+    maxDiameterMm: 1.7,
+    contrast: 1.08,
+    gamma: 1,
+    edgeEmphasis: 0.4,
+    density: 1,
+    threshold: 0.03,
   },
   bold: {
     spacingMm: 4.8,
@@ -208,13 +227,8 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
         ? 0
         : settings.detailPreservation,
   };
-  const modes: RenderMode[] = [
-    "dots",
-    "mosaic",
-    "contour",
-    "line-amplification",
-  ];
-  if (!modes.includes(s.mode)) throw new Error("Unknown rendering mode.");
+  if (!RENDER_MODE_IDS.includes(s.mode))
+    throw new Error("Unknown rendering mode.");
   const ranges: [keyof RenderSettings, number, number][] = [
     ["widthMm", 30, 1500],
     ["heightMm", 30, 1500],
@@ -246,6 +260,10 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
   }
   if (typeof s.invert !== "boolean")
     throw new Error("Inversion must be true or false.");
+  if (usesOpticalColour(s) && s.invert)
+    throw new Error(
+      "Colour Blend, TV Weave and colour Fibonacci Spiral use a light canvas. Turn off inversion first.",
+    );
   if (typeof s.autoExposure !== "boolean")
     throw new Error("Automatic exposure must be true or false.");
   if (!/^#[0-9a-f]{6}$/i.test(s.inkColor))
@@ -264,14 +282,18 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
     !["square", "rounded", "hexagon"].includes(s.cellShape)
   )
     throw new Error("Choose square, rounded or hexagon cells.");
+  if (isOpticalMode(s.mode) && s.palette === undefined)
+    s.palette = defaultOpticalPalette();
   if (s.palette !== undefined) {
     if (
       !Array.isArray(s.palette) ||
       s.palette.length < 2 ||
-      s.palette.length > 8 ||
+      s.palette.length > MAX_PALETTE_COLOURS ||
       s.palette.some((c) => typeof c !== "string" || !/^#[0-9a-f]{6}$/i.test(c))
     )
-      throw new Error("A palette needs 2 to 8 hexadecimal marker colours.");
+      throw new Error(
+        `A palette needs 2 to ${MAX_PALETTE_COLOURS} hexadecimal marker colours.`,
+      );
     s.palette = [...new Set(s.palette.map((c) => c.toLowerCase()))];
     if (s.palette.length < 2)
       throw new Error("Choose at least two distinct marker colours.");

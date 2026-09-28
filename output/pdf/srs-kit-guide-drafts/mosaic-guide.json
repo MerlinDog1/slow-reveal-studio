@@ -1,6 +1,6 @@
 {
   "version": "srs-kit-guide/1.0.0",
-  "rendererVersion": "slow-reveal-geometry/1.3.0",
+  "rendererVersion": "slow-reveal-geometry/1.7.0",
   "status": "draft-for-physical-trial",
   "mode": "mosaic",
   "dimensions": {

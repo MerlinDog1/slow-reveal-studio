@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RENDER_MODE_IDS } from "../renderers/types";
 import { randomUUID } from "node:crypto";
 import { getCatalogue } from "./catalog";
 import { anonymousHash, takeQuota } from "./rate-limit";
@@ -24,9 +25,7 @@ export const EVENT_NAMES = [
 const eventSchema = z
   .object({
     event: z.enum(EVENT_NAMES),
-    mode: z
-      .enum(["dots", "mosaic", "contour", "line-amplification"])
-      .optional(),
+    mode: z.enum(RENDER_MODE_IDS).optional(),
     productId: z.string().min(1).max(40).optional(),
     step: z
       .enum([

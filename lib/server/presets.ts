@@ -4,6 +4,7 @@ import {
   DEFAULT_SETTINGS,
   normalizeSettings,
   RENDERER_VERSION,
+  RENDER_MODE_IDS,
 } from "../renderers";
 import { getAvailableModes } from "../mode-availability";
 import {
@@ -36,7 +37,7 @@ const metadata = {
 export const createPresetSchema = z
   .object({
     ...metadata,
-    mode: z.enum(["dots", "mosaic", "contour", "line-amplification"]),
+    mode: z.enum(RENDER_MODE_IDS),
     settings: presetSettingsSchema,
   })
   .strict();
@@ -108,10 +109,7 @@ export async function listAdminPresets(): Promise<RendererPreset[]> {
 export async function publishedPresets(
   mode?: string | null,
 ): Promise<PublicPresetsResponse> {
-  if (
-    mode &&
-    !["dots", "mosaic", "contour", "line-amplification"].includes(mode)
-  )
+  if (mode && !RENDER_MODE_IDS.some((id) => id === mode))
     throw new ApiError(400, "Unknown renderer mode.");
   if (!hasDatabase() && !localPersistenceAllowed())
     return { presets: [], persistence: "unconfigured" };

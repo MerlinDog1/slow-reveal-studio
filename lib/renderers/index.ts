@@ -1,4 +1,7 @@
 import { analyzeImage } from "./sampling";
+import { renderOptical, TV_COLUMN_RATIO } from "./optical";
+import { renderStipple } from "./stipple";
+import { renderFibonacci, renderFibonacciColour } from "./fibonacci";
 import {
   pathLength,
   renderContours,
@@ -9,6 +12,9 @@ import {
 } from "./modes";
 import {
   clamp,
+  isOpticalMode,
+  supportsPalette,
+  usesOpticalColour,
   MAX_MARKS,
   normalizeSettings,
   RENDERER_VERSION,
@@ -132,7 +138,8 @@ export function renderImage(
     );
   const requestedPitch = s.spacingMm / Math.sqrt(s.density);
   const areaPitch = Math.sqrt(
-    (bounds.width * bounds.height) / (MAX_MARKS * 0.82),
+    (bounds.width * bounds.height) /
+      (MAX_MARKS * 0.82 * (s.mode === "tv-weave" ? TV_COLUMN_RATIO : 1)),
   );
   // Keep a 0.25 mm clear gap, including the rounding precision, between adjacent dots.
   const pitch = Math.max(requestedPitch, s.minDiameterMm + 0.251, areaPitch);
@@ -153,13 +160,24 @@ export function renderImage(
     maxDiameter,
     subjectMask: maskSampler,
   };
-  const circles = s.mode === "dots" ? renderDots(context) : [];
+  const circles =
+    s.mode === "dots"
+      ? renderDots(context)
+      : s.mode === "stipple"
+        ? renderStipple(context)
+        : s.mode === "fibonacci" && !s.palette
+          ? renderFibonacci(context)
+          : [];
   const cells =
     s.mode === "mosaic"
       ? renderMosaic(context)
-      : s.mode === "line-amplification"
-        ? renderLines(context)
-        : [];
+      : s.mode === "fibonacci" && s.palette
+        ? renderFibonacciColour(context)
+        : isOpticalMode(s.mode)
+          ? renderOptical(context)
+          : s.mode === "line-amplification"
+            ? renderLines(context)
+            : [];
   const contourInset = 0.5;
   const paths =
     s.mode === "contour"
@@ -183,7 +201,13 @@ export function renderImage(
     0,
   );
   const cellArea = cells.reduce((area, cell) => {
-    if (!cell.points) return area + cell.width * cell.height;
+    if (!cell.points) {
+      if (usesOpticalColour(s)) {
+        const r = cell.radius ?? 0;
+        return area + cell.width * cell.height - (4 - Math.PI) * r * r;
+      }
+      return area + cell.width * cell.height;
+    }
     let signed = 0;
     cell.points.forEach((p, i) => {
       const q = cell.points![(i + 1) % cell.points!.length];
@@ -201,7 +225,9 @@ export function renderImage(
   const seconds =
     s.mode === "contour"
       ? traceLength / 3 + count * 4
-      : count * (s.mode === "dots" ? 1.6 : 2.2) + inkArea / 8;
+      : count *
+          (["dots", "stipple", "fibonacci"].includes(s.mode) ? 1.6 : 2.2) +
+        inkArea / 8;
   if (input.width < s.widthMm || input.height < s.heightMm)
     warnings.push(
       "Low source resolution for this canvas. Inspect the face and fine details before ordering.",
@@ -242,21 +268,32 @@ export function renderImage(
     warnings.push(
       "Every Line Amplification kit must include a ruler or straight edge.",
     );
-  if (s.palette && s.mode !== "mosaic")
-    warnings.push("Limited palettes currently apply to Mosaic Fill only.");
-  if (s.palette && s.mode === "mosaic") {
+  if (s.palette && !supportsPalette(s.mode))
     warnings.push(
-      `Mosaic colour key: ${s.palette.map((hex, i) => `${i + 1} = ${hex}`).join(", ")}. Supply matching markers and a separate colour legend.`,
+      "Limited palettes apply to Mosaic Fill, Fibonacci Spiral, Colour Blend and TV Weave only.",
     );
-    if (maxDiameter < 3)
+  if (s.palette && supportsPalette(s.mode)) {
+    warnings.push(
+      `${s.mode === "mosaic" ? "Mosaic" : s.mode === "fibonacci" ? "Fibonacci Spiral" : s.mode === "colour-blend" ? "Colour Blend" : "TV Weave"} colour key: ${s.palette.map((hex, i) => `${i + 1} = ${hex}`).join(", ")}. Supply matching markers and a separate colour legend.`,
+    );
+    if (
+      maxDiameter < 3 ||
+      (usesOpticalColour(s) && cells.some((cell) => cell.width < 3))
+    )
       warnings.push(
-        "Palette numbers may be hard to read below 3 mm. Increase spacing and cell size.",
+        usesOpticalColour(s)
+          ? "Palette numbers may be hard to read below 3 mm wide. Increase spacing and mark size."
+          : "Palette numbers may be hard to read below 3 mm. Increase spacing and cell size.",
       );
     if (s.invert)
       warnings.push(
         "Palette mapping assumes a light substrate; inverted colour mosaics need a separate physical proof.",
       );
   }
+  if (usesOpticalColour(s))
+    warnings.push(
+      "Neighbouring colours blend visually at a distance. White gaps and the actual marker colours limit contrast and colour range; this is not a calibrated ink simulation.",
+    );
   return {
     version: RENDERER_VERSION,
     mode: s.mode,

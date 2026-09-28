@@ -1,5 +1,6 @@
 import {
   normalizeSettings,
+  supportsPalette,
   round,
   type RenderGeometry,
   type RenderMode,
@@ -36,6 +37,48 @@ const ACTIVITIES: Record<
   RenderMode,
   { title: string; steps: KitGuideModel["steps"] }
 > = {
+  fibonacci: {
+    title: "Follow the sunflower spirals",
+    steps: [
+      {
+        title: "Choose a small spiral section",
+        body: "Find a short arc of outlined dots. The sunflower pattern curves in both directions; choose a direction that feels comfortable.",
+      },
+      {
+        title: "Fill each separate circle",
+        body: "Use the selected trial marker to fill each circle to its printed size. Keep the dots separate; do not draw connecting spiral lines.",
+      },
+      {
+        title: "Follow the changing sizes",
+        body: "Larger circles build the shadows and smaller circles form lighter details. Leave areas without circles unmarked.",
+      },
+      {
+        title: "Step back and compare",
+        body: "Compare a filled patch with the digital reference. Record guide visibility, dot control and any marks that join.",
+      },
+    ],
+  },
+  stipple: {
+    title: "Build shade with scattered dots",
+    steps: [
+      {
+        title: "Start with a small patch",
+        body: "Choose a small group of outlined circles. The irregular spacing is part of the picture; do not arrange the dots into rows.",
+      },
+      {
+        title: "Fill each separate dot",
+        body: "Use the selected trial marker to fill each printed circle. Follow its size and keep neighbouring dots separate.",
+      },
+      {
+        title: "Leave the light areas open",
+        body: "Dense dots create shadows and sparse dots create highlights. Leave unmarked canvas untouched; do not add extra dots to fill the gaps.",
+      },
+      {
+        title: "Step back and compare",
+        body: "Compare a filled patch with the digital reference at a distance. Record guide visibility, dot control and any marks that join.",
+      },
+    ],
+  },
   dots: {
     title: "Fill the circles",
     steps: [
@@ -75,6 +118,48 @@ const ACTIVITIES: Record<
       {
         title: "Compare and record",
         body: "Compare a small filled area with the digital reference. Record number readability, colour matching and coverage.",
+      },
+    ],
+  },
+  "colour-blend": {
+    title: "Build colour with dots",
+    steps: [
+      {
+        title: "Match the numbered pens",
+        body: "Match each printed number to the key on page 2. The operator must assign and test the physical markers first.",
+      },
+      {
+        title: "Fill one colour at a time",
+        body: "Fill the numbered circles with their assigned pen. Keep each colour inside its own boundary; do not mix wet inks.",
+      },
+      {
+        title: "Keep the white gaps",
+        body: "Leave unmarked canvas untouched. The spaces and neighbouring pen colours both contribute to the picture.",
+      },
+      {
+        title: "Step back and compare",
+        body: "Compare close up and from a distance. Record number readability, colour matching and whether the separate dots blend visually.",
+      },
+    ],
+  },
+  "tv-weave": {
+    title: "Weave colour with dashes",
+    steps: [
+      {
+        title: "Match the numbered pens",
+        body: "Match each printed number to the key on page 2. The operator must assign and test the physical markers first.",
+      },
+      {
+        title: "Fill the vertical dashes",
+        body: "Fill each short outlined dash with its numbered colour. Keep adjacent dashes separate; do not join them into long stripes.",
+      },
+      {
+        title: "Keep the white gaps",
+        body: "Leave unmarked canvas untouched. Fill one number at a time without overlapping or mixing the inks.",
+      },
+      {
+        title: "Step back and compare",
+        body: "View the woven pattern close up, then from a distance. Record readability, control and how the separate colours blend visually.",
       },
     ],
   },
@@ -255,7 +340,13 @@ function sampleFrom(geometry: RenderGeometry): KitGuideModel["sample"] {
 
 /** Saved geometry is the authority. No source image, customer lettering or live catalogue is copied. */
 export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
-  const settings = normalizeSettings(geometry.settings);
+  const settings = normalizeSettings(
+    geometry.mode === "fibonacci" &&
+      geometry.circles.length &&
+      !geometry.cells.length
+      ? { ...geometry.settings, palette: undefined }
+      : geometry.settings,
+  );
   if (
     geometry.mode !== settings.mode ||
     geometry.widthMm !== settings.widthMm ||
@@ -272,16 +363,27 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
   )
     throw new Error("Kit guide geometry exceeds the mark limit.");
   if (
-    (geometry.mode !== "dots" && geometry.circles.length) ||
-    (geometry.mode !== "mosaic" &&
+    (geometry.mode !== "dots" &&
+      geometry.mode !== "stipple" &&
+      geometry.mode !== "fibonacci" &&
+      geometry.circles.length) ||
+    (!supportsPalette(geometry.mode) &&
       geometry.mode !== "line-amplification" &&
       geometry.cells.length) ||
-    (geometry.mode !== "contour" && geometry.paths.length)
+    (geometry.mode !== "contour" && geometry.paths.length) ||
+    (geometry.mode === "fibonacci" &&
+      geometry.circles.length &&
+      geometry.cells.length)
   )
     throw new Error("Kit guide marks do not match the selected activity.");
   const legend: KitGuideModel["legend"] = [];
-  if (geometry.mode === "mosaic" && settings.palette) {
-    if (geometry.settings.palette!.length !== settings.palette.length)
+  if (
+    supportsPalette(geometry.mode) &&
+    settings.palette &&
+    // Pre-colour Fibonacci snapshots could retain an unused palette setting.
+    !(geometry.mode === "fibonacci" && geometry.circles.length)
+  ) {
+    if (geometry.settings.palette?.length !== settings.palette.length)
       throw new Error(
         "Kit guide palette must already have distinct canonical entries.",
       );
@@ -376,14 +478,44 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
     warnings.push(
       "Line Amplification remains a research activity until ruler and completion trials pass.",
     );
+  const activity =
+    geometry.mode === "fibonacci" && legend[0]?.index !== null
+      ? {
+          title: "Build colour along the sunflower spirals",
+          steps: [
+            {
+              title: "Match the numbered pens",
+              body: "Match each printed number to the key on page 2. The operator must assign and test the physical markers first.",
+            },
+            {
+              title: "Follow a spiral of dots",
+              body: "Choose a short sunflower arc and fill each numbered circle with its matching pen. Fill one colour at a time without joining the dots.",
+            },
+            {
+              title: "Keep the white gaps",
+              body: "Leave unmarked canvas untouched. Each dot uses one pen colour; neighbouring colours blend visually when viewed from a distance.",
+            },
+            {
+              title: "Step back and compare",
+              body: "Compare the filled patch with the digital reference. Record number readability, marker matching and whether nearby colours blend.",
+            },
+          ],
+        }
+      : ACTIVITIES[geometry.mode];
   return {
     version: KIT_GUIDE_VERSION,
     rendererVersion: geometry.version,
     status: "draft-for-physical-trial",
     mode: geometry.mode,
     dimensions: { widthMm: geometry.widthMm, heightMm: geometry.heightMm },
-    title: ACTIVITIES[geometry.mode].title,
-    steps: ACTIVITIES[geometry.mode].steps.map((step) => ({ ...step })),
+    title: activity.title,
+    steps: activity.steps.map((step) => ({
+      ...step,
+      body:
+        legend.length > 16
+          ? step.body.replace("the key on page 2", "the key on pages 2 and 3")
+          : step.body,
+    })),
     materials,
     legend,
     warnings,
@@ -405,7 +537,7 @@ export function kitGuideText(model: KitGuideModel): string {
     "DIGITAL COLOUR KEY",
     ...model.legend.map(
       (entry) =>
-        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}: ${entry.color}${model.mode === "mosaic" ? `; ${entry.usedCellCount} cells` : ""}. Physical marker assignment unresolved.`,
+        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}: ${entry.color}${supportsPalette(model.mode) ? `; ${entry.usedCellCount} ${model.mode === "mosaic" ? "cells" : "marks"}` : ""}. Physical marker assignment unresolved.`,
     ),
     "Leave unmarked canvas unmarked; it is not an additional numbered colour.",
     "",

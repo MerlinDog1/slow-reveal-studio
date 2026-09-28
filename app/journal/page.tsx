@@ -39,7 +39,7 @@ export default function Journal() {
           <span className="eyebrow">03 / The possibilities</span>
           <h2>More than one way to slow down.</h2>
           <p>
-            Mosaic cells, contour lines and rhythmic line studies are early
+            Mosaic cells and rhythmic line studies are early
             experiments. Each needs a clear, enjoyable physical action before it
             earns a place beside Signature Dots.
           </p>

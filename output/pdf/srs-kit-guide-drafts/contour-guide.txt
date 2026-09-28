@@ -27,4 +27,4 @@ Digital colour swatches are references, not verified matches to physical marker 
 Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.
 Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.
 
-srs-kit-guide/1.0.0; renderer slow-reveal-geometry/1.3.0. No order identity or personal lettering is included in this guide.
+srs-kit-guide/1.0.0; renderer slow-reveal-geometry/1.7.0. No order identity or personal lettering is included in this guide.

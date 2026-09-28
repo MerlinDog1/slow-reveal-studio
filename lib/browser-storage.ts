@@ -4,6 +4,7 @@ export type LocalProject = {
   updatedAt: string;
   image: Blob;
   settings: unknown;
+  subjectMask?: unknown;
   crop: { zoom: number; x: number; y: number; rotation: number };
   productId: string;
   finishId: string;

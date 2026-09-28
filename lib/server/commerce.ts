@@ -93,7 +93,12 @@ export async function beginCheckout(input: unknown) {
     tokenHash: digest(token),
     accessKeyId,
     createdAt: new Date().toISOString(),
-    design: { ...design, email: undefined, source: production.source },
+    design: {
+      ...design,
+      email: undefined,
+      source: production.source,
+      subjectMask: production.subjectMask,
+    },
     package: production,
     amountPence: price.totalPence,
     shippingId: body.shippingId,

@@ -26,6 +26,7 @@ export const presetSettingsSchema = settingsSchema
     heightMm: true,
     inkColor: true,
     text: true,
+    subjectMaskStrength: true,
   })
   .strict();
 const metadata = {

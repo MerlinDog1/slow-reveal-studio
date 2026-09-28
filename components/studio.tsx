@@ -31,6 +31,9 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { PreviewDialog } from "@/components/preview-dialog";
+import { SubjectMaskEditor } from "@/components/subject-mask-editor";
+import { hashBlob } from "@/lib/browser-subject-mask";
+import { assertSubjectMaskBinding, type SubjectMask } from "@/lib/subject-mask";
 import {
   DEFAULT_SETTINGS,
   PRESETS,
@@ -111,6 +114,7 @@ function Range({
   step = 1,
   suffix = "",
   onChange,
+  disabled = false,
 }: {
   label: string;
   value: number;
@@ -119,6 +123,7 @@ function Range({
   step?: number;
   suffix?: string;
   onChange: (v: number) => void;
+  disabled?: boolean;
 }) {
   return (
     <label className="range-field">
@@ -136,6 +141,7 @@ function Range({
         max={max}
         step={step}
         value={value}
+        disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </label>
@@ -162,6 +168,9 @@ export function Studio({
   const [crop, setCrop] = useState<Crop>(DEFAULT_CROP);
   const [source, setSource] = useState<string | null>(null);
   const [sourceBlob, setSourceBlob] = useState<Blob | null>(null);
+  const [sourceSha256, setSourceSha256] = useState("");
+  const [subjectMask, setSubjectMask] = useState<SubjectMask | undefined>();
+  const [maskEditorOpen, setMaskEditorOpen] = useState(false);
   const [sourceName, setSourceName] = useState("Your photograph");
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [croppedUrl, setCroppedUrl] = useState<string | null>(null);
@@ -334,10 +343,25 @@ export function Studio({
     !!selection?.ready &&
     !reviewRequired &&
     !pendingRestore;
-  const update = useCallback((patch: Partial<RenderSettings>) => {
-    setSettings((s) => ({ ...s, ...patch }));
-    setSaved(false);
-  }, []);
+  const update = useCallback(
+    (patch: Partial<RenderSettings>) => {
+      if (
+        subjectMask &&
+        ((patch.mode !== undefined && patch.mode !== settings.mode) ||
+          (patch.widthMm !== undefined && patch.widthMm !== settings.widthMm) ||
+          (patch.heightMm !== undefined &&
+            patch.heightMm !== settings.heightMm))
+      ) {
+        setError(
+          "Clear the manual subject selection before changing the style or canvas size.",
+        );
+        return;
+      }
+      setSettings((s) => ({ ...s, ...patch }));
+      setSaved(false);
+    },
+    [subjectMask, settings.mode, settings.widthMm, settings.heightMm],
+  );
   useEffect(() => {
     const w = new Worker(
       new URL("../workers/render.worker.ts", import.meta.url),
@@ -385,12 +409,14 @@ export function Studio({
       const request = ++sourceRequest.current;
       const url = URL.createObjectURL(blob);
       let image: HTMLImageElement;
+      let digest: string;
       try {
         image = await loadImage(url);
         if (image.naturalWidth * image.naturalHeight > 40_000_000)
           throw new Error(
             "Please resize this photograph to 40 megapixels or less.",
           );
+        digest = await hashBlob(blob);
       } catch (e) {
         URL.revokeObjectURL(url);
         throw e;
@@ -402,6 +428,11 @@ export function Studio({
       if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
       sourceUrl.current = url;
       sourceImage.current = image;
+      setSourceSha256(digest);
+      setSubjectMask(undefined);
+      setMaskEditorOpen(false);
+      setSettings((s) => ({ ...s, subjectMaskStrength: 0 }));
+      setCroppedUrl(null);
       setPhotoAnalysis(null);
       setFaceDetection({ status: "checking", boxes: [] });
       setSource(url);
@@ -497,6 +528,13 @@ export function Studio({
             ? sourceImage.current
             : await loadImage(source);
         if (stopped) return;
+        if (subjectMask)
+          assertSubjectMaskBinding(subjectMask, {
+            sourceSha256,
+            crop,
+            widthMm: settings.widthMm,
+            heightMm: settings.heightMm,
+          });
         const { canvas, pixels } = cropImage(
           image,
           crop,
@@ -510,11 +548,11 @@ export function Studio({
           height: pixels.height,
         };
         if (worker.current)
-          worker.current.postMessage({ id, input, settings }, [
+          worker.current.postMessage({ id, input, settings, subjectMask }, [
             pixels.data.buffer,
           ]);
         else {
-          setGeometry(renderImage(input, settings));
+          setGeometry(renderImage(input, settings, subjectMask));
           setRendering(false);
         }
       } catch (e) {
@@ -528,7 +566,7 @@ export function Studio({
       stopped = true;
       clearTimeout(timer);
     };
-  }, [source, crop, settings, modeAvailable]);
+  }, [source, crop, settings, modeAvailable, subjectMask, sourceSha256]);
   useEffect(() => {
     if (!source) return;
     let stopped = false;
@@ -634,6 +672,7 @@ export function Studio({
         updatedAt: new Date().toISOString(),
         image: sourceBlob,
         settings,
+        subjectMask,
         crop,
         productId,
         finishId,
@@ -686,6 +725,14 @@ export function Studio({
     request: number,
   ) {
     if (request !== restoreRequest.current) return;
+    if (project.subjectMask)
+      assertSubjectMaskBinding(project.subjectMask, {
+        sourceSha256: await hashBlob(project.image),
+        crop: project.crop,
+        widthMm: project.settings.widthMm,
+        heightMm: project.settings.heightMm,
+      });
+    if (request !== restoreRequest.current) return;
     const refId = REFERENCE_IMAGES.some((ref) => ref.id === project.referenceId)
       ? (project.referenceId ?? null)
       : null;
@@ -706,6 +753,7 @@ export function Studio({
       )?.id ?? "black",
     );
     setSettings(project.settings);
+    setSubjectMask(project.subjectMask);
     setCrop(project.crop);
     setProductId(project.productId);
     setFinishId(project.finishId);
@@ -759,6 +807,7 @@ export function Studio({
         view === "template" ? "template" : "finished",
         sourceBlob ?? undefined,
         crop,
+        subjectMask,
       );
     } catch (e) {
       setError(
@@ -769,6 +818,12 @@ export function Studio({
     }
   }
   function selectProduct(id: string) {
+    if (subjectMask) {
+      setError(
+        "Clear the manual subject selection before changing the canvas size.",
+      );
+      return;
+    }
     const p = products.find((p) => p.id === id);
     if (!p) return;
     setProductId(id);
@@ -800,7 +855,14 @@ export function Studio({
     if (!name?.trim()) return;
     const next = [
       ...customPresets,
-      { name: name.trim().slice(0, 40), settings },
+      {
+        name: name.trim().slice(0, 40),
+        settings: {
+          ...DEFAULT_SETTINGS,
+          mode: settings.mode,
+          ...presetSettings(settings),
+        },
+      },
     ].slice(-12);
     try {
       localStorage.setItem("sr-presets", JSON.stringify(next));
@@ -845,6 +907,7 @@ export function Studio({
         updatedAt: new Date().toISOString(),
         image: sourceBlob,
         settings,
+        subjectMask,
         crop,
         productId,
         finishId,
@@ -891,6 +954,26 @@ export function Studio({
     [geometry, templateView, safeArea],
   );
   const currentRef = REFERENCE_IMAGES.find((r) => r.id === referenceId);
+  function clearSubjectSelection() {
+    setSubjectMask(undefined);
+    update({ subjectMaskStrength: 0 });
+    setNotice(
+      "Manual subject selection cleared. You can change the crop and canvas size.",
+    );
+  }
+  const selectionLockNotice = subjectMask ? (
+    <div className="photo-advice">
+      <div>
+        <p>
+          Your manual selection is tied to this photograph, crop and canvas
+          size. Clear it before changing the composition.
+        </p>
+        <button className="text-button" onClick={clearSubjectSelection}>
+          Clear manual selection
+        </button>
+      </div>
+    </div>
+  ) : null;
   const artworkPreview = (
     <>
       <div
@@ -980,6 +1063,52 @@ export function Studio({
         onClose={() => setZoomPreview(false)}
       >
         <div className="canvas-stage">{artworkPreview}</div>
+      </PreviewDialog>
+      <PreviewDialog
+        open={maskEditorOpen}
+        title="Paint your subject selection"
+        closeLabel="Close selection editor"
+        onClose={() => setMaskEditorOpen(false)}
+      >
+        {croppedUrl && sourceSha256 && (
+          <SubjectMaskEditor
+            sourceUrl={croppedUrl}
+            binding={{
+              sourceSha256,
+              crop,
+              widthMm: settings.widthMm,
+              heightMm: settings.heightMm,
+            }}
+            value={subjectMask}
+            onClose={() => setMaskEditorOpen(false)}
+            onApply={(mask) => {
+              try {
+                assertSubjectMaskBinding(mask, {
+                  sourceSha256,
+                  crop,
+                  widthMm: settings.widthMm,
+                  heightMm: settings.heightMm,
+                });
+                setSubjectMask(mask);
+                update({
+                  subjectMaskStrength: subjectMask
+                    ? (settings.subjectMaskStrength ?? 1)
+                    : 1,
+                });
+                setMaskEditorOpen(false);
+                setNotice(
+                  "Manual selection applied. Check the finished and template previews.",
+                );
+              } catch (e) {
+                setError(
+                  e instanceof Error
+                    ? e.message
+                    : "The selection could not be applied.",
+                );
+              }
+            }}
+          />
+        )}
       </PreviewDialog>
       <div className="studio-topline">
         <div>
@@ -1315,6 +1444,7 @@ export function Studio({
                 <button
                   className="icon-button"
                   aria-label="Reset crop"
+                  disabled={!!subjectMask}
                   onClick={() => {
                     setCrop(DEFAULT_CROP);
                     setSaved(false);
@@ -1325,6 +1455,7 @@ export function Studio({
               </div>
               <Range
                 label="Zoom"
+                disabled={!!subjectMask}
                 value={crop.zoom}
                 min={1}
                 max={3}
@@ -1337,6 +1468,7 @@ export function Studio({
               />
               <Range
                 label="Horizontal position"
+                disabled={!!subjectMask}
                 value={crop.x}
                 min={-1}
                 max={1}
@@ -1348,6 +1480,7 @@ export function Studio({
               />
               <Range
                 label="Vertical position"
+                disabled={!!subjectMask}
                 value={crop.y}
                 min={-1}
                 max={1}
@@ -1359,6 +1492,7 @@ export function Studio({
               />
               <button
                 className="button light full"
+                disabled={!!subjectMask}
                 onClick={() => {
                   setCrop((c) => ({ ...c, rotation: (c.rotation + 90) % 360 }));
                   setSaved(false);
@@ -1367,6 +1501,7 @@ export function Studio({
                 <RotateCcw size={16} />
                 Rotate 90°
               </button>
+              {selectionLockNotice}
               <div className="photo-advice">
                 <Sparkles size={18} />
                 <div>
@@ -1466,6 +1601,7 @@ export function Studio({
                   {modeOptions.map((m) => (
                     <button
                       key={m.id}
+                      disabled={!!subjectMask && m.id !== settings.mode}
                       className={settings.mode === m.id ? "selected" : ""}
                       onClick={() => {
                         track("renderer_selected", { mode: m.id, productId });
@@ -1487,6 +1623,56 @@ export function Studio({
                 <div className="inline-warning">
                   Experimental study. This mode is available in the lab only
                   until physical completion has been tested.
+                </div>
+              )}
+              {settings.mode === "dots" && (lab || subjectMask) && (
+                <div className="subject-selection-controls">
+                  <h3>Manual subject selection</h3>
+                  <p className="fine-print">
+                    Paint the area to keep, then soften the background with
+                    strength. This selection is made by you and stays on this
+                    device until you save privately for checkout.
+                  </p>
+                  <button
+                    className="button light full"
+                    disabled={
+                      !geometry ||
+                      rendering ||
+                      !!busy ||
+                      !croppedUrl ||
+                      !sourceSha256
+                    }
+                    onClick={() => setMaskEditorOpen(true)}
+                  >
+                    {subjectMask
+                      ? "Edit subject selection"
+                      : "Paint subject selection"}
+                  </button>
+                  {subjectMask && (
+                    <>
+                      <Range
+                        label="Subject mask strength"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={settings.subjectMaskStrength ?? 0}
+                        onChange={(subjectMaskStrength) =>
+                          update({ subjectMaskStrength })
+                        }
+                      />
+                      <p className="fine-print">
+                        0 keeps the whole photograph; 1 removes marks outside
+                        your selection.
+                      </p>
+                      <button
+                        className="text-button"
+                        onClick={clearSubjectSelection}
+                      >
+                        Clear manual selection
+                      </button>
+                    </>
+                  )}
+                  <div className="control-divider" />
                 </div>
               )}
               {lab && settings.mode === "mosaic" && (
@@ -1815,7 +2001,11 @@ export function Studio({
                 Canvas size
                 <select
                   value={productId}
-                  disabled={catalogueStatus !== "ready" || !products.length}
+                  disabled={
+                    !!subjectMask ||
+                    catalogueStatus !== "ready" ||
+                    !products.length
+                  }
                   onChange={(e) => selectProduct(e.target.value)}
                 >
                   {!product && (
@@ -1836,6 +2026,7 @@ export function Studio({
                 <button
                   className="button light small"
                   onClick={() => selectProduct(productId)}
+                  disabled={!!subjectMask}
                 >
                   Apply current size: {selection.dimensions!.widthMm} ×{" "}
                   {selection.dimensions!.heightMm} mm
@@ -1843,6 +2034,7 @@ export function Studio({
               )}
               <button
                 className="text-button"
+                disabled={!!subjectMask}
                 onClick={() =>
                   update({
                     widthMm: settings.heightMm,
@@ -1853,6 +2045,7 @@ export function Studio({
                 <RotateCcw size={14} />
                 Switch portrait / landscape
               </button>
+              {selectionLockNotice}
               <label className="select-field">
                 Finish
                 <select

@@ -32,6 +32,8 @@ export interface RenderSettings {
   guideWidthMm?: number;
   /** Bounded highlight normalization for dark, non-flat photographs. */
   autoExposure?: boolean;
+  /** Manual Dots mask background suppression; its private alpha/binding is supplied separately. */
+  subjectMaskStrength?: number;
   cellShape?: "square" | "rounded" | "hexagon";
   /** Supplied marker colours. Unmarked white canvas is an additional paper tone. */
   palette?: string[];
@@ -105,7 +107,7 @@ export interface SvgOptions {
   title?: string;
 }
 
-export const RENDERER_VERSION = "slow-reveal-geometry/1.1.0";
+export const RENDERER_VERSION = "slow-reveal-geometry/1.2.0";
 export const MAX_MARKS = 60_000;
 export const DEFAULT_SETTINGS: RenderSettings = {
   mode: "dots",
@@ -126,6 +128,7 @@ export const DEFAULT_SETTINGS: RenderSettings = {
   safeMarginMm: 10,
   guideWidthMm: 0.15,
   autoExposure: true,
+  subjectMaskStrength: 0,
 };
 
 export const PRESETS = {
@@ -188,7 +191,14 @@ export const clamp = (n: number, lo = 0, hi = 1): number =>
 export function normalizeSettings(settings: RenderSettings): RenderSettings {
   if (!settings || typeof settings !== "object")
     throw new Error("Renderer settings are required.");
-  const s = { ...DEFAULT_SETTINGS, ...settings };
+  const s = {
+    ...DEFAULT_SETTINGS,
+    ...settings,
+    subjectMaskStrength:
+      settings.subjectMaskStrength === undefined
+        ? 0
+        : settings.subjectMaskStrength,
+  };
   const modes: RenderMode[] = [
     "dots",
     "mosaic",
@@ -211,6 +221,7 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
     ["guideOpacity", 0.05, 1],
     ["safeMarginMm", 0, 100],
     ["guideWidthMm", 0.05, 0.5],
+    ["subjectMaskStrength", 0, 1],
   ];
   for (const [key, min, max] of ranges) {
     const n = s[key];

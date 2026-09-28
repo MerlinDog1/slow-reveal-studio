@@ -19,6 +19,11 @@ import {
   type TextGeometry,
 } from "./types";
 import { FONT_OUTLINE_VERSION, measureLettering } from "./fonts";
+import {
+  createSubjectMaskSampler,
+  normalizeSubjectMask,
+  type SubjectMask,
+} from "../subject-mask";
 
 export * from "./types";
 export { toSvg, effectiveGuideWidthMm } from "./svg";
@@ -80,11 +85,31 @@ function textLayout(
 export function renderImage(
   input: PixelImage,
   settings: RenderSettings,
+  subjectMask?: SubjectMask,
 ): RenderGeometry {
   const s = normalizeSettings(settings);
+  const mask =
+    subjectMask === undefined ? undefined : normalizeSubjectMask(subjectMask);
+  if (mask && (mask.widthMm !== s.widthMm || mask.heightMm !== s.heightMm))
+    throw new Error(
+      "The subject mask does not match this canvas size. Clear it or redraw the selection.",
+    );
+  const maskActive = s.subjectMaskStrength! > 0;
+  if (maskActive && s.mode !== "dots")
+    throw new Error("Manual subject masks currently apply to Dots only.");
+  if (maskActive && !mask)
+    throw new Error(
+      "Paint a subject selection before increasing subject mask strength.",
+    );
+  const maskSampler =
+    maskActive && mask ? createSubjectMaskSampler(mask) : undefined;
   const warnings: string[] = [
     "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
   ];
+  if (maskActive)
+    warnings.push(
+      "Manual subject mask applied; inspect the painted selection and both proof views. No automatic segmentation was used.",
+    );
   if (s.invert && s.inkColor === "#1e1e1c") {
     s.inkColor = "#f4efe6";
     warnings.push(
@@ -120,7 +145,14 @@ export function renderImage(
     warnings.push(
       "Maximum mark size was reduced to prevent neighbouring marks touching.",
     );
-  const context = { tone, settings: s, bounds, pitch, maxDiameter };
+  const context = {
+    tone,
+    settings: s,
+    bounds,
+    pitch,
+    maxDiameter,
+    subjectMask: maskSampler,
+  };
   const circles = s.mode === "dots" ? renderDots(context) : [];
   const cells =
     s.mode === "mosaic"

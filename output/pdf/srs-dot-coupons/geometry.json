@@ -1,6 +1,6 @@
 {
   "version": "srs-dot-coupons/1.0.0",
-  "rendererVersion": "slow-reveal-geometry/1.1.0",
+  "rendererVersion": "slow-reveal-geometry/1.2.0",
   "fontVersion": "srs-outlines/1.0.0:6670bff0c25c4547",
   "page": {
     "widthMm": 210,
@@ -22,7 +22,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -44,7 +44,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -117,7 +118,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -139,7 +140,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -212,7 +214,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -234,7 +236,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -307,7 +310,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -329,7 +332,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -402,7 +406,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -424,7 +428,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -497,7 +502,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -519,7 +524,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -592,7 +598,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -614,7 +620,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -687,7 +694,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -709,7 +716,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -782,7 +790,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -804,7 +812,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -877,7 +886,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -899,7 +908,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -972,7 +982,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -994,7 +1004,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -1067,7 +1078,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1089,7 +1100,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -1162,7 +1174,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1184,7 +1196,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -1257,7 +1270,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1279,7 +1292,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -1678,7 +1692,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.1.0",
+        "version": "slow-reveal-geometry/1.2.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -1700,7 +1714,8 @@
           "guideOpacity": 0.3,
           "safeMarginMm": 10,
           "guideWidthMm": 0.16,
-          "autoExposure": true
+          "autoExposure": true,
+          "subjectMaskStrength": 0
         },
         "circles": [],
         "cells": [],
@@ -2078,7 +2093,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2100,7 +2115,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2151,7 +2167,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2173,7 +2189,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2224,7 +2241,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2246,7 +2263,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2297,7 +2315,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2319,7 +2337,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2370,7 +2389,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2392,7 +2411,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2443,7 +2463,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2465,7 +2485,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2516,7 +2537,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2538,7 +2559,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2589,7 +2611,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2611,7 +2633,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2662,7 +2685,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2684,7 +2707,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2735,7 +2759,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2757,7 +2781,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2808,7 +2833,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2830,7 +2855,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2881,7 +2907,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2903,7 +2929,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -2954,7 +2981,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2976,7 +3003,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3027,7 +3055,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3049,7 +3077,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3100,7 +3129,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3122,7 +3151,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3173,7 +3203,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3195,7 +3225,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3246,7 +3277,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3268,7 +3299,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3319,7 +3351,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3341,7 +3373,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3392,7 +3425,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3414,7 +3447,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -3465,7 +3499,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3487,7 +3521,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -4141,7 +4176,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.1.0",
+        "version": "slow-reveal-geometry/1.2.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -4163,7 +4198,8 @@
           "guideOpacity": 0.3,
           "safeMarginMm": 10,
           "guideWidthMm": 0.16,
-          "autoExposure": true
+          "autoExposure": true,
+          "subjectMaskStrength": 0
         },
         "circles": [],
         "cells": [],
@@ -4538,7 +4574,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4560,7 +4596,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -4633,7 +4670,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4655,7 +4692,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -4728,7 +4766,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4750,7 +4788,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -4823,7 +4862,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4845,7 +4884,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -4918,7 +4958,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4940,7 +4980,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5013,7 +5054,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5035,7 +5076,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5108,7 +5150,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5130,7 +5172,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5203,7 +5246,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5225,7 +5268,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5298,7 +5342,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5320,7 +5364,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5393,7 +5438,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5415,7 +5460,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5488,7 +5534,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5510,7 +5556,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5583,7 +5630,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5605,7 +5652,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5678,7 +5726,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5700,7 +5748,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -5773,7 +5822,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5795,7 +5844,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -6194,7 +6244,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.1.0",
+        "version": "slow-reveal-geometry/1.2.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -6216,7 +6266,8 @@
           "guideOpacity": 0.3,
           "safeMarginMm": 10,
           "guideWidthMm": 0.16,
-          "autoExposure": true
+          "autoExposure": true,
+          "subjectMaskStrength": 0
         },
         "circles": [],
         "cells": [],
@@ -6594,7 +6645,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6616,7 +6667,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -6667,7 +6719,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6689,7 +6741,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -6740,7 +6793,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6762,7 +6815,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -6813,7 +6867,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6835,7 +6889,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.08,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -6886,7 +6941,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6908,7 +6963,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -6959,7 +7015,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6981,7 +7037,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7032,7 +7089,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7054,7 +7111,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7105,7 +7163,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7127,7 +7185,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.12,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7178,7 +7237,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7200,7 +7259,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7251,7 +7311,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7273,7 +7333,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7324,7 +7385,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7346,7 +7407,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7397,7 +7459,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7419,7 +7481,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.16,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7470,7 +7533,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7492,7 +7555,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7543,7 +7607,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7565,7 +7629,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7616,7 +7681,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7638,7 +7703,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7689,7 +7755,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7711,7 +7777,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.2,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7762,7 +7829,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7784,7 +7851,8 @@
               "guideOpacity": 0.1,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7835,7 +7903,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7857,7 +7925,8 @@
               "guideOpacity": 0.2,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7908,7 +7977,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7930,7 +7999,8 @@
               "guideOpacity": 0.3,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -7981,7 +8051,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.1.0",
+            "version": "slow-reveal-geometry/1.2.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -8003,7 +8073,8 @@
               "guideOpacity": 0.4,
               "safeMarginMm": 10,
               "guideWidthMm": 0.3,
-              "autoExposure": true
+              "autoExposure": true,
+              "subjectMaskStrength": 0
             },
             "circles": [
               {
@@ -8657,7 +8728,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.1.0",
+        "version": "slow-reveal-geometry/1.2.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -8679,7 +8750,8 @@
           "guideOpacity": 0.3,
           "safeMarginMm": 10,
           "guideWidthMm": 0.16,
-          "autoExposure": true
+          "autoExposure": true,
+          "subjectMaskStrength": 0
         },
         "circles": [],
         "cells": [],

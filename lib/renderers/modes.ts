@@ -21,6 +21,7 @@ export interface ModeContext {
   bounds: ArtBounds;
   pitch: number;
   maxDiameter: number;
+  subjectMask?: (u: number, v: number) => number;
 }
 
 /** Area averages preserve dark features; a wider neighbourhood restores local contrast. */
@@ -51,7 +52,15 @@ export function renderDots(c: ModeContext): Circle[] {
     for (let col = 0; col < cols; col++) {
       const x = x0 + col * pitch,
         y = y0 + row * dy;
-      const value = darknessAt(c, x, y);
+      const photographicDarkness = darknessAt(c, x, y);
+      // Suppress final ink demand after exposure, inversion and edge emphasis.
+      // The painted boundary must not become an artificial photographic edge.
+      const value = c.subjectMask
+        ? photographicDarkness *
+          (1 -
+            (s.subjectMaskStrength ?? 0) *
+              (1 - c.subjectMask((x - b.x) / b.width, (y - b.y) / b.height)))
+        : photographicDarkness;
       if (value <= s.threshold) continue;
       // Area tracks tone. Highlights below the printable minimum use deterministic
       // sparse marks rather than oversize dots that muddy otherwise white detail.

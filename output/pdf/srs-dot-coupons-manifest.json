@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packVersion": "srs-dot-coupons/1.0.0",
-  "rendererVersion": "slow-reveal-geometry/1.1.0",
+  "rendererVersion": "slow-reveal-geometry/1.2.0",
   "fontVersion": "srs-outlines/1.0.0:6670bff0c25c4547",
   "physicalValidation": "NOT PERFORMED - unvalidated test candidates; all observation fields remain blank",
   "page": {
@@ -87,8 +87,8 @@
         "G04",
         "G05"
       ],
-      "sampleGeometrySha256": "8be801da91b79370a1cf22dbcaae3caeab16d690879a3e43fa92c7a63e5f6835",
-      "calibrationSha256": "2e011f08f55a84ef341fa94d7fcf3703632004fb6c6d749c0c076b7936f41a3f",
+      "sampleGeometrySha256": "2aa9dea6f4f23414f3832ba1475451218adebd978710f33619f590714fbf96ae",
+      "calibrationSha256": "82f2f049ea64c0471d315a82297f45cd939a6ee2e3029e7770613366636f7cce",
       "svg": "output/pdf/srs-dot-coupons/marks-guide.svg",
       "png": ".data/qa/coupons/marks-guide.png"
     },
@@ -118,8 +118,8 @@
         "W05-O30",
         "W05-O40"
       ],
-      "sampleGeometrySha256": "40f26e25910dcf5d6fe9665c1e54e248e783b64c4963caa2a8882aa9e95e76e2",
-      "calibrationSha256": "2e011f08f55a84ef341fa94d7fcf3703632004fb6c6d749c0c076b7936f41a3f",
+      "sampleGeometrySha256": "ceb8e6afe658f07aa0e093ddf6d25ddaf6e7a3e87bf68335730bc5856a769393",
+      "calibrationSha256": "82f2f049ea64c0471d315a82297f45cd939a6ee2e3029e7770613366636f7cce",
       "svg": "output/pdf/srs-dot-coupons/guides-guide.svg",
       "png": ".data/qa/coupons/guides-guide.png"
     },
@@ -143,8 +143,8 @@
         "G04",
         "G05"
       ],
-      "sampleGeometrySha256": "8be801da91b79370a1cf22dbcaae3caeab16d690879a3e43fa92c7a63e5f6835",
-      "calibrationSha256": "2e011f08f55a84ef341fa94d7fcf3703632004fb6c6d749c0c076b7936f41a3f",
+      "sampleGeometrySha256": "2aa9dea6f4f23414f3832ba1475451218adebd978710f33619f590714fbf96ae",
+      "calibrationSha256": "82f2f049ea64c0471d315a82297f45cd939a6ee2e3029e7770613366636f7cce",
       "svg": "output/pdf/srs-dot-coupons/marks-filled.svg",
       "png": ".data/qa/coupons/marks-filled.png"
     },
@@ -174,8 +174,8 @@
         "W05-O30",
         "W05-O40"
       ],
-      "sampleGeometrySha256": "40f26e25910dcf5d6fe9665c1e54e248e783b64c4963caa2a8882aa9e95e76e2",
-      "calibrationSha256": "2e011f08f55a84ef341fa94d7fcf3703632004fb6c6d749c0c076b7936f41a3f",
+      "sampleGeometrySha256": "ceb8e6afe658f07aa0e093ddf6d25ddaf6e7a3e87bf68335730bc5856a769393",
+      "calibrationSha256": "82f2f049ea64c0471d315a82297f45cd939a6ee2e3029e7770613366636f7cce",
       "svg": "output/pdf/srs-dot-coupons/guides-filled.svg",
       "png": ".data/qa/coupons/guides-filled.png"
     }
@@ -183,7 +183,7 @@
   "publicCopy": {
     "canonical": "output/pdf/srs-dot-coupons.pdf",
     "public": "public/production-coupons/srs-dot-coupons.pdf",
-    "sha256": "b17c7549a644bdc481143edcb97e0bec2063abde7842fa11541b34fe64acd32b",
+    "sha256": "271045e3ddb62225322261552302d66cddf67a4e59f1a6d5918b11bc17a17dda",
     "byteIdentical": true
   },
   "sourceHashes": [
@@ -201,7 +201,7 @@
     },
     {
       "file": "lib/renderers/types.ts",
-      "sha256": "a26f6bcb0095be3b885a98016d6760d3875aa9fdd86f9b017c21f07ea1c0e974"
+      "sha256": "c536528c4ed9de6c67d0fa29a06c9b7816f1d0bfcf258f821a2e95729967ee7e"
     },
     {
       "file": "lib/renderers/fonts.ts",
@@ -219,8 +219,8 @@
   "artifacts": [
     {
       "file": "output/pdf/srs-dot-coupons/geometry.json",
-      "bytes": 245467,
-      "sha256": "0519d376c22c679fc1e3c466e74bee482527b0cd6894e7e3c874171269b8a0da",
+      "bytes": 248331,
+      "sha256": "c02c3f951d916bff66374ffc9c03bdbc62cf7bab1c3569e8b9716b68bb430280",
       "mime": "application/json"
     },
     {
@@ -232,7 +232,7 @@
     {
       "file": "output/pdf/srs-dot-coupons/marks-guide.svg",
       "bytes": 350924,
-      "sha256": "862d6d0f80a40719710da124f2cd703e54ad4f2feecea30c2d2b90f2a1a9cc29",
+      "sha256": "f19f15252647c09a7836a4625956a84b0e3101d6c2870ae4ed5c4ea427fb32db",
       "mime": "image/svg+xml",
       "widthMm": 210,
       "heightMm": 297
@@ -250,7 +250,7 @@
     {
       "file": "output/pdf/srs-dot-coupons/guides-guide.svg",
       "bytes": 373811,
-      "sha256": "900da8bc43071a24db73fb15987cc8471338a77f5580ba798048847132092088",
+      "sha256": "2ef5e3d7db002cc0d390c9d7da4bbb15046e9955a117498315f876e742447d17",
       "mime": "image/svg+xml",
       "widthMm": 210,
       "heightMm": 297
@@ -268,7 +268,7 @@
     {
       "file": "output/pdf/srs-dot-coupons/marks-filled.svg",
       "bytes": 357020,
-      "sha256": "966d6583b41534a9f14347da52da0a1ac19eb43ef16b2c2aa88efd30867b431a",
+      "sha256": "1c4ade27a12bdfe3c42111964d527dd76c5d920b8587f1b7a8a40a49dfb518ad",
       "mime": "image/svg+xml",
       "widthMm": 210,
       "heightMm": 297
@@ -286,7 +286,7 @@
     {
       "file": "output/pdf/srs-dot-coupons/guides-filled.svg",
       "bytes": 379034,
-      "sha256": "270b247384223994e275c4a88fa790ac2daf6002feed0a042295f4e9d31890d3",
+      "sha256": "921d1998e886650e2abd66ee529095431cd7acacd5bc8099acca224a52688fad",
       "mime": "image/svg+xml",
       "widthMm": 210,
       "heightMm": 297
@@ -304,7 +304,7 @@
     {
       "file": "output/pdf/srs-dot-coupons.pdf",
       "bytes": 1089166,
-      "sha256": "b17c7549a644bdc481143edcb97e0bec2063abde7842fa11541b34fe64acd32b",
+      "sha256": "271045e3ddb62225322261552302d66cddf67a4e59f1a6d5918b11bc17a17dda",
       "mime": "application/pdf",
       "pageCount": 4,
       "widthMm": 210,
@@ -314,7 +314,7 @@
     {
       "file": "public/production-coupons/srs-dot-coupons.pdf",
       "bytes": 1089166,
-      "sha256": "b17c7549a644bdc481143edcb97e0bec2063abde7842fa11541b34fe64acd32b",
+      "sha256": "271045e3ddb62225322261552302d66cddf67a4e59f1a6d5918b11bc17a17dda",
       "mime": "application/pdf",
       "byteIdenticalTo": "output/pdf/srs-dot-coupons.pdf"
     }

@@ -67,7 +67,9 @@ export function AdminDesk({
     rotation: number;
   }>({ zoom: 1, x: 0, y: 0, rotation: 0 });
   const review = selected ? orderReviewDetails(selected) : null;
-  const cropDirty = Boolean(review && hasUnappliedCrop(crop, review.crop));
+  const [clearSubjectMask, setClearSubjectMask] = useState(false);
+  const cropDirty =
+    clearSubjectMask || Boolean(review && hasUnappliedCrop(crop, review.crop));
   useEffect(() => {
     if (mutatingRef.current) reloadAfterMutation.current = true;
     else void load(token);
@@ -169,6 +171,7 @@ export function AdminDesk({
     inspection.current++;
     selectedOrder.current = null;
     setSelected(null);
+    setClearSubjectMask(false);
     setProofReady(false);
     for (const url of previewUrls.current) URL.revokeObjectURL(url);
     previewUrls.current.clear();
@@ -200,6 +203,7 @@ export function AdminDesk({
       (r) => r.id === order.currentRevisionId,
     );
     setCrop(latest?.crop ?? order.originalSnapshot.design.crop);
+    setClearSubjectMask(false);
     for (const url of previewUrls.current) URL.revokeObjectURL(url);
     previewUrls.current.clear();
     setSource(null);
@@ -239,7 +243,7 @@ export function AdminDesk({
     if (!selected || loadingRef.current || mutatingRef.current) return;
     if (cropDirty && (action === "approve" || action === "dispatch")) {
       setError(
-        "Create revised artwork or undo the crop changes before approving or dispatching.",
+        "Create revised artwork or undo the crop and selection changes before approving or dispatching.",
       );
       return;
     }
@@ -262,7 +266,7 @@ export function AdminDesk({
           revision: selected.currentRevisionId,
           ...(notificationId ? { notificationId } : {}),
           ...(action === "dispatch" ? { tracking } : {}),
-          ...(action === "regenerate" ? { crop } : {}),
+          ...(action === "regenerate" ? { crop, clearSubjectMask } : {}),
         }),
       });
       await accessDenied(r.status, access);
@@ -573,13 +577,36 @@ export function AdminDesk({
                   )}
                 </div>
               )}
+              {review?.subjectMask && (
+                <div className="inline-warning">
+                  <p>
+                    This revision has a manual subject selection tied to its
+                    crop. Remove it to change the crop; the customer will need
+                    to approve the revised proof.
+                  </p>
+                  <label className="check-label">
+                    <input
+                      type="checkbox"
+                      checked={clearSubjectMask}
+                      disabled={busy}
+                      onChange={(e) => {
+                        setClearSubjectMask(e.target.checked);
+                        if (!e.target.checked) setCrop(review.crop);
+                      }}
+                    />
+                    Remove manual subject selection in revised artwork
+                  </label>
+                </div>
+              )}
               <div className="crop-inputs">
                 {["zoom", "x", "y", "rotation"].map((key) => (
                   <label className="text-field" key={key}>
                     {key}
                     <input
                       type="number"
-                      disabled={busy}
+                      disabled={
+                        busy || (!!review?.subjectMask && !clearSubjectMask)
+                      }
                       step={key === "rotation" ? 90 : 0.05}
                       min={key === "zoom" ? 1 : key === "rotation" ? 0 : -1}
                       max={key === "zoom" ? 4 : key === "rotation" ? 270 : 1}
@@ -597,15 +624,19 @@ export function AdminDesk({
               {cropDirty && (
                 <div className="inline-warning" role="status">
                   <p>
-                    The crop changes are not in these previews yet. Create
-                    revised artwork to apply them, then review the new proofs.
+                    The crop or selection changes are not in these previews yet.
+                    Create revised artwork to apply them, then review the new
+                    proofs.
                   </p>
                   <button
                     className="text-button"
                     disabled={busy}
-                    onClick={() => review && setCrop(review.crop)}
+                    onClick={() => {
+                      if (review) setCrop(review.crop);
+                      setClearSubjectMask(false);
+                    }}
                   >
-                    Undo crop changes
+                    Undo artwork changes
                   </button>
                 </div>
               )}

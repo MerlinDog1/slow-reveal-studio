@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { RenderSettings } from "../renderers/types";
 import type { PrivateAsset } from "./assets";
+import { normalizeSubjectMask } from "../subject-mask";
 
 export const cropSchema = z
   .object({
@@ -34,6 +35,7 @@ export const settingsSchema = z.object({
   safeMarginMm: z.number().min(0).max(100),
   guideWidthMm: z.number().min(0.05).max(0.5).optional(),
   autoExposure: z.boolean().optional(),
+  subjectMaskStrength: z.number().min(0).max(1).optional(),
   text: z
     .object({
       value: z.string().max(80),
@@ -62,6 +64,14 @@ export const sourceInputSchema = z.union([
     .object({ uploadId: z.string().uuid(), token: z.string().min(32).max(256) })
     .strict(),
 ]);
+export const subjectMaskSchema = z.unknown().transform((input, context) => {
+  try {
+    return normalizeSubjectMask(input);
+  } catch {
+    context.addIssue({ code: "custom", message: "Invalid subject mask." });
+    return z.NEVER;
+  }
+});
 export const designSchema = z
   .object({
     mode: z.enum(["dots", "mosaic", "contour", "line-amplification"]),
@@ -71,6 +81,7 @@ export const designSchema = z
     crop: cropSchema,
     settings: settingsSchema,
     source: sourceInputSchema,
+    subjectMask: subjectMaskSchema.optional(),
     rightsConfirmed: z.literal(true),
     marketingConsent: z.boolean().default(false),
     email: z.string().email().max(254).optional(),
@@ -89,6 +100,7 @@ export type Design = {
   crop: Crop;
   settings: RenderSettings;
   source: PrivateAsset;
+  subjectMask?: PrivateAsset;
   rightsConfirmed: true;
   marketingConsent: boolean;
   email?: string;
@@ -100,6 +112,7 @@ export type Package = {
   templateSvg: PrivateAsset;
   finishedSvg: PrivateAsset;
   source: PrivateAsset;
+  subjectMask?: PrivateAsset;
   manifest: Record<string, unknown>;
   snapshotHash: string;
 };
@@ -121,6 +134,7 @@ export type Revision = {
   package: Package;
   settings: RenderSettings;
   crop: Crop;
+  subjectMask?: PrivateAsset;
   note: string;
   origin?: "customer-replacement" | "admin-regeneration";
   submissionId?: string;

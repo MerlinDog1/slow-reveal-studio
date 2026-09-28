@@ -150,9 +150,13 @@ export async function submitReplacement(
     const latest = currentRevision(order);
     const design = {
       ...order.originalSnapshot.design,
-      settings: latest?.settings ?? order.originalSnapshot.design.settings,
+      settings: {
+        ...(latest?.settings ?? order.originalSnapshot.design.settings),
+        subjectMaskStrength: 0,
+      },
       crop: body.crop,
       source: asset,
+      subjectMask: undefined,
       warnings,
       rightsConfirmed: true as const,
     };

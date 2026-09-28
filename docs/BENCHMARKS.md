@@ -23,11 +23,13 @@ For all eight fixtures, run Dots Easy/Standard/Detailed at 300×400 and 400×500
 
 For each case save canonical settings, crop, input checksum, renderer version, mark count/path length, render duration, estimated work duration, geometry bounds, minimum/maximum marks and a finished/template pair. Compare small and large preview resolutions to prove they share physical geometry. Repeat the same input to test deterministic output. Use structural or geometry hashes rather than PNG metadata/timestamps as the reproducibility oracle.
 
+For manual Dots masks, retain the canonical private selection checksum, feather and strength with each case. Compare strength 0/0.5/1, full/empty/feathered selections, inversion and cropped subjects. Synthetic mask invariants are automated; a representative eight-photo manual-selection comparison and user usability study have not been run. Keep raw selection data private.
+
 ## Acceptance evidence
 
 | Area | Proposed target / invariant | Evidence needed |
 |---|---|---|
-| Determinism | Same source, crop, dimensions, settings and renderer version yields identical geometry | Automated fixtures/hashes and repeated invocation |
+| Determinism | Same source, crop, dimensions, settings, optional mask and renderer version yields identical geometry | Automated fixtures/hashes and repeated invocation |
 | Physical units | SVG mm dimensions, PDF page size, raster pixels/DPI agree within rounding; vector coordinates within 0.1mm serialization tolerance | Parse all exported formats; measure a real 100mm print rule separately |
 | Collision safety | No overlapping dots outside explicitly documented test mode; preserve configured physical gap | Neighbour-distance tests on dense/extreme inputs |
 | Bounds | Marks and text remain within configured safe geometry; bleed/trim outside intended face | Extreme dimensions, rotated crops, long text, empty/white/black inputs |
@@ -48,6 +50,7 @@ Timing values are targets, not measurements. Rendering a photograph without an e
 date / commit / operator / browser / device:
 fixture ID / SHA-256 / crop / renderer version:
 size mm / preset / full settings hash:
+manual mask hash or none / mask feather / subjectMaskStrength:
 mark count or path length / minimum gap / geometry bounds:
 decode ms / warm render median / p95 / production export ms:
 finished + template + manifest file paths:

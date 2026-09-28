@@ -12,6 +12,7 @@ import { getRecord, replaceOrder } from "./store";
 import { ApiError } from "./security";
 import { createProductionPackage } from "./production";
 import { normalizeSettings } from "../renderers";
+import { designSubjectMask } from "./subject-masks";
 import {
   currentRevision,
   currentPackage,
@@ -41,6 +42,7 @@ const actionSchema = z
     note: z.string().max(1000).default(""),
     settings: settingsSchema.optional(),
     crop: cropSchema.optional(),
+    clearSubjectMask: z.boolean().optional(),
     revision: z.string().max(100).optional(),
     tracking: z.string().max(200).optional(),
     notificationId: z.string().uuid().optional(),
@@ -131,6 +133,11 @@ export async function updateOrder(
   actor?: AdminIdentity,
 ): Promise<{ order: Order; notification?: NotificationResult }> {
   const body = actionSchema.parse(input);
+  if (body.clearSubjectMask !== undefined && body.action !== "regenerate")
+    throw new ApiError(
+      400,
+      "Subject masks can only be cleared in a new artwork revision.",
+    );
   const order = await getRecord<Order>("orders", id);
   if (!order) throw new ApiError(404, "Order not found.");
   if (order.dataDeletedAt)
@@ -178,9 +185,14 @@ export async function updateOrder(
       throw new ApiError(409, "Dispatched artwork cannot be regenerated.");
     const latest = currentRevision(order);
     const current = currentPackage(order);
+    const currentMask =
+      current.subjectMask ??
+      latest?.subjectMask ??
+      (!latest ? order.originalSnapshot.design.subjectMask : undefined);
     const design = {
       ...order.originalSnapshot.design,
       source: current.source,
+      subjectMask: body.clearSubjectMask ? undefined : currentMask,
       warnings: Array.isArray(current.manifest.sourceWarnings)
         ? current.manifest.sourceWarnings.filter(
             (item): item is string => typeof item === "string",
@@ -196,8 +208,10 @@ export async function updateOrder(
       heightMm: base.heightMm,
       mode: base.mode,
       inkColor: base.inkColor,
+      ...(body.clearSubjectMask ? { subjectMaskStrength: 0 } : {}),
     });
     const crop = body.crop ?? latest?.crop ?? design.crop;
+    await designSubjectMask(design, settings, crop);
     const production = await produce(design, id, settings, crop);
     uncommitted = production;
     const revision: Revision = {
@@ -206,9 +220,15 @@ export async function updateOrder(
       package: production,
       settings,
       crop,
+      subjectMask: production.subjectMask,
       note: body.note,
       origin: "admin-regeneration",
-      customerProofRequired: latest?.customerProofRequired,
+      customerProofRequired:
+        latest?.customerProofRequired ||
+        (!!currentMask &&
+          (body.clearSubjectMask === true ||
+            (base.subjectMaskStrength ?? 0) !==
+              (settings.subjectMaskStrength ?? 0))),
     };
     next = {
       ...order,

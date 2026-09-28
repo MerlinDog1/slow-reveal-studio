@@ -3,8 +3,8 @@
   "width": 1200,
   "height": 630,
   "sha256": "bd45b99bc7a4f428048aa6dd9903f0fc7bfb531afc5c444b4da2bdfdc2995109",
-  "rendererVersion": "slow-reveal-geometry/1.1.0",
-  "geometrySha256": "51caf77d57178888e567d7f70979d0e3e1e970868e4962ee4f6b641b180a00eb",
+  "rendererVersion": "slow-reveal-geometry/1.2.0",
+  "geometrySha256": "4cb361d882b0ebef84802e7f29067dec1291a4cc4425760523bc62915a826600",
   "status": "digital-renderer-study",
   "isPhysicalProductEvidence": false,
   "source": {

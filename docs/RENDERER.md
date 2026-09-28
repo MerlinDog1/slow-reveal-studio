@@ -4,9 +4,9 @@ The shared TypeScript renderer produces a serializable, versioned geometry snaps
 
 ## API
 
-`renderImage({data: Uint8ClampedArray, width, height}, settings)` consumes already cropped RGBA pixels. `toSvg(geometry, "finished" | "template", options)` serializes exactly that geometry. Both are exported by `lib/renderers/index.ts`, together with `RenderSettings`, `RenderGeometry`, `DEFAULT_SETTINGS`, `PRESETS`, `normalizeSettings` and `RENDERER_VERSION`.
+`renderImage({data: Uint8ClampedArray, width, height}, settings, subjectMask?)` consumes already cropped RGBA pixels. `toSvg(geometry, "finished" | "template", options)` serializes exactly that geometry. Both are exported by `lib/renderers/index.ts`, together with `RenderSettings`, `RenderGeometry`, `DEFAULT_SETTINGS`, `PRESETS`, `normalizeSettings` and `RENDERER_VERSION`.
 
-The worker accepts `{id, input, settings}` and responds with `{id, geometry}` or `{id, error}`. Consumers must discard stale IDs and display failures. The worker does not upload or log source pixels.
+The worker accepts `{id, input, settings, subjectMask?}` and responds with `{id, geometry}` or `{id, error}`. Consumers must discard stale IDs and display failures. The worker does not upload or log source pixels.
 
 SVG width and height carry `mm` units and the viewBox uses the same physical coordinates. `background:false` omits the simulated substrate for production; the default warm paper rectangle is a preview aid. `includeSafeArea:true` adds a diagnostic safe-area outline and must not be used in print jobs. Background strings and inks require six-digit hexadecimal colours. Text and metadata are XML-escaped.
 
@@ -20,6 +20,18 @@ SVG width and height carry `mm` units and the viewBox uses the same physical coo
 - Template outlines are inset into the finished footprint so the guide can be covered by the intended filled mark. Guide width is also bounded by half the minimum diameter.
 
 The proposed minimums, gaps and guide settings are engineering defaults, **not material-tested production limits**. Easy, Standard and Detailed change physical workload. Completion estimates use provisional per-mark and filled-area constants and are not customer promises.
+
+### Manual subject selection (renderer 1.2.0)
+
+Dots accepts a separate private `SubjectMask` input from `lib/subject-mask.ts`. The lab provides keep/remove brushes, undo, a keyboard drawing cursor, overlay and feathering; Apply commits an independent snapshot and Cancel discards the draft. This is manually painted selection, not automatic semantic segmentation. Other modes do not support active masking.
+
+The canonical `cropped-v1` alpha8 raster has a 512-pixel long edge, matching the physical canvas aspect ratio, at most 262,144 bytes. It is bound to SHA-256 of the exact original photo bytes, crop zoom/x/y/quarter-turn, and canvas width/height in millimetres. Strict validation rejects unknown fields, malformed base64, wrong dimensions or stale binding. Feathering uses a deterministic separable box blur with clamped edges and radius `round(feather * min(width, height))`, where feather is 0–0.05; coverage is sampled bilinearly. The overlay shows the raw selection before feathering.
+
+`subjectMaskStrength` is 0–1 (legacy/missing defaults to 0). Dots multiplies the original final darkness, after exposure/inversion/edge processing, by `1 - strength * (1 - coverage)`. Zero strength leaves primitives unchanged; one removes marks outside the selection. Mask edges do not create photographic edges or change exposure statistics. Physical centres, minimum mark diameter, gaps, safe bounds, outlined text and the 60,000-mark cap remain shared with unmasked rendering. The selected photo is still mapped into the artwork bounds, including any reserved lettering band.
+
+Selection data is separate from renderer settings, geometry, analytics and preset exports. Local projects retain it privately in IndexedDB. Restore verifies the original blob checksum before opening the selection; a new photo clears the selection and strength. Crop, mode and canvas-size changes require explicitly clearing it first. A private design save validates against the decoded upload and authoritative catalogue dimensions, then stores canonical selection JSON as a separate private asset. Paid snapshots retain the asset reference, enabling artwork erasure; they never inline the alpha pixels. Each production revision owns a mask copy, and its archive contains `source/subject-mask.json`. Local prototype ZIPs include that file and its checksum too.
+
+The canonical server proof hash binds the mask digest even when strength is zero or two masks produce identical geometry. Admin regeneration preserves the current revision's mask; changing its crop requires explicit removal. Removing a mask or changing active strength requires new customer proof approval and queues the revised-proof notice. Replacement photos clear inherited masks. Historical paid snapshots stay immutable; saved projects from an earlier renderer require the existing explicit rebuild review. Production services, representative selection usability and physical outcomes remain unverified.
 
 ### Effective guide width
 
@@ -47,7 +59,7 @@ Alternative modes remain experimental until hand-completed prototypes pass revie
 
 Text is limited to 80 characters, curated serif/sans-serif choices and four placements. It reserves a band outside the dot image and uses actual glyph bounds, advances and pair kerning to fit. Both personalisation and mosaic numerals serialize as SVG paths. Browser previews and libvips/server exports consume identical vectors without a font download, installed system font, browser text measurement or platform substitution.
 
-Renderer `1.1.0` uses the licensed **SRS Serif Outline** and **SRS Sans Outline** sets derived from the 400-weight Fontsource Playfair Display and DM Sans WOFFs, both package version 5.3.0. These internal derivative names respect the Playfair Display Reserved Font Name. Copyright, attribution and complete SIL OFL 1.1 licences are retained in `public/fonts/`. The outline data remains OFL licensed; finished documents are not required to adopt that licence.
+Renderer `1.2.0` uses the licensed **SRS Serif Outline** and **SRS Sans Outline** sets derived from the 400-weight Fontsource Playfair Display and DM Sans WOFFs, both package version 5.3.0. These internal derivative names respect the Playfair Display Reserved Font Name. Copyright, attribution and complete SIL OFL 1.1 licences are retained in `public/fonts/`. The outline data remains OFL licensed; finished documents are not required to adopt that licence.
 
 The common repertoire contains **339 characters**: printable ASCII, supported Latin-1/extended Latin accents, typographic quotes, en/em dashes, ellipsis, common symbols and currencies including £, €, ¥ and ₹. The exact list is exported as `SUPPORTED_TEXT_CHARACTERS` and recorded in `lib/renderers/font-data.json`. NFC normalization makes composed and decomposed equivalents (such as `é` and `e` + combining acute) produce identical geometry. Unsupported characters, including emoji and currently unsupported non-Latin scripts, fail with an explicit codepoint message instead of silently substituting a glyph. This is a Latin lettering subset, not a complete international shaping engine.
 

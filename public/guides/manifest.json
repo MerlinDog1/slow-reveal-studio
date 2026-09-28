@@ -62,8 +62,8 @@
       "cropMode": "centre cover to 4:5 after optional extraction",
       "isPhysicalEvidence": false,
       "kind": "digital-rendering",
-      "rendererVersion": "slow-reveal-geometry/1.1.0",
-      "geometrySha256": "9488e9416dcc221d1af5cfe3223061805323be0ea86783470afc6fec935447bf",
+      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "geometrySha256": "a018c60e948914e479736a6fad06ecc7677e2f09e9bd8a2702e9e5dc26fdff43",
       "derivatives": [
         {
           "file": "/guides/dots-wide-640.webp",
@@ -152,8 +152,8 @@
       "cropMode": "centre cover to 4:5 after optional extraction",
       "isPhysicalEvidence": false,
       "kind": "digital-rendering",
-      "rendererVersion": "slow-reveal-geometry/1.1.0",
-      "geometrySha256": "96fef1dcded89dae0af8fbd4ee329f1c736fd0cf2e32248f6a696caa7073e27f",
+      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "geometrySha256": "64135a0b5c6f6bba7f0939399fb9d06a05a665a70b22de6dfb719aaedbef69d0",
       "derivatives": [
         {
           "file": "/guides/dots-closer-640.webp",
@@ -192,8 +192,8 @@
       "kind": "digital-rendering",
       "isPhysicalEvidence": false,
       "caption": "Digital renderer example. Sample wording; not a customer result.",
-      "rendererVersion": "slow-reveal-geometry/1.1.0",
-      "geometrySha256": "73e5ea3280c4be1a0331d6dfabbbe3eb1b5e08b7f636f3c7ee40ca67448aec66",
+      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "geometrySha256": "4fdda467af6080eca8f457e127faa18828e59605c2645bcd51b286f731fc8582",
       "derivatives": [
         {
           "file": "/guides/personalisation-finished-640.webp",
@@ -232,8 +232,8 @@
       "kind": "digital-rendering",
       "isPhysicalEvidence": false,
       "caption": "Digital renderer example. Sample wording; not a customer result.",
-      "rendererVersion": "slow-reveal-geometry/1.1.0",
-      "geometrySha256": "73e5ea3280c4be1a0331d6dfabbbe3eb1b5e08b7f636f3c7ee40ca67448aec66",
+      "rendererVersion": "slow-reveal-geometry/1.2.0",
+      "geometrySha256": "4fdda467af6080eca8f457e127faa18828e59605c2645bcd51b286f731fc8582",
       "derivatives": [
         {
           "file": "/guides/personalisation-template-640.webp",

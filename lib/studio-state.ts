@@ -8,6 +8,11 @@ import {
   type RenderSettings,
 } from "./renderers";
 import { presetSettings, type PublishedPreset } from "./preset-types";
+import {
+  normalizeSubjectMask,
+  assertSubjectMaskBinding,
+  type SubjectMask,
+} from "./subject-mask";
 
 export type StudioCatalogue = {
   products: Product[];
@@ -19,8 +24,12 @@ export type StudioSelection = {
   finishId: string;
   settings: RenderSettings;
 };
-export type RestorableProject = Omit<LocalProject, "settings"> & {
+export type RestorableProject = Omit<
+  LocalProject,
+  "settings" | "subjectMask"
+> & {
   settings: RenderSettings;
+  subjectMask?: SubjectMask;
 };
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -175,6 +184,7 @@ export function validateRestorableProject(
     if (
       key !== "guideWidthMm" &&
       key !== "autoExposure" &&
+      key !== "subjectMaskStrength" &&
       raw[key] === undefined
     )
       throw new Error(
@@ -232,6 +242,24 @@ export function validateRestorableProject(
       typeof input.referenceId === "string" ? input.referenceId : null,
     rendererVersion: input.rendererVersion as string | undefined,
   };
+  if (input.subjectMask !== undefined) {
+    const mask = normalizeSubjectMask(input.subjectMask);
+    assertSubjectMaskBinding(mask, {
+      sourceSha256: mask.sourceSha256,
+      crop: project.crop,
+      widthMm: settings.widthMm,
+      heightMm: settings.heightMm,
+    });
+    if (settings.mode !== "dots")
+      throw new Error(
+        "Manual subject selections are supported in Signature Dots only.",
+      );
+    project.subjectMask = mask;
+  } else if ((settings.subjectMaskStrength ?? 0) > 0) {
+    throw new Error(
+      "This saved design is missing its manual subject selection. The saved original has not been changed.",
+    );
+  }
   return {
     project,
     needsRendererReview: project.rendererVersion !== RENDERER_VERSION,
@@ -249,9 +277,11 @@ export function parseLocalPresets(
       return [
         {
           name: value.name.slice(0, 40),
-          settings: normalizeSettings(
-            value.settings as unknown as RenderSettings,
-          ),
+          settings: normalizeSettings({
+            ...DEFAULT_SETTINGS,
+            mode: value.settings.mode as RenderMode,
+            ...presetSettings(value.settings as unknown as RenderSettings),
+          }),
         },
       ];
     } catch {

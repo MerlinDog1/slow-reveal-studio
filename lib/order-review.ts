@@ -30,6 +30,9 @@ export function orderReviewDetails(order: Order) {
       : {};
   return {
     settings,
+    subjectMask: revision
+      ? revision.subjectMask
+      : order.originalSnapshot.design.subjectMask,
     crop: revision?.crop ?? order.originalSnapshot.design.crop,
     artwork,
     customerProofPending: Boolean(

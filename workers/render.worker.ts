@@ -4,11 +4,13 @@ import {
   type RenderGeometry,
   type RenderSettings,
 } from "../lib/renderers";
+import type { SubjectMask } from "../lib/subject-mask";
 
 export interface RenderWorkerRequest {
   id: number | string;
   input: PixelImage;
   settings: RenderSettings;
+  subjectMask?: SubjectMask;
 }
 export interface RenderWorkerResponse {
   id: number | string;
@@ -25,7 +27,7 @@ scope.onmessage = ({ data }) => {
   try {
     scope.postMessage({
       id: data.id,
-      geometry: renderImage(data.input, data.settings),
+      geometry: renderImage(data.input, data.settings, data.subjectMask),
     });
   } catch (error) {
     scope.postMessage({

@@ -10,6 +10,9 @@ import {
 } from "@/lib/browser-storage";
 import { INKS, formatPrice, type Product, type Finish } from "@/lib/catalog";
 import { loadImage, cropImage } from "@/lib/image-processing";
+import { hashBlob } from "@/lib/browser-subject-mask";
+import { assertSubjectMaskBinding } from "@/lib/subject-mask";
+import { validateRestorableProject } from "@/lib/studio-state";
 import {
   track,
   getAnalyticsSessionId,
@@ -63,7 +66,24 @@ export function Basket() {
     getLocalProject("basket")
       .then(async (p) => {
         if (!p) return;
-        setProject(p);
+        const validated = validateRestorableProject(p, [
+          "dots",
+          "mosaic",
+          "contour",
+          "line-amplification",
+        ]);
+        if (validated.needsRendererReview)
+          throw new Error(
+            "Reopen this design in the studio and review it with the current renderer before checkout.",
+          );
+        const checked = validated.project;
+        if (checked.subjectMask)
+          assertSubjectMaskBinding(checked.subjectMask, {
+            sourceSha256: await hashBlob(checked.image),
+            crop: checked.crop,
+            widthMm: checked.settings.widthMm,
+            heightMm: checked.settings.heightMm,
+          });
         const meta = JSON.parse(localStorage.getItem("sr-basket") ?? "{}");
         setInkId(meta.inkId ?? "black");
         setReference(!!meta.reference);
@@ -85,10 +105,12 @@ export function Basket() {
                   height: pixels.height,
                 },
                 settings,
+                checked.subjectMask,
               ),
               "finished",
             ),
           );
+          setProject(checked);
         } finally {
           URL.revokeObjectURL(url);
         }
@@ -257,6 +279,7 @@ export function Basket() {
           inkId,
           crop: project.crop,
           settings,
+          subjectMask: project.subjectMask,
           source,
           rightsConfirmed: true,
           marketingConsent: false,

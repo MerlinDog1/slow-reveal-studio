@@ -3,6 +3,7 @@ import { getRecord } from "./store";
 import { ApiError, tokenMatches } from "./security";
 import { hasStorage } from "./config";
 import { removeAsset } from "./assets";
+import { packageAssets } from "./artwork-assets";
 
 /** An uncertain database response must never cause deletion of artwork that may have committed. */
 export async function discardUncommittedPackage(
@@ -23,14 +24,7 @@ export async function discardUncommittedPackage(
     ].some((item) => item.archive.key === production.archive.key)
   )
     return;
-  await Promise.allSettled(
-    [
-      production.source,
-      production.archive,
-      production.templateSvg,
-      production.finishedSvg,
-    ].map(removeAsset),
-  );
+  await Promise.allSettled(packageAssets(production).map(removeAsset));
 }
 
 export async function authorizedOrder(

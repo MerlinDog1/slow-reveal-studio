@@ -8,7 +8,7 @@
     "requiredCaption": "Digital rendering · simulated completion",
     "generatedAt": "2026-09-27",
     "tool": "shared TypeScript renderer + Sharp layout",
-    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "rendererVersion": "slow-reveal-geometry/1.2.0",
     "sourceImages": [
       "/references/black-dog.jpg"
     ],
@@ -20,7 +20,7 @@
       "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
     },
     "geometryFile": "/marketing/digital/dots-progression-geometry.json",
-    "geometrySha256": "ed219c1b407f92bd9a4d84831b232e78d31ce98945af193bed303105278405e1",
+    "geometrySha256": "c7edf2d3e239062b17deaaca98fc6adfdebf92c3cfacd728a367ba851b114f94",
     "deterministic": true,
     "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
     "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
@@ -39,7 +39,7 @@
     "requiredCaption": "Digital rendering · simulated completion",
     "generatedAt": "2026-09-27",
     "tool": "shared TypeScript renderer + Sharp layout",
-    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "rendererVersion": "slow-reveal-geometry/1.2.0",
     "sourceImages": [
       "/references/building.jpg"
     ],
@@ -51,7 +51,7 @@
       "sha256": "05c60cadc1dc41cea1ba4759d8f85763b2cd4b7675c4bc6ff29252380c25844e"
     },
     "geometryFile": "/marketing/digital/mosaic-progression-geometry.json",
-    "geometrySha256": "9f355ed8ecffa92c3837af21cc09171854a3255234dda8d95e377cef33765e28",
+    "geometrySha256": "c49f57c5fefda508d891e260124da5ac5ed7db7150f4e6e38e686009e60f4df1",
     "deterministic": true,
     "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art. Palette: #1e1e1c, #68442f, #7b8b77, #c6a25a; template numbers map in that order.",
     "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
@@ -70,7 +70,7 @@
     "requiredCaption": "Digital rendering · simulated completion",
     "generatedAt": "2026-09-27",
     "tool": "shared TypeScript renderer + Sharp layout",
-    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "rendererVersion": "slow-reveal-geometry/1.2.0",
     "sourceImages": [
       "/references/vehicle.jpg"
     ],
@@ -82,7 +82,7 @@
       "sha256": "5ff93fa03c053613f17e62138d844bdb8cdc3ad796cd72842732b60d6e235a36"
     },
     "geometryFile": "/marketing/digital/contour-progression-geometry.json",
-    "geometrySha256": "07bce696169b014d414a1a8aba5f9a15c4e7869a528732a4d0557e283413cb5b",
+    "geometrySha256": "dbf47a6212d1f9a8298386ae966844a73b3e38b9861e7361ddf8fdaea651c5e1",
     "deterministic": true,
     "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
     "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
@@ -101,7 +101,7 @@
     "requiredCaption": "Digital rendering · screen colours are illustrative",
     "generatedAt": "2026-09-27",
     "tool": "shared TypeScript renderer + Sharp layout",
-    "rendererVersion": "slow-reveal-geometry/1.1.0",
+    "rendererVersion": "slow-reveal-geometry/1.2.0",
     "sourceImages": [
       "/references/black-dog.jpg"
     ],
@@ -113,7 +113,7 @@
       "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
     },
     "geometryFile": "/marketing/digital/colour-options-geometry.json",
-    "geometrySha256": "ed219c1b407f92bd9a4d84831b232e78d31ce98945af193bed303105278405e1",
+    "geometrySha256": "c7edf2d3e239062b17deaaca98fc6adfdebf92c3cfacd728a367ba851b114f94",
     "palette": [
       {
         "id": "black",

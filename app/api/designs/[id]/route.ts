@@ -13,7 +13,7 @@ type Context = { params: Promise<{ id: string }> };
 export async function GET(request: Request, context: Context) {
   return api(async () =>
     privateJson(
-      publicDesign(
+      await publicDesign(
         await authorizedDesign((await context.params).id, bearer(request)),
       ),
     ),

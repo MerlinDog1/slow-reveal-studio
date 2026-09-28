@@ -13,6 +13,7 @@ import type { RenderSettings, RenderGeometry } from "../renderers/types";
 import { getAsset, putAsset, removeAsset, type PrivateAsset } from "./assets";
 import type { Crop, Design, Package } from "./schema";
 import { ApiError, digest } from "./security";
+import { designSubjectMask } from "./subject-masks";
 
 /** A fixed 1000px analysis raster is shared with the editor; final geometry remains in mm. */
 export async function cropRaster(
@@ -81,18 +82,25 @@ export async function renderDesign(
 ) {
   const source = await getAsset(design.source);
   const normalized = normalizeSettings(settings);
+  const subjectMask = await designSubjectMask(design, normalized, crop);
   const { raster, cropped } = await cropRaster(
     source,
     crop,
     normalized.widthMm,
     normalized.heightMm,
   );
-  return { geometry: renderImage(raster, normalized), cropped, source };
+  return {
+    geometry: renderImage(raster, normalized, subjectMask),
+    cropped,
+    source,
+    subjectMask,
+  };
 }
 export function proofHash(design: Design, geometry: RenderGeometry): string {
   return digest(
     JSON.stringify({
       sourceSha256: design.source.sha256,
+      subjectMaskSha256: design.subjectMask?.sha256,
       rendererVersion: RENDERER_VERSION,
       crop: design.crop,
       geometry,
@@ -106,7 +114,7 @@ export async function createProductionPackage(
   crop = design.crop,
   expectedProofHash?: string,
 ): Promise<Package> {
-  const { geometry, source, cropped } = await renderDesign(
+  const { geometry, source, cropped, subjectMask } = await renderDesign(
     design,
     settings,
     crop,
@@ -179,6 +187,8 @@ export async function createProductionPackage(
     orderId,
     revisionId,
     sourceSha256: design.source.sha256,
+    subjectMaskSha256: design.subjectMask?.sha256,
+    subjectMaskStrength: settings.subjectMaskStrength ?? 0,
     snapshotHash,
     rendererVersion: RENDERER_VERSION,
     mode: design.mode,
@@ -214,6 +224,11 @@ export async function createProductionPackage(
   const archive = new JSZip();
   archive.file(`source/original.${originalExtension}`, source);
   archive.file("source/cropped.jpg", cropped);
+  const subjectMaskBytes = subjectMask
+    ? Buffer.from(JSON.stringify(subjectMask))
+    : undefined;
+  if (subjectMaskBytes)
+    archive.file("source/subject-mask.json", subjectMaskBytes);
   archive.file("preview/finished.jpg", previewFinished);
   archive.file("preview/template.jpg", previewTemplate);
   archive.file(`production/${prefix}_template.svg`, template);
@@ -257,6 +272,13 @@ export async function createProductionPackage(
       source,
       design.source.mime,
     );
+    const privateMask = subjectMaskBytes
+      ? await write(
+          `${base}/subject-mask.json`,
+          subjectMaskBytes,
+          "application/json",
+        )
+      : undefined;
     const templateSvg = await write(
       `${base}/template.svg`,
       Buffer.from(template),
@@ -281,6 +303,7 @@ export async function createProductionPackage(
       templateSvg,
       finishedSvg,
       source: privateSource,
+      subjectMask: privateMask,
       manifest,
       snapshotHash,
     };

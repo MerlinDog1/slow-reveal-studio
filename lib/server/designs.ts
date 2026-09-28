@@ -2,7 +2,12 @@ import { randomUUID } from "node:crypto";
 import { getAvailableModes } from "../mode-availability";
 import { INKS } from "../catalog";
 import { normalizeSettings, RENDERER_VERSION } from "../renderers";
-import { decodeSource, putAsset, removeAsset } from "./assets";
+import {
+  decodeSource,
+  putAsset,
+  removeAsset,
+  type PrivateAsset,
+} from "./assets";
 import { getCatalogue, quote } from "./catalog";
 import { designSchema, type Design, type Checkout, type Order } from "./schema";
 import { ApiError, digest, newToken, tokenMatches } from "./security";
@@ -10,6 +15,12 @@ import { getRecord, listRecords, putRecord, deleteRecord } from "./store";
 import { sendEmail } from "./email";
 import { deleteUpload, uploadedSource } from "./uploads";
 import { validatePhoto } from "./source-validation";
+import { designSubjectMask, validateSubjectMask } from "./subject-masks";
+import {
+  checkoutArtworkAssets,
+  designArtworkAssets,
+  orderArtworkAssets,
+} from "./artwork-assets";
 
 export async function saveDesign(input: unknown) {
   const parsed = designSchema.parse(input);
@@ -47,6 +58,16 @@ export async function saveDesign(input: unknown) {
       ? decodeSource(parsed.source.dataUrl)
       : await uploadedSource(parsed.source.uploadId, parsed.source.token);
   const warnings = await validatePhoto(source.bytes);
+  validateSubjectMask(
+    parsed.subjectMask,
+    {
+      sourceSha256: digest(source.bytes),
+      crop: parsed.crop,
+      widthMm: settings.widthMm,
+      heightMm: settings.heightMm,
+    },
+    settings,
+  );
   const id = randomUUID();
   const token = newToken();
   const asset = await putAsset(
@@ -54,25 +75,45 @@ export async function saveDesign(input: unknown) {
     source.bytes,
     source.mime,
   );
-  const design: Design = {
-    id,
-    tokenHash: digest(token),
-    createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 30 * 86400_000).toISOString(),
-    mode: parsed.mode,
-    productId: parsed.productId,
-    finishId: parsed.finishId,
-    inkId: parsed.inkId,
-    crop: parsed.crop,
-    settings,
-    source: asset,
-    rightsConfirmed: true,
-    marketingConsent: parsed.marketingConsent,
-    email: parsed.email,
-    warnings,
-    rendererVersion: RENDERER_VERSION,
-  };
-  await putRecord("designs", id, design, true);
+  let maskAsset: PrivateAsset | undefined;
+  let design: Design;
+  try {
+    maskAsset = parsed.subjectMask
+      ? await putAsset(
+          `designs/${id}/subject-mask.json`,
+          Buffer.from(JSON.stringify(parsed.subjectMask)),
+          "application/json",
+        )
+      : undefined;
+    design = {
+      id,
+      tokenHash: digest(token),
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 30 * 86400_000).toISOString(),
+      mode: parsed.mode,
+      productId: parsed.productId,
+      finishId: parsed.finishId,
+      inkId: parsed.inkId,
+      crop: parsed.crop,
+      settings,
+      source: asset,
+      subjectMask: maskAsset,
+      rightsConfirmed: true,
+      marketingConsent: parsed.marketingConsent,
+      email: parsed.email,
+      warnings,
+      rendererVersion: RENDERER_VERSION,
+    };
+    await putRecord("designs", id, design, true);
+  } catch (error) {
+    // An uncertain database write may have committed; never remove its artwork.
+    const saved = await getRecord<Design>("designs", id).catch(() => undefined);
+    if (saved === null)
+      await Promise.allSettled(
+        [asset, ...(maskAsset ? [maskAsset] : [])].map(removeAsset),
+      );
+    throw error;
+  }
   if ("uploadId" in parsed.source)
     await deleteUpload(parsed.source.uploadId).catch(() => {
       /* Retention retries orphaned staging cleanup. */
@@ -111,14 +152,37 @@ export async function deleteDesign(id: string, token: string | null) {
       409,
       "This photo is attached to an order or checkout. Contact the studio for an order-data deletion review.",
     );
-  await removeAsset(design.source);
+  const otherDesigns = await listRecords<Design>("designs");
+  const protectedKeys = new Set(
+    [
+      ...checkouts.flatMap(checkoutArtworkAssets),
+      ...orders
+        .filter((order) => !order.dataDeletedAt)
+        .flatMap(orderArtworkAssets),
+      ...otherDesigns
+        .filter((other) => other.id !== id)
+        .flatMap(designArtworkAssets),
+    ].map((asset) => asset.key),
+  );
+  await Promise.all(
+    designArtworkAssets(design)
+      .filter((asset) => !protectedKeys.has(asset.key))
+      .map(removeAsset),
+  );
   await deleteRecord("designs", id);
 }
-export function publicDesign(design: Design) {
-  const { tokenHash: _, email: __, source, ...publicFields } = design;
+export async function publicDesign(design: Design) {
+  const {
+    tokenHash: _,
+    email: __,
+    source,
+    subjectMask: _maskAsset,
+    ...publicFields
+  } = design;
   return {
     ...publicFields,
     source: { mime: source.mime, bytes: source.bytes, sha256: source.sha256 },
     sourceUrl: `/api/designs/${design.id}/source`,
+    subjectMask: await designSubjectMask(design),
   };
 }

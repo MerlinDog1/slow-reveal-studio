@@ -1,5 +1,12 @@
 import { toSvg, type RenderGeometry } from "@/lib/renderers";
 import { withPngResolution } from "@/lib/png-resolution";
+import { hashBlob } from "@/lib/browser-subject-mask";
+import {
+  normalizeSubjectMask,
+  assertSubjectMaskBinding,
+  type SubjectMask,
+  type SubjectMaskCrop,
+} from "@/lib/subject-mask";
 export function downloadBlob(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -46,7 +53,27 @@ export async function exportArtwork(
   variant: "finished" | "template",
   source?: Blob,
   crop?: unknown,
+  subjectMask?: SubjectMask,
 ) {
+  let maskJson: string | undefined;
+  let maskHash: string | undefined;
+  if (subjectMask) {
+    if (!source || !crop)
+      throw new Error(
+        "The selected artwork needs its original photo and crop for export.",
+      );
+    const mask = normalizeSubjectMask(subjectMask);
+    assertSubjectMaskBinding(mask, {
+      sourceSha256: await hashBlob(source),
+      crop: crop as SubjectMaskCrop,
+      widthMm: geometry.widthMm,
+      heightMm: geometry.heightMm,
+    });
+    maskJson = JSON.stringify(mask);
+    maskHash = await hashBlob(new Blob([maskJson]));
+  } else if ((geometry.settings.subjectMaskStrength ?? 0) > 0) {
+    throw new Error("This artwork is missing its manual subject selection.");
+  }
   const stem = `slow-reveal_${geometry.mode}_${geometry.widthMm}x${geometry.heightMm}mm`;
   const svg = toSvg(geometry, variant, { background: variant !== "template" });
   if (format === "svg")
@@ -116,6 +143,7 @@ export async function exportArtwork(
     JSON.stringify({ settings: geometry.settings, crop }, null, 2),
   );
   zip.file("geometry.json", JSON.stringify(geometry));
+  if (maskJson) zip.file("source/subject-mask.json", maskJson);
   zip.file(
     "manifest.json",
     JSON.stringify(
@@ -129,6 +157,14 @@ export async function exportArtwork(
         vector: "SVG in millimetres",
         status: "prototype-not-approved-for-print",
         stats: geometry.stats,
+        ...(maskHash
+          ? {
+              subjectMask: {
+                path: "source/subject-mask.json",
+                sha256: maskHash,
+              },
+            }
+          : {}),
       },
       null,
       2,

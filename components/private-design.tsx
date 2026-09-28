@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { saveLocalProject } from "@/lib/browser-storage";
 import { type RenderSettings } from "@/lib/renderers";
 import { type Crop } from "@/lib/image-processing";
+import type { SubjectMask } from "@/lib/subject-mask";
 type Design = {
   id: string;
   settings: RenderSettings;
@@ -12,6 +13,8 @@ type Design = {
   inkId: string;
   sourceUrl: string;
   expiresAt: string;
+  subjectMask?: SubjectMask;
+  rendererVersion?: string;
 };
 export function PrivateDesign({ id }: { id: string }) {
   const [token, setToken] = useState("");
@@ -80,6 +83,8 @@ export function PrivateDesign({ id }: { id: string }) {
         name: "Your saved photograph",
         image: await r.blob(),
         settings: design.settings,
+        subjectMask: design.subjectMask,
+        rendererVersion: design.rendererVersion,
         crop: design.crop,
         productId: design.productId,
         finishId: design.finishId,

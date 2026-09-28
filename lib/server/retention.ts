@@ -6,6 +6,12 @@ import { stripeClient } from "./commerce";
 import { type UploadTicket, deleteUpload } from "./uploads";
 import type { AnalyticsRecord } from "./analytics";
 import type { AdminIdentity } from "./admin-auth";
+import {
+  checkoutArtworkAssets,
+  designArtworkAssets,
+  orderArtworkAssets,
+  packageAssets,
+} from "./artwork-assets";
 
 export async function expireUnpaidDesigns() {
   const [designs, checkouts, orders] = await Promise.all([
@@ -14,23 +20,35 @@ export async function expireUnpaidDesigns() {
     listRecords<Order>("orders"),
   ]);
   const attached = new Set([
-    ...checkouts.map((c) => c.design.source.key),
+    ...checkouts.flatMap(checkoutArtworkAssets).map((asset) => asset.key),
     ...orders
       .filter((o) => !o.dataDeletedAt)
-      .flatMap((o) => [
-        o.originalSnapshot.design.source.key,
-        ...o.revisions.map((r) => r.package.source.key),
-      ]),
+      .flatMap(orderArtworkAssets)
+      .map((asset) => asset.key),
   ]);
+  const retainedDesignKeys = new Set(
+    designs
+      .filter(
+        (design) =>
+          Date.parse(design.expiresAt) >= Date.now() ||
+          designArtworkAssets(design).some((asset) => attached.has(asset.key)),
+      )
+      .flatMap(designArtworkAssets)
+      .map((asset) => asset.key),
+  );
   let deleted = 0;
   let retainedForOrderReview = 0;
   for (const design of designs) {
     if (Date.parse(design.expiresAt) >= Date.now()) continue;
-    if (attached.has(design.source.key)) {
+    if (designArtworkAssets(design).some((asset) => attached.has(asset.key))) {
       retainedForOrderReview++;
       continue;
     }
-    await removeAsset(design.source);
+    await Promise.all(
+      designArtworkAssets(design)
+        .filter((asset) => !retainedDesignKeys.has(asset.key))
+        .map(removeAsset),
+    );
     await deleteRecord("designs", design.id);
     deleted++;
   }
@@ -50,35 +68,23 @@ export async function eraseOrderArtwork(
   if (!order) throw new ApiError(404, "Order not found.");
   if (order.reviewStatus !== "dispatched")
     throw new ApiError(409, "Resolve fulfilment before deleting paid artwork.");
-  const assets: PrivateAsset[] = [
-    order.originalSnapshot.package.archive,
-    order.originalSnapshot.package.templateSvg,
-    order.originalSnapshot.package.finishedSvg,
-    order.originalSnapshot.package.source,
-    order.originalSnapshot.design.source,
-    ...order.revisions.flatMap((r) => [
-      r.package.archive,
-      r.package.templateSvg,
-      r.package.finishedSvg,
-      r.package.source,
-    ]),
-  ];
+  const assets: PrivateAsset[] = orderArtworkAssets(order);
   const unique = new Map(assets.map((a) => [a.key, a]));
-  const [otherOrders, otherCheckouts] = await Promise.all([
+  const [otherOrders, otherCheckouts, designs] = await Promise.all([
     listRecords<Order>("orders"),
     listRecords<Checkout>("checkouts"),
+    listRecords<Design>("designs"),
   ]);
   const protectedSources = new Set([
     ...otherOrders
       .filter((o) => o.id !== id && !o.dataDeletedAt)
-      .flatMap((o) => [
-        o.originalSnapshot.design.source.key,
-        o.originalSnapshot.package.source.key,
-        ...o.revisions.map((r) => r.package.source.key),
-      ]),
+      .flatMap(orderArtworkAssets)
+      .map((asset) => asset.key),
     ...otherCheckouts
       .filter((c) => c.id !== id)
-      .flatMap((c) => [c.design.source.key, c.package.source.key]),
+      .flatMap(checkoutArtworkAssets)
+      .map((asset) => asset.key),
+    ...designs.flatMap(designArtworkAssets).map((asset) => asset.key),
   ]);
   // Mark before deleting: concurrent readers fail closed while erasure is in progress.
   const erasedAt = new Date().toISOString();
@@ -115,11 +121,12 @@ export async function eraseOrderArtwork(
 }
 
 export async function runRetention() {
-  const [uploads, events, checkouts, orders] = await Promise.all([
+  const [uploads, events, checkouts, orders, designs] = await Promise.all([
     listRecords<UploadTicket>("uploads"),
     listRecords<AnalyticsRecord>("events"),
     listRecords<Checkout>("checkouts"),
     listRecords<Order>("orders"),
+    listRecords<Design>("designs"),
   ]);
   let stagedUploadsDeleted = 0;
   let analyticsBatchesDeleted = 0;
@@ -176,21 +183,15 @@ export async function runRetention() {
     const protectedKeys = new Set([
       ...checkouts
         .filter((c) => c.id !== checkout.id)
-        .flatMap((c) => [c.design.source.key, c.package.source.key]),
+        .flatMap(checkoutArtworkAssets)
+        .map((asset) => asset.key),
       ...orders
         .filter((o) => !o.dataDeletedAt)
-        .flatMap((o) => [
-          o.originalSnapshot.design.source.key,
-          o.originalSnapshot.package.source.key,
-          ...o.revisions.map((r) => r.package.source.key),
-        ]),
+        .flatMap(orderArtworkAssets)
+        .map((asset) => asset.key),
+      ...designs.flatMap(designArtworkAssets).map((asset) => asset.key),
     ]);
-    for (const asset of [
-      checkout.package.archive,
-      checkout.package.templateSvg,
-      checkout.package.finishedSvg,
-      checkout.package.source,
-    ])
+    for (const asset of packageAssets(checkout.package))
       if (!protectedKeys.has(asset.key)) await removeAsset(asset);
     await deleteRecord("checkouts", checkout.id);
     abandonedCheckoutsDeleted++;

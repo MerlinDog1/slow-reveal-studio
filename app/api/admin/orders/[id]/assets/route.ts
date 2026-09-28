@@ -13,13 +13,13 @@ export async function DELETE(
 ) {
   return api(async () => {
     requireSameOrigin(request);
-    requireAdmin(request);
+    const identity = await requireAdmin(request, "operator");
     const { note } = z
       .object({ note: z.string().min(10).max(1000) })
       .strict()
       .parse(await readJson(request, 2048));
     return privateJson(
-      await eraseOrderArtwork((await context.params).id, note),
+      await eraseOrderArtwork((await context.params).id, note, identity),
     );
   });
 }

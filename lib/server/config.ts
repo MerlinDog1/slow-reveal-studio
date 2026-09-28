@@ -1,4 +1,5 @@
 import { hasOrderAccessKey } from "./order-access";
+import { supabaseAdminConfigured } from "./admin-auth";
 
 export const hasDatabase = () =>
   Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -48,8 +49,8 @@ export function launchGates() {
     },
     {
       id: "admin",
-      label: "Production administrator configured",
-      passed: (process.env.ADMIN_API_TOKEN?.length ?? 0) >= 32,
+      label: "Per-user Supabase administrator authentication configured",
+      passed: supabaseAdminConfigured(),
     },
     {
       id: "abuse-controls",

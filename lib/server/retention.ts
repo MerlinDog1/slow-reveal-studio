@@ -5,6 +5,7 @@ import { ApiError } from "./security";
 import { stripeClient } from "./commerce";
 import { type UploadTicket, deleteUpload } from "./uploads";
 import type { AnalyticsRecord } from "./analytics";
+import type { AdminIdentity } from "./admin-auth";
 
 export async function expireUnpaidDesigns() {
   const [designs, checkouts, orders] = await Promise.all([
@@ -35,7 +36,11 @@ export async function expireUnpaidDesigns() {
   }
   return { deleted, retainedForOrderReview };
 }
-export async function eraseOrderArtwork(id: string, note: string) {
+export async function eraseOrderArtwork(
+  id: string,
+  note: string,
+  actor?: AdminIdentity,
+) {
   if (note.trim().length < 10)
     throw new ApiError(
       400,
@@ -90,6 +95,7 @@ export async function eraseOrderArtwork(id: string, note: string) {
           action: "artwork-erasure",
           note,
           revisionId: order.currentRevisionId,
+          ...(actor ? { actorId: actor.userId, actorKind: actor.kind } : {}),
         },
       ],
     });

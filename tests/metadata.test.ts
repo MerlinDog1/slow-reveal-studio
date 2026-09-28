@@ -21,6 +21,8 @@ test("search metadata stays private by default and includes only approved public
       [
         "https://studio.example/",
         "https://studio.example/journal",
+        "https://studio.example/photo-guide",
+        "https://studio.example/canvas-guide",
         "https://studio.example/create",
       ],
     );

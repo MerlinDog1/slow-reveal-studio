@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { AdminIdentity } from "./admin-auth";
 import { randomUUID } from "node:crypto";
 import {
   cropSchema,
@@ -125,6 +126,7 @@ export async function updateOrder(
   input: unknown,
   transport?: NotificationTransport,
   produce = createProductionPackage,
+  actor?: AdminIdentity,
 ): Promise<{ order: Order; notification?: NotificationResult }> {
   const body = actionSchema.parse(input);
   const order = await getRecord<Order>("orders", id);
@@ -145,6 +147,21 @@ export async function updateOrder(
         400,
         "Choose the pending customer notification to retry.",
       );
+    if (actor)
+      await replaceOrder(order, {
+        ...order,
+        audit: [
+          ...order.audit,
+          {
+            at: new Date().toISOString(),
+            action: "retry-notification",
+            note: "Administrator retried the existing customer notification.",
+            revisionId: order.currentRevisionId,
+            actorId: actor.userId,
+            actorKind: actor.kind,
+          },
+        ],
+      });
     const notification = await deliverNotification(
       id,
       body.notificationId,
@@ -222,6 +239,12 @@ export async function updateOrder(
     body.action === "dispatch" || body.action === "request-photo"
       ? newNotification(body.action, body.note, body.tracking)
       : undefined;
+  if (actor)
+    next.audit = next.audit.map((entry, index) =>
+      index < order.audit.length
+        ? entry
+        : { ...entry, actorId: actor.userId, actorKind: actor.kind },
+    );
   if (customerNotification)
     next.notifications = [...(next.notifications ?? []), customerNotification];
   try {

@@ -23,7 +23,8 @@ On the first run, copy the example environment file as above; preserve an existi
 | `/basket`                                                | Kit review, private save, canonical production proof and gated checkout                            |
 | `/design/:id#token=…`                                    | Private saved design; the capability stays out of server URL query logs                            |
 | `/order/:id#token=…`                                     | Payment/fulfilment status, requested replacement-photo submission and revised-proof approval       |
-| `/admin`                                                 | Token-protected production review and launch readiness                                             |
+| `/admin`                                                 | Individual operator sign-in, production review and versioned renderer presets                       |
+| `/photo-guide`, `/canvas-guide`                          | Photo/crop advice and planned canvas sizes/finishes with digital examples                             |
 | `/studies`                                               | Labelled digital studies and illustrative concepts; unapproved alternative-mode studies stay local |
 | `/journal`, `/privacy`                                   | Development notes and current data handling                                                        |
 
@@ -39,7 +40,9 @@ For a local administrator token, generate a value using:
 node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))"
 ```
 
-Set `ADMIN_API_TOKEN` in `.env.local`, restart the server, and enter that value in `/admin`. There is no unauthenticated admin bypass. The operator token stays in page memory, not browser storage.
+For loopback development only, set `ADMIN_API_TOKEN` and `ALLOW_LOCAL_ADMIN_TOKEN=true` in `.env.local`, restart the server, and enter that value in `/admin`. A local production build also requires `ALLOW_LOCAL_DEVELOPMENT_STORAGE=true`. Both the configured canonical URL and request origin must be loopback. There is no unauthenticated admin bypass; the development token stays in page memory.
+
+For a deployed production desk, follow the individual Supabase operator provisioning instructions in `OPERATIONS.md`. Sign-in uses a preprovisioned account and active private membership; reviewer and operator roles have different permissions. The local token does not satisfy the production launch gate. Supabase sessions stay in page memory and signing out clears the desk.
 
 ## Verify
 

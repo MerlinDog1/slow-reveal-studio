@@ -8,6 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${origin}/`, images: [`${origin}/social/studio-og.png`] },
     { url: `${origin}/journal` },
+    { url: `${origin}/photo-guide` },
+    { url: `${origin}/canvas-guide` },
     { url: `${origin}/create` },
   ];
 }

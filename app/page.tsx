@@ -10,6 +10,11 @@ import {
 } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { HeroArtwork } from "@/components/hero-artwork";
+import {
+  PersonalisationSection,
+  PhotoSuitabilitySection,
+  CanvasChoiceSection,
+} from "@/components/making-guides";
 import { trustedPublicOrigin } from "@/lib/public-origin";
 import { getAvailableModes } from "@/lib/mode-availability";
 
@@ -198,6 +203,7 @@ export default function Home() {
             </p>
           </div>
         </section>
+        <PersonalisationSection />
         <section className="progression-section section">
           <span className="eyebrow">The same memory, seen differently</span>
           <h2>
@@ -219,6 +225,8 @@ export default function Home() {
             <ArrowRight size={17} />
           </Link>
         </section>
+        <PhotoSuitabilitySection />
+        <CanvasChoiceSection />
         <section className="faq-section section">
           <div>
             <span className="eyebrow">A few things you might wonder</span>

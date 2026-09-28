@@ -60,11 +60,11 @@ test("guest capabilities do not authorize by ID, prefix, or wrong token", () => 
   assert.equal(tokenMatches(newToken(), digest(token)), false);
   assert.equal(tokenMatches(null, digest(token)), false);
 });
-test("no unauthenticated admin fallback and cross-origin mutations fail", () => {
+test("no unauthenticated admin fallback and cross-origin mutations fail", async () => {
   const previous = process.env.ADMIN_API_TOKEN;
   delete process.env.ADMIN_API_TOKEN;
   try {
-    assert.throws(
+    await assert.rejects(
       () => requireAdmin(new Request("http://localhost/api/admin")),
       ApiError,
     );

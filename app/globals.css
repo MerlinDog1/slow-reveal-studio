@@ -2475,3 +2475,106 @@ a svg {
     scroll-behavior: auto !important;
   }
 }
+
+/* Making guides: scoped additions; physical dimensions are illustrative catalogue plans. */
+.srs-guide-page { width: min(1180px, 90%); margin: 0 auto; }
+.srs-guide-page-header { max-width: 840px; padding: 72px 0 64px; }
+.srs-guide-back { display: block; font-size: 12px; color: #596250; margin-bottom: 38px; }
+.srs-guide-back:hover { text-decoration: underline; }
+.srs-guide-page-header h1 { font-size: clamp(43px, 6.2vw, 80px); margin: 20px 0 28px; }
+.srs-guide-page-header > p { font-size: 19px; max-width: 690px; color: #56604f; }
+.srs-guide-jump-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 32px; font-size: 13px; }
+.srs-guide-jump-links a { border-bottom: 1px solid #b0b7a6; padding-bottom: 6px; }
+.srs-guide-jump-links a:hover { border-color: var(--green); }
+.srs-guide-block { padding: 56px 0; border-top: 1px solid var(--line); scroll-margin-top: 30px; }
+.srs-guide-block h2, .srs-guide-section h2 { font-size: clamp(33px, 4.2vw, 52px); margin: 16px 0 24px; }
+.srs-guide-lead { max-width: 760px; color: #59604f; margin-bottom: 34px; }
+.srs-guide-section { border-top: 1px solid var(--line); }
+.srs-guide-section p { max-width: 680px; }
+.srs-guide-feature, .srs-guide-two-column { display: grid; grid-template-columns: 1fr 1.12fr; align-items: center; gap: clamp(28px, 5vw, 76px); }
+.srs-guide-feature > div, .srs-guide-two-column > div { min-width: 0; }
+.srs-guide-section-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; margin-bottom: 36px; }
+.srs-guide-section-intro h2 { margin-bottom: 0; }
+.srs-guide-art-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.srs-guide-art-pair figure, .srs-guide-comparison figure { margin: 0; min-width: 0; }
+.srs-guide-art-pair img, .srs-guide-comparison img { width: 100%; height: auto; background: var(--paper); border: 1px solid #ded8cc; }
+.srs-guide-art-pair figcaption, .srs-guide-comparison figcaption { font-size: 12px; line-height: 1.5; margin-top: 10px; color: #535d4d; }
+.srs-guide-caption { font-size: 13px; line-height: 1.65; color: #59604f; margin: 22px 0 10px; max-width: 880px !important; }
+.srs-guide-credit { font-size: 11px; line-height: 1.6; color: #62685c; margin: 0; }
+.srs-guide-credit a, .srs-guide-caption a { text-decoration: underline; text-underline-offset: 3px; }
+.srs-guide-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.srs-guide-comparison > article { min-width: 0; }
+.srs-guide-comparison > article > div:not(.srs-guide-example-label) > figure { max-width: 100%; }
+.srs-guide-section .srs-guide-comparison > article > figure img { max-height: 440px; object-fit: cover; object-position: center; }
+.srs-guide-example-label { display: flex; gap: 14px; align-items: baseline; margin-bottom: 16px; }
+.srs-guide-example-label > span, .srs-guide-index { color: #61705a; font-size: 12px; letter-spacing: 1px; }
+.srs-guide-example-label h3 { margin: 0; font-size: 16px; }
+.srs-guide-scale { margin: 24px 0 32px; padding: 22px 20px; background: #ebe9df; }
+.srs-guide-scale svg { display: block; width: 100%; height: auto; }
+.srs-guide-scale figcaption { max-width: 820px; margin: 14px auto 0; color: #59604f; font-size: 12px; line-height: 1.6; }
+.srs-guide-finish-strip, .srs-guide-finish-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+.srs-guide-finish-strip > div { border-left: 1px solid #c0c4b4; padding-left: 22px; }
+.srs-guide-finish-strip h3 { font-size: 16px; margin-bottom: 8px; }
+.srs-guide-finish-strip p { font-size: 14px; color: #59604f; margin-bottom: 0; }
+.srs-guide-subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 52px; margin-top: 34px; }
+.srs-guide-subject-grid article { border-bottom: 1px solid var(--line); padding: 8px 0 28px; }
+.srs-guide-subject-grid h3, .srs-guide-finish-cards h3 { font: 27px/1.25 var(--serif); font-weight: 400; letter-spacing: -.5px; margin: 12px 0 18px; }
+.srs-guide-try { padding-left: 18px; border-left: 2px solid #a3af96; color: #506147; font-size: 14px; }
+.srs-guide-try strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 6px; }
+.srs-guide-note { padding: 30px; background: #e5e7dc; }
+.srs-guide-note h3 { font: 25px/1.25 var(--serif); margin-bottom: 20px; }
+.srs-guide-note p, .srs-guide-note li { font-size: 14px; line-height: 1.75; }
+.srs-guide-note ol, .srs-guide-note ul { padding-left: 20px; margin: 0 0 20px; }
+.srs-guide-note li + li { margin-top: 9px; }
+.srs-guide-note > :last-child { margin-bottom: 0; }
+.srs-guide-checklist { list-style: none; counter-reset: guide-step; padding: 0; margin: 32px 0; }
+.srs-guide-checklist li { counter-increment: guide-step; display: grid; grid-template-columns: 34px minmax(180px, .7fr) 1.4fr; gap: 24px; border-top: 1px solid var(--line); padding: 24px 0; }
+.srs-guide-checklist li::before { content: "0" counter(guide-step); color: #61705a; font-size: 12px; padding-top: 3px; }
+.srs-guide-checklist strong { font-weight: 500; }
+.srs-guide-checklist li > span { color: #59604f; font-size: 15px; }
+.srs-guide-table-wrap { overflow-x: auto; }
+.srs-guide-table { border-collapse: collapse; width: 100%; font-size: 14px; text-align: left; }
+.srs-guide-table caption { text-align: left; padding: 0 0 16px; color: #58604e; font-size: 12px; }
+.srs-guide-table th, .srs-guide-table td { padding: 17px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.srs-guide-table thead { background: #e5e7dc; }
+.srs-guide-table th { font-weight: 500; }
+.srs-guide-finish-cards article { background: var(--paper); padding: 28px; border: 1px solid #dfdfd2; }
+.srs-guide-finish-cards article > p { min-height: 52px; color: #59604f; }
+.srs-guide-finish-cards dt { margin: 24px 0 7px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #53644a; }
+.srs-guide-finish-cards dd { margin: 0; font-size: 14px; line-height: 1.7; }
+.srs-guide-lettering { scroll-margin-top: 25px; }
+.srs-guide-lettering .srs-guide-section { padding: 56px 0; width: 100%; max-width: none; }
+.srs-guide-end { border-top: 1px solid var(--line); padding: 60px 0 90px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.srs-guide-end h2 { font-size: clamp(31px, 4vw, 44px); margin: 15px 0 0; }
+.srs-guide-actions { display: flex; align-items: flex-start; flex-direction: column; gap: 20px; }
+@media (max-width: 850px) {
+  .srs-guide-feature, .srs-guide-two-column { grid-template-columns: 1fr; }
+  .srs-guide-feature > div:first-child { max-width: 660px; }
+  .srs-guide-finish-cards { grid-template-columns: 1fr; }
+  .srs-guide-finish-cards article > p { min-height: auto; }
+  .srs-guide-comparison { gap: 20px; }
+  .srs-guide-section-intro { gap: 28px; }
+}
+@media (max-width: 600px) {
+  .srs-guide-page-header { padding: 42px 0; }
+  .srs-guide-page-header > p { font-size: 17px; }
+  .srs-guide-back { margin-bottom: 26px; }
+  .srs-guide-jump-links { gap: 14px 18px; }
+  .srs-guide-block { padding: 40px 0; }
+  .srs-guide-section-intro, .srs-guide-subject-grid { grid-template-columns: 1fr; gap: 25px; }
+  .srs-guide-comparison { grid-template-columns: 1fr; gap: 30px; }
+  .srs-guide-section .srs-guide-comparison { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .srs-guide-section .srs-guide-example-label { display: block; }
+  .srs-guide-example-label h3 { font-size: 15px; }
+  .srs-guide-art-pair { gap: 10px; }
+  .srs-guide-scale { padding: 20px 8px; margin-bottom: 24px; }
+  .srs-guide-scale figcaption { padding: 0 8px; }
+  .srs-guide-finish-strip { grid-template-columns: 1fr; gap: 20px; }
+  .srs-guide-note, .srs-guide-finish-cards article { padding: 24px; }
+  .srs-guide-checklist li { grid-template-columns: 24px 1fr; gap: 12px; }
+  .srs-guide-checklist li > span { grid-column: 2; }
+  .srs-guide-end { align-items: flex-start; flex-direction: column; padding-bottom: 60px; }
+}
+.srs-guide-scale-drawing { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.srs-guide-scale-drawing svg { min-width: 780px; }
+.srs-guide-scale-drawing:focus-visible { outline: 2px solid var(--green); outline-offset: 5px; }

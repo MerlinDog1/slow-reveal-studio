@@ -1,5 +1,13 @@
 # Independent software acceptance audit
 
+## Follow-up — 28 September 2026
+
+Subsequent independent reviews covered individual admin authentication, immutable shared presets, role enforcement, private/public projections and the operator UI. They identified and corrected a preset refresh/mutation race, SQL-null handling in the preset revision trigger, and selected-proof/download revision drift. Administrator asset requests now require the selected revision, and refreshing changed artwork clears the old inspection. Audit entries show verified operator attribution. The regression suite checks missing/stale revision rejection for every asset type and current asset bytes; an isolated browser check confirmed old proof/download controls are removed after another reviewer regenerates the order.
+
+The current catalogue implementation also supersedes the automatic reconciliation described in the dated audit below: restored IDs/dimensions are retained until explicit review, and older/unknown renderer versions require a rebuild decision. Full integrated results and the unexecuted real PostgreSQL regression are recorded in [VERIFICATION.md](VERIFICATION.md). No review establishes physical or deployed-service acceptance.
+
+## Original bounded audit — 27 September 2026
+
 Reviewed 27 September 2026 against the full README and current implementation, then re-read after the assigned fixes landed. This bounded review supplements the 34-section coverage map in [BUILD_STATUS.md](BUILD_STATUS.md). No application/backend code was changed by this audit. Source line numbers identify the current inspected state and may move as work continues.
 
 **Result: five P2 findings identified; all five corrected in the current source. No additional open P1/P2 finding was established in this bounded review.** This does not mean all software or physical acceptance checks are complete. Physical trials, credentials/deployment, alternative-mode public gating and the replacement-photo workflow have separate owners and gates.

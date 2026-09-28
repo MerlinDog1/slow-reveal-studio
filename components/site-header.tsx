@@ -52,6 +52,8 @@ export function SiteFooter() {
       </div>
       <div className="footer-links">
         <Link href="/studies">Studio studies</Link>
+        <Link href="/photo-guide">Photo guide</Link>
+        <Link href="/canvas-guide">Canvas sizes & finishes</Link>
         <Link href="/create">Create your own</Link>
         <Link href="/lab/dots">Rendering lab</Link>
         <Link href="/privacy">Your photos & privacy</Link>

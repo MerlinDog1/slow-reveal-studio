@@ -147,7 +147,14 @@ export type Order = {
   revisions: Revision[];
   currentRevisionId: string;
   approvedRevisionId?: string;
-  audit: { at: string; action: string; note: string; revisionId: string }[];
+  audit: {
+    at: string;
+    action: string;
+    note: string;
+    revisionId: string;
+    actorId?: string;
+    actorKind?: "supabase" | "local-token";
+  }[];
   customerEmail?: string;
   delivery?: unknown;
   tracking?: string;

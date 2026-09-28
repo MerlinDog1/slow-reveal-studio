@@ -1,16 +1,17 @@
 "use client";
-import { useRef, useState } from "react";
-import {
-  Check,
-  LockKeyhole,
-  LoaderCircle,
-  ArrowDownToLine,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, ArrowDownToLine } from "lucide-react";
 import { formatPrice } from "@/lib/catalog";
 import { downloadBlob } from "@/lib/export-artwork";
 import type { Order } from "@/lib/server/schema";
 import { orderReviewDetails, hasUnappliedCrop } from "@/lib/order-review";
+import { AdminPresets } from "./admin-presets";
 type Desk = {
+  identity: {
+    kind: "supabase" | "local-token";
+    userId: string;
+    role: "reviewer" | "operator";
+  };
   analytics?: {
     windowDays: number;
     rows: {
@@ -26,15 +27,34 @@ type Desk = {
   configuration: { persistence: string; storage: string };
   gates: { id: string; label: string; passed: boolean }[];
 };
-export function AdminDesk() {
+export function AdminDesk({
+  accessToken: token,
+  onSignOut,
+  onSessionEnded,
+}: {
+  accessToken: string;
+  onSignOut: () => void;
+  onSessionEnded: (message: string) => void;
+}) {
   const inspection = useRef(0);
+  const loadRequest = useRef(0);
+  const previewUrls = useRef(new Set<string>());
   const [proofReady, setProofReady] = useState(false);
-  const [token, setToken] = useState("");
   const [data, setData] = useState<Desk | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [mutating, setMutating] = useState(false);
+  const [reload, setReload] = useState(0);
+  const busy = loading || mutating;
+  const loadingRef = useRef(false);
+  const mutatingRef = useRef(false);
+  const reloadAfterMutation = useRef(false);
+  const currentToken = useRef(token);
+  currentToken.current = token;
+  const mounted = useRef(true);
   const [selected, setSelected] = useState<Order | null>(null);
+  const selectedOrder = useRef<Order | null>(null);
   const [note, setNote] = useState("");
   const [tracking, setTracking] = useState("");
   const [source, setSource] = useState<string | null>(null);
@@ -48,38 +68,140 @@ export function AdminDesk() {
   }>({ zoom: 1, x: 0, y: 0, rotation: 0 });
   const review = selected ? orderReviewDetails(selected) : null;
   const cropDirty = Boolean(review && hasUnappliedCrop(crop, review.crop));
-  async function load() {
-    setBusy(true);
+  useEffect(() => {
+    if (mutatingRef.current) reloadAfterMutation.current = true;
+    else void load(token);
+    return () => {
+      loadRequest.current++;
+    };
+  }, [token, reload]);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      inspection.current++;
+      for (const url of previewUrls.current) URL.revokeObjectURL(url);
+      previewUrls.current.clear();
+    };
+  }, []);
+  async function accessDenied(status: number, requestToken: string) {
+    if (
+      !mounted.current ||
+      requestToken !== currentToken.current ||
+      ![401, 403].includes(status)
+    )
+      return;
+    if (status === 401) {
+      onSessionEnded("Your administrator session ended. Sign in again.");
+      return;
+    }
+    // A 403 can be a role downgrade rather than revoked membership. The guarded desk load
+    // rechecks membership and invalidates older loads, without clearing a session on outages.
+    await load(requestToken, true);
+  }
+  async function load(access = currentToken.current, afterMutation = false) {
+    if (mutatingRef.current && !afterMutation) {
+      reloadAfterMutation.current = true;
+      return;
+    }
+    const request = ++loadRequest.current;
+    loadingRef.current = true;
+    setLoading(true);
     setError("");
     try {
       const r = await fetch("/api/admin", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${access}` },
       });
       const result = await r.json();
+      if (
+        !mounted.current ||
+        request !== loadRequest.current ||
+        access !== currentToken.current
+      )
+        return;
+      if (r.status === 401 || r.status === 403) {
+        onSessionEnded(
+          "Operator access ended. Sign in again or ask the studio owner to check your access.",
+        );
+        return;
+      }
       if (!r.ok)
         throw new Error(
           result.error ?? "The production desk could not be opened.",
         );
       setData(result);
+      const inspected = selectedOrder.current;
+      if (inspected) {
+        const fresh = (result as Desk).orders.find(
+          (order) => order.id === inspected.id,
+        );
+        if (
+          !fresh ||
+          fresh.dataDeletedAt ||
+          fresh.currentRevisionId !== inspected.currentRevisionId
+        ) {
+          clearInspection();
+          setNotice(
+            "The inspected artwork changed or is no longer available. Select Review on the current order before approving or downloading.",
+          );
+        } else {
+          // Status and audit changes can refresh without discarding an unsaved crop or reusing a different proof.
+          selectedOrder.current = fresh;
+          setSelected(fresh);
+        }
+      }
       return result as Desk;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load orders.");
+      if (
+        mounted.current &&
+        request === loadRequest.current &&
+        access === currentToken.current
+      )
+        setError(e instanceof Error ? e.message : "Could not load orders.");
     } finally {
-      setBusy(false);
+      if (mounted.current && request === loadRequest.current) {
+        loadingRef.current = false;
+        setLoading(false);
+      }
     }
   }
-  async function inspect(order: Order) {
+  function clearInspection() {
+    inspection.current++;
+    selectedOrder.current = null;
+    setSelected(null);
+    setProofReady(false);
+    for (const url of previewUrls.current) URL.revokeObjectURL(url);
+    previewUrls.current.clear();
+    setSource(null);
+    setFinished(null);
+    setTemplate(null);
+  }
+  function staleFile(response: Response) {
+    if (response.status !== 409) return false;
+    if (mounted.current) {
+      clearInspection();
+      setError(
+        "The artwork revision changed. Refresh the production desk and review the latest proofs before downloading or approving.",
+      );
+    }
+    return true;
+  }
+  async function inspect(order: Order, afterMutation = false) {
+    if ((loadingRef.current || mutatingRef.current) && !afterMutation) return;
+    const access = currentToken.current;
     const inspectionId = ++inspection.current;
     setProofReady(false);
+    selectedOrder.current = order;
     setSelected(order);
+    setNotice("");
     setNote("");
     setTracking(order.tracking ?? "");
     const latest = order.revisions.find(
       (r) => r.id === order.currentRevisionId,
     );
     setCrop(latest?.crop ?? order.originalSnapshot.design.crop);
-    for (const url of [source, finished, template])
-      if (url) URL.revokeObjectURL(url);
+    for (const url of previewUrls.current) URL.revokeObjectURL(url);
+    previewUrls.current.clear();
     setSource(null);
     setFinished(null);
     setTemplate(null);
@@ -90,35 +212,48 @@ export function AdminDesk() {
         ["template", setTemplate],
       ] as const) {
         const r = await fetch(
-          `/api/admin/orders/${order.id}/files?file=${type}`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          `/api/admin/orders/${order.id}/files?file=${type}&revision=${encodeURIComponent(order.currentRevisionId)}`,
+          { headers: { Authorization: `Bearer ${access}` } },
         );
+        if (!mounted.current || inspectionId !== inspection.current) return;
+        await accessDenied(r.status, access);
+        if (staleFile(r)) return;
         if (!r.ok) throw new Error("A private preview could not be opened.");
         const blob = await r.blob();
         if (inspectionId !== inspection.current) return;
-        set(URL.createObjectURL(blob));
+        const url = URL.createObjectURL(blob);
+        previewUrls.current.add(url);
+        set(url);
       }
       if (inspectionId === inspection.current) setProofReady(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Preview unavailable.");
+      if (
+        mounted.current &&
+        inspectionId === inspection.current &&
+        access === currentToken.current
+      )
+        setError(e instanceof Error ? e.message : "Preview unavailable.");
     }
   }
   async function action(action: string, notificationId?: string) {
-    if (!selected) return;
+    if (!selected || loadingRef.current || mutatingRef.current) return;
     if (cropDirty && (action === "approve" || action === "dispatch")) {
       setError(
         "Create revised artwork or undo the crop changes before approving or dispatching.",
       );
       return;
     }
-    setBusy(true);
+    mutatingRef.current = true;
+    setMutating(true);
+    inspection.current++;
+    const access = currentToken.current;
     setError("");
     setNotice("");
     try {
       const r = await fetch(`/api/admin/orders/${selected.id}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -130,30 +265,45 @@ export function AdminDesk() {
           ...(action === "regenerate" ? { crop } : {}),
         }),
       });
+      await accessDenied(r.status, access);
       const result = await r.json();
+      if (!mounted.current) return;
       if (!r.ok)
         throw new Error(result.error ?? "The order could not be updated.");
-      const refreshed = await load();
+      const refreshed = await load(currentToken.current, true);
       const updated = refreshed?.orders.find((o) => o.id === selected.id);
-      if (updated) await inspect(updated);
+      if (updated) await inspect(updated, true);
       if (result.notification?.message) setNotice(result.notification.message);
     } catch (e) {
+      if (!mounted.current) return;
       setError(e instanceof Error ? e.message : "Order update failed.");
     } finally {
-      setBusy(false);
+      finishMutation();
     }
   }
   async function download() {
-    if (!selected) return;
-    setBusy(true);
+    if (
+      !selected ||
+      !proofReady ||
+      cropDirty ||
+      loadingRef.current ||
+      mutatingRef.current
+    )
+      return;
+    mutatingRef.current = true;
+    setMutating(true);
+    const access = currentToken.current;
     try {
       const ticketResponse = await fetch(
-        `/api/admin/orders/${selected.id}/files?file=archive&format=url`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        `/api/admin/orders/${selected.id}/files?file=archive&format=url&revision=${encodeURIComponent(selected.currentRevisionId)}`,
+        { headers: { Authorization: `Bearer ${access}` } },
       );
+      await accessDenied(ticketResponse.status, access);
+      if (staleFile(ticketResponse)) return;
       if (!ticketResponse.ok)
         throw new Error("Production archive access failed.");
       const ticket = await ticketResponse.json();
+      if (!mounted.current) return;
       if (ticket.url) {
         const link = document.createElement("a");
         link.href = ticket.url;
@@ -162,49 +312,57 @@ export function AdminDesk() {
         return;
       }
       const r = await fetch(
-        `/api/admin/orders/${selected.id}/files?file=archive`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        `/api/admin/orders/${selected.id}/files?file=archive&revision=${encodeURIComponent(selected.currentRevisionId)}`,
+        { headers: { Authorization: `Bearer ${access}` } },
       );
+      await accessDenied(r.status, access);
+      if (staleFile(r)) return;
       if (!r.ok) throw new Error("Production package could not be downloaded.");
-      downloadBlob(
-        await r.blob(),
-        `SRS-${selected.id.slice(0, 8)}-production.zip`,
-      );
+      const blob = await r.blob();
+      if (!mounted.current) return;
+      downloadBlob(blob, `SRS-${selected.id.slice(0, 8)}-production.zip`);
     } catch (e) {
+      if (!mounted.current) return;
       setError(e instanceof Error ? e.message : "Download failed.");
     } finally {
-      setBusy(false);
+      finishMutation();
+    }
+  }
+  function finishMutation() {
+    mutatingRef.current = false;
+    if (!mounted.current) return;
+    setMutating(false);
+    if (reloadAfterMutation.current) {
+      reloadAfterMutation.current = false;
+      setReload((value) => value + 1);
     }
   }
   return (
     <>
       <div className="prose-card">
-        <LockKeyhole size={22} />
         <p>
-          The production desk is private. Enter the administrator token
-          configured for this studio. It stays in memory for this visit.
+          {data
+            ? `Signed in as ${data.identity.role}${data.identity.kind === "local-token" ? " · local development" : ""}.`
+            : "Checking operator access…"}
         </p>
-        <form
-          className="setup-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void load();
-          }}
-        >
-          <input
-            className="input"
-            type="password"
-            autoComplete="off"
-            aria-label="Administrator token"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="Administrator token"
-          />
-          <button className="button" disabled={!token || busy}>
-            {busy ? <LoaderCircle className="spin" size={16} /> : null}Open
-            production desk
+        {data?.identity.role === "reviewer" && (
+          <p>
+            Reviewers can inspect and revise artwork. Dispatch, deletion and
+            publishing studio presets require an operator.
+          </p>
+        )}
+        <div className="admin-actions">
+          <button
+            className="button light"
+            disabled={busy}
+            onClick={() => void load()}
+          >
+            Refresh production desk
           </button>
-        </form>
+          <button className="button light" onClick={onSignOut}>
+            Sign out
+          </button>
+        </div>
       </div>
       {error && (
         <p className="inline-warning" role="alert">
@@ -272,6 +430,11 @@ export function AdminDesk() {
               )}
             </details>
           )}
+          <AdminPresets
+            token={token}
+            role={data.identity.role}
+            onAccessDenied={accessDenied}
+          />
           {!data.orders.length ? (
             <div className="empty-state">
               <h2>A quiet workbench.</h2>
@@ -304,6 +467,7 @@ export function AdminDesk() {
                     <td>
                       <button
                         className="button small light"
+                        disabled={busy}
                         onClick={() => inspect(o)}
                       >
                         Review
@@ -415,6 +579,7 @@ export function AdminDesk() {
                     {key}
                     <input
                       type="number"
+                      disabled={busy}
                       step={key === "rotation" ? 90 : 0.05}
                       min={key === "zoom" ? 1 : key === "rotation" ? 0 : -1}
                       max={key === "zoom" ? 4 : key === "rotation" ? 270 : 1}
@@ -448,6 +613,7 @@ export function AdminDesk() {
                 Review note
                 <input
                   value={note}
+                  disabled={busy}
                   onChange={(e) => setNote(e.target.value)}
                   maxLength={1000}
                 />
@@ -456,6 +622,7 @@ export function AdminDesk() {
                 Carrier and tracking reference
                 <input
                   value={tracking}
+                  disabled={busy}
                   onChange={(e) => setTracking(e.target.value)}
                   maxLength={200}
                 />
@@ -502,6 +669,7 @@ export function AdminDesk() {
                     busy ||
                     cropDirty ||
                     review?.customerProofPending ||
+                    data?.identity.role !== "operator" ||
                     selected.reviewStatus !== "approved"
                   }
                   onClick={() => action("dispatch")}
@@ -510,7 +678,7 @@ export function AdminDesk() {
                 </button>
                 <button
                   className="button light"
-                  disabled={busy || cropDirty}
+                  disabled={busy || cropDirty || !proofReady}
                   onClick={download}
                 >
                   <ArrowDownToLine size={15} />
@@ -547,6 +715,17 @@ export function AdminDesk() {
                 <p className="fine-print" key={i}>
                   {new Date(a.at).toLocaleString("en-GB")} · {a.action} ·{" "}
                   {a.note}
+                  {a.actorId && (
+                    <>
+                      {" "}
+                      ·{" "}
+                      {a.actorKind === "local-token"
+                        ? "Local development"
+                        : "Operator"}
+                      : {a.actorId}
+                      {a.actorKind ? ` (${a.actorKind})` : ""}
+                    </>
+                  )}
                 </p>
               ))}
             </section>

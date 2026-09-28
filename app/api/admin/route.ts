@@ -5,10 +5,11 @@ import { api, privateJson, requireAdmin } from "@/lib/server/security";
 import { analyticsSummary } from "@/lib/server/analytics";
 export async function GET(request: Request) {
   return api(async () => {
-    requireAdmin(request);
+    const identity = await requireAdmin(request);
     const orders = await listRecords<Order>("orders");
     const designs = await listRecords<Design>("designs");
     return privateJson({
+      identity,
       orders: orders.map(({ tokenHash: _, ...order }) => ({
         ...order,
         originalSnapshot: {

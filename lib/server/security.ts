@@ -27,14 +27,12 @@ export function bearer(request: Request): string | null {
       ?.match(/^Bearer ([A-Za-z0-9_-]{32,256})$/)?.[1] ?? null
   );
 }
-export function requireAdmin(request: Request) {
-  const secret = process.env.ADMIN_API_TOKEN;
-  if (
-    !secret ||
-    secret.length < 32 ||
-    !tokenMatches(bearer(request), digest(secret))
-  )
-    throw new ApiError(401, "An administrator access token is required.");
+export async function requireAdmin(
+  request: Request,
+  role: import("./admin-auth").AdminRole = "reviewer",
+) {
+  const { authenticateAdmin } = await import("./admin-auth");
+  return authenticateAdmin(request, role);
 }
 export function requireSameOrigin(request: Request) {
   const origin = request.headers.get("origin");

@@ -1,8 +1,31 @@
-# Verification record — 27 September 2026
+# Verification record — 28 September 2026
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
 
-## Current integrated follow-up
+## Operator accounts, shared presets and customer guides — 28 September
+
+- `npm run typecheck`: passed after the final account, preset, catalogue and guide integration.
+- `npm test`: **64 cases, 62 passed, zero failed, two optional browser raster/EXIF checks skipped**. The previous separately enabled EXIF/font checks remain historical evidence, not new runs.
+- `npm run build`: passed with the new public guides, dynamic administrator page and preset APIs; the default production build still generates only Dot Lab.
+- All 40 production file-trace manifests exclude private `.data/` content. Dependencies and lockfile are unchanged. All 12 guide WebPs, two sources and three geometry snapshots matched manifest hashes and dimensions in an independent read-only check.
+- New tests verify provider-validated identity and active private membership on each request, operator/reviewer permissions, loopback-only token access, safe public browser credentials, immutable preset versions and publication, stale/concurrent writes, public field projection, catalogue failure/empty/removed/changed selections, explicit legacy-renderer review and device-storage failures.
+- Independent review fixed a refresh/mutation race in the operator UI and a SQL NULL comparison in the preset revision trigger. The rollback-only `supabase/tests/preset_revision_guard.sql` exercises the actual trigger/RPC, but **has not been run against PostgreSQL**. Migration 004 and real Supabase sign-in, session refresh, revocation and RLS remain deployment verification gates.
+
+The in-app browser exercised the following against local servers. The operator flow used the isolated ignored local adapter and a synthetic order; no live service credentials, payment or email transport were configured:
+
+1. The ordinary development desk displayed an unconfigured account message with no shared-token form. Explicitly configured loopback QA allowed local operator access. Sign-out removed the private orders and presets and cleared the token input.
+2. A new preset stayed absent from the public endpoint until publication. The customer editor displayed and applied public version 1. Saving version 2 kept version 1 public; explicit publication changed it to version 2. Selecting version 1 and reloading preserved that historical view. Unpublishing removed the public entry; archive and restore retained two versions and restored only a draft.
+3. The public preset response contained only `id`, `version`, `name`, `description`, `mode`, `settings` and `rendererVersion`. The lab Copy action displayed success; the in-app clipboard read API returned empty, so clipboard payload transfer is not claimed as independently verified. Automated allowlist tests verify the settings projection.
+4. A legacy local design required explicit renderer rebuild. It retained its 50 × 40 cm orientation and exact “Moose · September 2026” lettering, and Save/Review remained disabled until current size/finish review. After an explicit save, reopening did not repeat the legacy-renderer warning and still required catalogue review.
+5. Existing authenticated order previews loaded after the auth refactor. Changing the crop disabled print approval and package download; undo restored the loaded crop. The fixture's immutable paid original and replacement history were not changed by this check.
+6. The photo guide and homepage personalisation were inspected at desktop width. Photo/canvas guides and the homepage size section were inspected at 390px width with no page overflow. The proportional diagram has a labelled, focusable horizontal scroll region. No console warnings or errors were observed in the checked guide, editor or operator flows.
+7. A second local review process regenerated the synthetic order while its existing proofs were open. Refresh cleared the old inspection, proof images and download control, and asked for a fresh review. The original paid snapshot was unchanged. Automated route checks reject missing/old revision IDs for all four asset types in both stream and signed-URL forms and compare current-revision bytes with the exact stored assets.
+
+Screenshots: [desktop photo comparison](photo-guide-desktop.png), [mobile photo comparison](photo-guide-mobile.png), [homepage personalisation](home-lettering-preview.png), [local preset version history](admin-presets-preview.png), [stale-proof refresh](admin-stale-proof-preview.png). These show digital renderer studies and local fixtures, not completed physical kits or real customer orders.
+
+Changed live database catalogues, remote auth session lifecycle, real-device accessibility, browser downloads and all physical/service gates remain unverified. The scope map retains these distinctions in [BUILD_STATUS.md](BUILD_STATUS.md).
+
+## Replacement workflow and release policy — 27 September
 
 - `npm run typecheck`: passed after the replacement, release-policy, photo-analysis and operator-review changes.
 - `npm test`: **50 cases, 48 passed, zero failed, two optional browser raster/EXIF checks skipped by default**. The separately enabled photo browser check passed all eight EXIF orientations; that does not cover every mobile camera/browser combination.

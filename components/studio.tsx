@@ -32,20 +32,27 @@ import { SiteHeader } from "@/components/site-header";
 import {
   DEFAULT_SETTINGS,
   PRESETS,
+  RENDERER_VERSION,
   renderImage,
   toSvg,
   type RenderGeometry,
   type RenderMode,
   type RenderSettings,
 } from "@/lib/renderers";
+import { INKS, formatPrice } from "@/lib/catalog";
 import {
-  PRODUCTS,
-  FINISHES,
-  INKS,
-  formatPrice,
-  type Product,
-  type Finish,
-} from "@/lib/catalog";
+  parseStudioCatalogue,
+  productDimensions,
+  reconcileStudioSelection,
+  validateRestorableProject,
+  parseLocalPresets,
+  parsePublishedPresets,
+  applyStudioPreset,
+  type StudioCatalogue,
+  type StudioSelection,
+  type RestorableProject,
+} from "@/lib/studio-state";
+import { presetSettings, type PublishedPreset } from "@/lib/preset-types";
 import { REFERENCE_IMAGES } from "@/lib/reference-images";
 import {
   DEFAULT_CROP,
@@ -173,14 +180,8 @@ export function Studio({
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
-  const [productId, setProductId] = useState<string>(
-    PRODUCTS.find(
-      (p) =>
-        p.widthMm === DEFAULT_SETTINGS.widthMm &&
-        p.heightMm === DEFAULT_SETTINGS.heightMm,
-    )?.id ?? PRODUCTS[0].id,
-  );
-  const [finishId, setFinishId] = useState<string>(FINISHES[0].id);
+  const [productId, setProductId] = useState("");
+  const [finishId, setFinishId] = useState("");
   const [inkId, setInkId] = useState<string>(INKS[0].id);
   const [saved, setSaved] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -189,6 +190,12 @@ export function Studio({
   const [customPresets, setCustomPresets] = useState<
     { name: string; settings: RenderSettings }[]
   >([]);
+  const [publishedPresets, setPublishedPresets] = useState<PublishedPreset[]>(
+    [],
+  );
+  const [presetsStatus, setPresetsStatus] = useState<
+    "loading" | "ready" | "error"
+  >("loading");
   const fileInput = useRef<HTMLInputElement>(null);
   const worker = useRef<Worker | null>(null);
   const renderId = useRef(0);
@@ -196,56 +203,114 @@ export function Studio({
   const sourceUrl = useRef<string | null>(null);
   const sourceImage = useRef<HTMLImageElement | null>(null);
   const sourceRequest = useRef(0);
-  const [catalogue, setCatalogue] = useState<{
-    products: Product[];
-    finishes: Finish[];
-  } | null>(null);
-  const products = catalogue ? catalogue.products : PRODUCTS;
-  const finishes = catalogue ? catalogue.finishes : FINISHES;
+  const [catalogue, setCatalogue] = useState<StudioCatalogue | null>(null);
+  const [catalogueStatus, setCatalogueStatus] = useState<
+    "loading" | "ready" | "error"
+  >("loading");
+  const [catalogueError, setCatalogueError] = useState("");
+  const [catalogueAttempt, setCatalogueAttempt] = useState(0);
+  const selectionOrigin = useRef<"new" | "chosen" | "restore">("new");
+  const restoreRequest = useRef(0);
+  const [restoredSelection, setRestoredSelection] =
+    useState<StudioSelection | null>(null);
+  const [catalogueReviewed, setCatalogueReviewed] = useState(false);
+  const [pendingRestore, setPendingRestore] =
+    useState<RestorableProject | null>(null);
+  const [projectIssue, setProjectIssue] = useState("");
+  const products = catalogue?.products ?? [];
+  const finishes = catalogue?.finishes ?? [];
   const modeAvailable = availableModes.includes(settings.mode);
   useEffect(() => {
-    fetch("/api/catalog")
+    const controller = new AbortController();
+    let disposed = false;
+    const timeout = setTimeout(() => {
+      controller.abort();
+      if (!disposed) {
+        setCatalogueStatus("error");
+        setCatalogueError("The catalogue took too long to load.");
+      }
+    }, 10000);
+    setCatalogueStatus("loading");
+    setCatalogue(null);
+    setCatalogueError("");
+    fetch("/api/catalog", { signal: controller.signal, cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();
       })
-      .then((c) => setCatalogue(c))
-      .catch(() => {});
+      .then((c) => {
+        clearTimeout(timeout);
+        const next = parseStudioCatalogue(c);
+        if (controller.signal.aborted) return;
+        setCatalogue(next);
+        setCatalogueStatus("ready");
+        setCatalogueReviewed(false);
+        // Restoring owns its original selection, even when catalogue loading finishes later.
+        if (selectionOrigin.current !== "new") return;
+        const current =
+          next.products.find(
+            (p) =>
+              p.widthMm === DEFAULT_SETTINGS.widthMm &&
+              p.heightMm === DEFAULT_SETTINGS.heightMm,
+          ) ?? next.products[0];
+        if (current) {
+          setProductId(current.id);
+          setSettings((s) => ({ ...s, ...productDimensions(current, s) }));
+        }
+        if (next.finishes[0]) setFinishId(next.finishes[0].id);
+        if (current || next.finishes[0]) selectionOrigin.current = "chosen";
+      })
+      .catch((e) => {
+        clearTimeout(timeout);
+        if (controller.signal.aborted) return;
+        setCatalogueStatus("error");
+        setCatalogueError(
+          e instanceof Error && e.message
+            ? e.message
+            : "The product catalogue could not be loaded.",
+        );
+      });
+    return () => {
+      disposed = true;
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [catalogueAttempt]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setPublishedPresets([]);
+    setPresetsStatus("loading");
+    const timeout = setTimeout(() => {
+      controller.abort();
+      setPresetsStatus("error");
+    }, 10000);
+    fetch(`/api/presets?mode=${encodeURIComponent(settings.mode)}`, {
+      signal: controller.signal,
+      cache: "no-store",
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error();
+        return response.json();
+      })
+      .then((body) => {
+        clearTimeout(timeout);
+        if (!controller.signal.aborted) {
+          setPublishedPresets(parsePublishedPresets(body, settings.mode));
+          setPresetsStatus("ready");
+        }
+      })
+      .catch(() => {
+        clearTimeout(timeout);
+        if (!controller.signal.aborted) setPresetsStatus("error");
+      });
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [settings.mode]);
+  useEffect(() => {
     track("builder_opened", { mode: initialMode, step: lab ? "lab" : "photo" });
   }, [initialMode, lab]);
-  useEffect(() => {
-    if (!catalogue) return;
-    const current =
-      catalogue.products.find((p) => p.id === productId) ??
-      catalogue.products[0];
-    if (current && current.id !== productId) {
-      setProductId(current.id);
-      setSaved(false);
-      setNotice(
-        "The previous canvas size is unavailable. The first available size is selected for your review.",
-      );
-    }
-    if (
-      !catalogue.finishes.some((finish) => finish.id === finishId) &&
-      catalogue.finishes[0]
-    ) {
-      setFinishId(catalogue.finishes[0].id);
-      setSaved(false);
-    }
-    if (!current) return;
-    setSettings((s) => {
-      const landscape = s.widthMm > s.heightMm;
-      const widthMm = landscape
-        ? Math.max(current.widthMm, current.heightMm)
-        : Math.min(current.widthMm, current.heightMm);
-      const heightMm = landscape
-        ? Math.min(current.widthMm, current.heightMm)
-        : Math.max(current.widthMm, current.heightMm);
-      return s.widthMm === widthMm && s.heightMm === heightMm
-        ? s
-        : { ...s, widthMm, heightMm };
-    });
-  }, [catalogue, productId, finishId]);
   useEffect(() => {
     if (view === "template")
       track("template_viewed", { mode: settings.mode, productId });
@@ -254,6 +319,19 @@ export function Studio({
   }, [view, settings.mode, productId]);
   const product = products.find((p) => p.id === productId);
   const finish = finishes.find((f) => f.id === finishId);
+  const selection = catalogue
+    ? reconcileStudioSelection(catalogue, { productId, finishId, settings })
+    : null;
+  const originalSelection =
+    catalogue && restoredSelection
+      ? reconcileStudioSelection(catalogue, restoredSelection)
+      : null;
+  const reviewRequired = !!restoredSelection && !catalogueReviewed;
+  const kitAvailable =
+    catalogueStatus === "ready" &&
+    !!selection?.ready &&
+    !reviewRequired &&
+    !pendingRestore;
   const update = useCallback((patch: Partial<RenderSettings>) => {
     setSettings((s) => ({ ...s, ...patch }));
     setSaved(false);
@@ -286,13 +364,22 @@ export function Studio({
   }, []);
   useEffect(() => {
     try {
-      setCustomPresets(JSON.parse(localStorage.getItem("sr-presets") ?? "[]"));
+      setCustomPresets(
+        parseLocalPresets(
+          JSON.parse(localStorage.getItem("sr-presets") ?? "[]"),
+        ),
+      );
     } catch {
       /* ignore obsolete preferences */
     }
   }, []);
   const openBlob = useCallback(
-    async (blob: Blob, name: string, refId: string | null = null) => {
+    async (
+      blob: Blob,
+      name: string,
+      refId: string | null = null,
+      isCurrent: () => boolean = () => true,
+    ) => {
       const request = ++sourceRequest.current;
       const url = URL.createObjectURL(blob);
       let image: HTMLImageElement;
@@ -306,9 +393,9 @@ export function Studio({
         URL.revokeObjectURL(url);
         throw e;
       }
-      if (request !== sourceRequest.current) {
+      if (request !== sourceRequest.current || !isCurrent()) {
         URL.revokeObjectURL(url);
-        return;
+        return false;
       }
       if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
       sourceUrl.current = url;
@@ -346,6 +433,7 @@ export function Studio({
       ).then((result) => {
         if (request === sourceRequest.current) setFaceDetection(result);
       });
+      return true;
     },
     [],
   );
@@ -353,16 +441,29 @@ export function Studio({
     async (id: string) => {
       const ref = REFERENCE_IMAGES.find((item) => item.id === id);
       if (!ref) return;
+      const request = ++restoreRequest.current;
+      setPendingRestore(null);
+      setProjectIssue("");
       setBusy("Opening photograph");
       try {
         const response = await fetch(ref.src);
         if (!response.ok)
           throw new Error("This reference could not be opened.");
-        await openBlob(await response.blob(), ref.label, id);
+        const blob = await response.blob();
+        if (request !== restoreRequest.current) return;
+        await openBlob(
+          blob,
+          ref.label,
+          id,
+          () => request === restoreRequest.current,
+        );
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Photo could not be opened.");
+        if (request === restoreRequest.current)
+          setError(
+            e instanceof Error ? e.message : "Photo could not be opened.",
+          );
       } finally {
-        setBusy("");
+        if (request === restoreRequest.current) setBusy("");
       }
     },
     [openBlob],
@@ -373,6 +474,7 @@ export function Studio({
     else if (REFERENCE_IMAGES[0]) void loadReference(REFERENCE_IMAGES[0].id);
     return () => {
       sourceRequest.current++;
+      restoreRequest.current++;
       if (sourceUrl.current) URL.revokeObjectURL(sourceUrl.current);
     };
   }, [loadReference]);
@@ -482,6 +584,9 @@ export function Studio({
   }, [notice]);
   async function upload(file?: File) {
     if (!file) return;
+    const request = ++restoreRequest.current;
+    setPendingRestore(null);
+    setProjectIssue("");
     track("upload_started", { mode: settings.mode, productId });
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setError(
@@ -495,19 +600,38 @@ export function Studio({
     }
     setBusy("Opening your photo");
     try {
-      await openBlob(file, file.name);
+      if (
+        !(await openBlob(
+          file,
+          file.name,
+          null,
+          () => request === restoreRequest.current,
+        ))
+      )
+        return;
       track("upload_completed", { mode: settings.mode, productId });
       setPanel("photo");
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "The image could not be opened.",
-      );
+      if (request === restoreRequest.current)
+        setError(
+          e instanceof Error ? e.message : "The image could not be opened.",
+        );
     } finally {
-      setBusy("");
+      if (request === restoreRequest.current) setBusy("");
     }
   }
   async function save() {
     if (!sourceBlob) return;
+    if (!geometry || rendering) {
+      setProjectIssue("Wait for a valid preview before saving this design.");
+      return;
+    }
+    if (reviewRequired || pendingRestore || !productId || !finishId) {
+      setProjectIssue(
+        "Review the current canvas size and finish before replacing your saved design.",
+      );
+      return;
+    }
     try {
       await saveLocalProject({
         id: "current",
@@ -519,6 +643,7 @@ export function Studio({
         productId,
         finishId,
         referenceId,
+        rendererVersion: RENDERER_VERSION,
       });
       setSaved(true);
       setNotice("Saved on this device. Your photograph has not been uploaded.");
@@ -529,40 +654,105 @@ export function Studio({
     }
   }
   async function restore() {
+    const request = ++restoreRequest.current;
+    selectionOrigin.current = "restore";
+    setBusy("Opening saved design");
+    setProjectIssue("");
+    setPendingRestore(null);
     try {
-      const project = await getLocalProject();
-      if (!project) {
+      const savedProject = await getLocalProject();
+      if (request !== restoreRequest.current) return;
+      if (!savedProject) {
         setNotice("No saved design on this device yet.");
         return;
       }
-      if (!availableModes.includes((project.settings as RenderSettings).mode)) {
-        setError(
-          "That saved design uses a mode which is currently unavailable here. Your saved project is unchanged. Choose an available mode and upload or select a photo to start a new design.",
-        );
+      const { project, needsRendererReview } = validateRestorableProject(
+        savedProject,
+        availableModes,
+      );
+      if (needsRendererReview) {
+        setPendingRestore(project);
         return;
       }
-      await openBlob(project.image, project.name, project.referenceId ?? null);
-      setInkId(
-        INKS.find(
-          (i) =>
-            i.color.toLowerCase() ===
-            (project.settings as RenderSettings).inkColor.toLowerCase(),
-        )?.id ?? "black",
-      );
-      setSettings(project.settings as RenderSettings);
-      setCrop(project.crop);
-      setProductId(project.productId);
-      setFinishId(project.finishId);
-      setSaved(true);
-      setNotice("Your saved design is open.");
-    } catch {
-      setError("Your saved design could not be opened.");
+      await openRestoredProject(project, request);
+    } catch (e) {
+      if (request === restoreRequest.current)
+        setProjectIssue(
+          e instanceof Error
+            ? e.message
+            : "Your saved design could not be opened. The saved original is unchanged.",
+        );
+    } finally {
+      if (request === restoreRequest.current) setBusy("");
+    }
+  }
+  async function openRestoredProject(
+    project: RestorableProject,
+    request: number,
+  ) {
+    if (request !== restoreRequest.current) return;
+    const refId = REFERENCE_IMAGES.some((ref) => ref.id === project.referenceId)
+      ? (project.referenceId ?? null)
+      : null;
+    if (
+      !(await openBlob(
+        project.image,
+        project.name,
+        refId,
+        () => request === restoreRequest.current,
+      )) ||
+      request !== restoreRequest.current
+    )
+      return;
+    setInkId(
+      INKS.find(
+        (i) =>
+          i.color.toLowerCase() === project.settings.inkColor.toLowerCase(),
+      )?.id ?? "black",
+    );
+    setSettings(project.settings);
+    setCrop(project.crop);
+    setProductId(project.productId);
+    setFinishId(project.finishId);
+    setRestoredSelection({
+      productId: project.productId,
+      finishId: project.finishId,
+      settings: project.settings,
+    });
+    setCatalogueReviewed(false);
+    setPendingRestore(null);
+    setSaved(project.rendererVersion === RENDERER_VERSION);
+    setNotice(
+      "Your design is open for review. The saved original is unchanged.",
+    );
+  }
+  async function rebuildSavedProject() {
+    if (!pendingRestore) return;
+    const request = ++restoreRequest.current;
+    setBusy("Rebuilding saved design");
+    try {
+      await openRestoredProject(pendingRestore, request);
+    } catch (e) {
+      if (request === restoreRequest.current)
+        setProjectIssue(
+          e instanceof Error
+            ? e.message
+            : "The saved photo could not be opened.",
+        );
+    } finally {
+      if (request === restoreRequest.current) setBusy("");
     }
   }
   async function remove() {
-    await deleteLocalProject();
-    setSaved(false);
-    setNotice("Saved design removed from this device.");
+    try {
+      await deleteLocalProject();
+      setSaved(false);
+      setNotice("Saved design removed from this device.");
+    } catch {
+      setProjectIssue(
+        "Device storage is blocked or unavailable. The saved design could not be removed; close other studio tabs and try again.",
+      );
+    }
   }
   async function exportFile(format: "svg" | "png" | "pdf" | "package") {
     if (!geometry) return;
@@ -588,12 +778,27 @@ export function Studio({
     if (!p) return;
     setProductId(id);
     track("product_size_selected", { mode: settings.mode, productId: id });
-    update({ widthMm: p.widthMm, heightMm: p.heightMm });
+    update(productDimensions(p, settings));
   }
   function choosePreset(key: keyof typeof PRESET_NAMES) {
     setPreset(key);
     track("preset_selected", { mode: settings.mode, productId, preset: key });
     update(PRESETS[key]);
+  }
+  function choosePublishedPreset(preset: PublishedPreset) {
+    try {
+      update(applyStudioPreset(settings, preset));
+      track("preset_selected", { mode: settings.mode, productId });
+      setNotice(
+        `${preset.name}, version ${preset.version}, applied. Size, crop, lettering and ink are unchanged.`,
+      );
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "This preset cannot be applied to the current design.",
+      );
+    }
   }
   function savePreset() {
     const name = window.prompt("Name this renderer preset");
@@ -602,12 +807,32 @@ export function Studio({
       ...customPresets,
       { name: name.trim().slice(0, 40), settings },
     ].slice(-12);
-    setCustomPresets(next);
-    localStorage.setItem("sr-presets", JSON.stringify(next));
-    setNotice("Preset saved on this device.");
+    try {
+      localStorage.setItem("sr-presets", JSON.stringify(next));
+      setCustomPresets(next);
+      setNotice("Preset saved on this device.");
+    } catch {
+      setProjectIssue(
+        "Device storage is blocked or full. This preset was not saved.",
+      );
+    }
+  }
+  async function copyPresetSettings() {
+    try {
+      await navigator.clipboard.writeText(
+        JSON.stringify(presetSettings(settings), null, 2),
+      );
+      setNotice(
+        "Renderer settings copied. Paste them into the admin preset editor for review.",
+      );
+    } catch {
+      setProjectIssue(
+        "Clipboard access is unavailable. Allow clipboard access and try copying the preset settings again.",
+      );
+    }
   }
   async function reviewKit() {
-    if (!modeAvailable || !product || !finish) {
+    if (!modeAvailable || !kitAvailable) {
       setError(
         "Choose an available style, size and finish before reviewing your kit.",
       );
@@ -629,6 +854,7 @@ export function Studio({
         productId,
         finishId,
         referenceId,
+        rendererVersion: RENDERER_VERSION,
       });
       localStorage.setItem(
         "sr-basket",
@@ -682,19 +908,113 @@ export function Studio({
           </h1>
         </div>
         <div className="studio-top-actions">
-          <button className="text-button" onClick={restore}>
+          <button className="text-button" onClick={restore} disabled={!!busy}>
             Open saved design
           </button>
           <button
             className="button light small"
             onClick={save}
-            disabled={!source || !!busy}
+            disabled={
+              !source ||
+              !geometry ||
+              rendering ||
+              !!busy ||
+              reviewRequired ||
+              !!pendingRestore ||
+              !productId ||
+              !finishId
+            }
           >
             {saved ? <Check size={16} /> : <Save size={16} />}{" "}
             {saved ? "Saved" : "Save design"}
           </button>
         </div>
       </div>
+      {catalogueStatus !== "ready" && (
+        <div className="render-warnings" role="status">
+          <p>
+            {catalogueStatus === "loading"
+              ? "Loading current canvas sizes, finishes and prices…"
+              : `${catalogueError} You can continue adjusting the preview; kit prices and review are unavailable until the catalogue loads.`}
+          </p>
+          {catalogueStatus === "error" && (
+            <button
+              className="button light small"
+              onClick={() => setCatalogueAttempt((n) => n + 1)}
+            >
+              Retry catalogue
+            </button>
+          )}
+        </div>
+      )}
+      {catalogueStatus === "ready" &&
+        (!products.length || !finishes.length) && (
+          <div className="render-warnings" role="status">
+            <p>
+              {!products.length
+                ? "No canvas sizes are currently available. "
+                : ""}
+              {!finishes.length ? "No finishes are currently available. " : ""}
+              Your photograph and preview can still be edited. Kit review is
+              unavailable.
+            </p>
+            <button
+              className="button light small"
+              onClick={() => setCatalogueAttempt((n) => n + 1)}
+            >
+              Refresh catalogue
+            </button>
+          </div>
+        )}
+      {projectIssue && (
+        <div className="render-warnings" role="alert">
+          <p>{projectIssue}</p>
+          <button className="text-button" onClick={() => setProjectIssue("")}>
+            Dismiss
+          </button>
+        </div>
+      )}
+      {pendingRestore && (
+        <div className="render-warnings" role="status">
+          <p>
+            This design was saved with{" "}
+            {pendingRestore.rendererVersion
+              ? "a different renderer version"
+              : "an earlier renderer without version information"}
+            . Rebuilding may change the artwork. Your saved original stays
+            untouched until you review and save the rebuilt design.
+          </p>
+          <button
+            className="button light small"
+            onClick={rebuildSavedProject}
+            disabled={!!busy}
+          >
+            Rebuild saved design
+          </button>{" "}
+          <button
+            className="text-button"
+            onClick={() => setPendingRestore(null)}
+            disabled={!!busy}
+          >
+            Keep current design
+          </button>
+        </div>
+      )}
+      {reviewRequired && (
+        <div className="render-warnings" role="status">
+          <p>
+            Your saved design is open for review. Check the current size, finish
+            and price, then inspect the finished and template views. The saved
+            original has not been overwritten.
+          </p>
+          {originalSelection?.messages.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+          <button className="text-button" onClick={() => setPanel("finish")}>
+            Review size and finish <ArrowRight size={15} />
+          </button>
+        </div>
+      )}
       <main className="studio-layout">
         <section className="preview-panel" aria-label="Artwork preview">
           <div className="preview-toolbar">
@@ -1219,6 +1539,40 @@ export function Studio({
                 </>
               )}
               <h3 className="field-heading">How would you like to make it?</h3>
+              {presetsStatus === "loading" && (
+                <p className="fine-print" role="status">
+                  Loading studio presets. Built-in choices are ready below.
+                </p>
+              )}
+              {presetsStatus === "error" && (
+                <p className="fine-print" role="status">
+                  Studio presets could not be loaded. Built-in choices are still
+                  available.
+                </p>
+              )}
+              {publishedPresets.length > 0 && (
+                <>
+                  <div className="preset-grid">
+                    {publishedPresets.map((p) => (
+                      <button
+                        key={`${p.id}:${p.version}`}
+                        className={`preset-card ${Object.entries(p.settings).every(([key, value]) => JSON.stringify(settings[key as keyof RenderSettings]) === JSON.stringify(value)) ? "selected" : ""}`}
+                        onClick={() => choosePublishedPreset(p)}
+                      >
+                        <strong>{p.name}</strong>
+                        <small>{p.description}</small>
+                        <small>Studio preset · version {p.version}</small>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="fine-print">
+                    These versioned presets apply renderer settings to your
+                    design. Your canvas size, crop, lettering and ink choice
+                    stay as selected.
+                  </p>
+                  <h3 className="field-heading">Built-in presets</h3>
+                </>
+              )}
               <div className="preset-grid">
                 {(["easy", "standard", "detailed"] as const).map((key, i) => (
                   <button
@@ -1404,6 +1758,12 @@ export function Studio({
                       <Save size={14} />
                       Save this preset
                     </button>
+                    <button
+                      className="text-button"
+                      onClick={copyPresetSettings}
+                    >
+                      Copy preset settings
+                    </button>
                     {customPresets.length > 0 && (
                       <label className="select-field">
                         Your presets
@@ -1412,15 +1772,11 @@ export function Studio({
                           onChange={(e) => {
                             const p = customPresets[Number(e.target.value)];
                             if (p) {
-                              const {
-                                mode,
-                                widthMm,
-                                heightMm,
-                                inkColor,
-                                text,
-                                ...tuning
-                              } = p.settings;
-                              update(tuning);
+                              update({
+                                palette: undefined,
+                                cellShape: undefined,
+                                ...presetSettings(p.settings),
+                              });
                             }
                           }}
                         >
@@ -1458,8 +1814,16 @@ export function Studio({
                 Canvas size
                 <select
                   value={productId}
+                  disabled={catalogueStatus !== "ready" || !products.length}
                   onChange={(e) => selectProduct(e.target.value)}
                 >
+                  {!product && (
+                    <option value={productId} disabled>
+                      {productId
+                        ? "Saved size unavailable — choose a size"
+                        : "Choose an available size"}
+                    </option>
+                  )}
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.label}
@@ -1467,6 +1831,15 @@ export function Studio({
                   ))}
                 </select>
               </label>
+              {selection?.product && !selection.dimensionsMatch && (
+                <button
+                  className="button light small"
+                  onClick={() => selectProduct(productId)}
+                >
+                  Apply current size: {selection.dimensions!.widthMm} ×{" "}
+                  {selection.dimensions!.heightMm} mm
+                </button>
+              )}
               <button
                 className="text-button"
                 onClick={() =>
@@ -1483,11 +1856,19 @@ export function Studio({
                 Finish
                 <select
                   value={finishId}
+                  disabled={catalogueStatus !== "ready" || !finishes.length}
                   onChange={(e) => {
                     setSaved(false);
                     setFinishId(e.target.value);
                   }}
                 >
+                  {!finish && (
+                    <option value={finishId} disabled>
+                      {finishId
+                        ? "Saved finish unavailable — choose a finish"
+                        : "Choose an available finish"}
+                    </option>
+                  )}
                   {finishes.map((f) => (
                     <option key={f.id} value={f.id}>
                       {f.label}
@@ -1495,6 +1876,37 @@ export function Studio({
                   ))}
                 </select>
               </label>
+              {selection && !selection.ready && (
+                <div role="status">
+                  {selection.messages.map((message) => (
+                    <p className="fine-print" key={message}>
+                      {message}
+                    </p>
+                  ))}
+                </div>
+              )}
+              {reviewRequired && (
+                <div className="photo-advice" role="status">
+                  <p>
+                    Review these choices and the crop before continuing. Saving
+                    after this review will replace the design stored on this
+                    device.
+                  </p>
+                  <button
+                    className="button light full"
+                    disabled={!selection?.ready || rendering || !geometry}
+                    onClick={() => {
+                      setCatalogueReviewed(true);
+                      setProjectIssue("");
+                      setNotice(
+                        "Current size and finish confirmed. Inspect both preview views before saving or ordering.",
+                      );
+                    }}
+                  >
+                    Use these size and finish choices
+                  </button>
+                </div>
+              )}
               <div className="control-divider" />
               <label className="text-field">
                 A few words, if you like
@@ -1608,14 +2020,20 @@ export function Studio({
                   <div className="price-row">
                     <span>
                       Your personalised kit
-                      <small>Indicative prototype price</small>
+                      <small>
+                        {catalogue?.prototype
+                          ? "Indicative prototype price"
+                          : "Current catalogue price"}
+                      </small>
                     </span>
                     <strong>
-                      {product && finish
-                        ? formatPrice(
-                            product.pricePence + finish.additionalPence,
-                          )
-                        : "Unavailable"}
+                      {catalogueStatus === "loading"
+                        ? "Loading…"
+                        : product && finish
+                          ? formatPrice(
+                              product.pricePence + finish.additionalPence,
+                            )
+                          : "Unavailable"}
                     </strong>
                   </div>
                   <p className="muted">
@@ -1636,11 +2054,7 @@ export function Studio({
                     className="button full"
                     onClick={reviewKit}
                     disabled={
-                      !geometry ||
-                      !!busy ||
-                      !modeAvailable ||
-                      !product ||
-                      !finish
+                      !geometry || !!busy || !modeAvailable || !kitAvailable
                     }
                   >
                     Review your kit

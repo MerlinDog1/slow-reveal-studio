@@ -59,6 +59,7 @@ test("requested customer photos preserve paid snapshots, bind ownership, require
     "NEXT_PUBLIC_SITE_URL",
     "PHYSICAL_VALIDATION_APPROVED",
     "ADMIN_API_TOKEN",
+    "ALLOW_LOCAL_ADMIN_TOKEN",
   ];
   const previous = Object.fromEntries(
     keys.map((key) => [key, process.env[key]]),
@@ -73,6 +74,7 @@ test("requested customer photos preserve paid snapshots, bind ownership, require
   process.env.NEXT_PUBLIC_SITE_URL = "http://localhost";
   process.env.PHYSICAL_VALIDATION_APPROVED = "true";
   process.env.ADMIN_API_TOKEN = newToken();
+  process.env.ALLOW_LOCAL_ADMIN_TOKEN = "true";
   try {
     const original = await sharp({
       create: { width: 80, height: 100, channels: 3, background: "#cccccc" },
@@ -505,12 +507,60 @@ test("requested customer photos preserve paid snapshots, bind ownership, require
     );
     const adminSource = await getAdminFile(
       new Request(
-        `http://localhost/api/admin/orders/${updated.id}/files?file=source`,
+        `http://localhost/api/admin/orders/${updated.id}/files?file=source&revision=${updated.currentRevisionId}`,
         { headers: { Authorization: `Bearer ${process.env.ADMIN_API_TOKEN}` } },
       ),
       { params: Promise.resolve({ id: updated.id }) },
     );
+    assert.equal(adminSource.status, 200);
     assert.deepEqual(Buffer.from(await adminSource.arrayBuffer()), alternate);
+    // A refreshed order must not return a newer package under an older selected proof.
+    for (const file of ["source", "finished", "template", "archive"]) {
+      for (const staleRevision of [undefined, updated.revisions[0].id]) {
+        for (const format of ["", "&format=url"]) {
+          const denied = await getAdminFile(
+            new Request(
+              `http://localhost/api/admin/orders/${updated.id}/files?file=${file}${format}${staleRevision ? `&revision=${staleRevision}` : ""}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${process.env.ADMIN_API_TOKEN}`,
+                },
+              },
+            ),
+            { params: Promise.resolve({ id: updated.id }) },
+          );
+          assert.equal(
+            denied.status,
+            409,
+            `${file} must reject missing or stale revisions before reading or signing an asset`,
+          );
+          assert.match((await denied.json()).error, /revision changed/);
+          assert.equal(denied.headers.get("Location"), null);
+        }
+      }
+      const allowed = await getAdminFile(
+        new Request(
+          `http://localhost/api/admin/orders/${updated.id}/files?file=${file}&revision=${updated.currentRevisionId}`,
+          {
+            headers: { Authorization: `Bearer ${process.env.ADMIN_API_TOKEN}` },
+          },
+        ),
+        { params: Promise.resolve({ id: updated.id }) },
+      );
+      assert.equal(allowed.status, 200);
+      const asset =
+        file === "source"
+          ? currentPackage(updated).source
+          : file === "finished"
+            ? currentPackage(updated).finishedSvg
+            : file === "template"
+              ? currentPackage(updated).templateSvg
+              : currentPackage(updated).archive;
+      assert.deepEqual(
+        Buffer.from(await allowed.arrayBuffer()),
+        await getAsset(asset),
+      );
+    }
     const note = newNotification("request-photo", "Sharper photo please");
     const mail = notificationMessage(updated, note);
     assert.match(mail.text, /upload it securely/);

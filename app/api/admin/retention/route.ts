@@ -8,7 +8,7 @@ import {
 export async function POST(request: Request) {
   return api(async () => {
     requireSameOrigin(request);
-    requireAdmin(request);
+    await requireAdmin(request, "operator");
     return privateJson(await runRetention());
   });
 }

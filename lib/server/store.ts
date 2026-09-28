@@ -86,6 +86,27 @@ export async function putRecord<T>(
           409,
           "Saved designs are immutable; save a new revision.",
         );
+      if (kind === "presets") {
+        for (const key of ["id", "mode", "createdAt"])
+          if (!equal(old[key], next[key]))
+            throw new ApiError(409, "Preset identity is immutable.");
+        if (next.revision !== Number(old.revision) + 1)
+          throw new ApiError(409, "Preset revisions must advance one step.");
+        for (const key of ["versions", "audit"]) {
+          const existing = old[key] as unknown[];
+          const replacement = next[key] as unknown[];
+          if (
+            !Array.isArray(existing) ||
+            !Array.isArray(replacement) ||
+            replacement.length < existing.length ||
+            existing.some((item, index) => !equal(item, replacement[index]))
+          )
+            throw new ApiError(
+              409,
+              "Preset version and audit history are append only.",
+            );
+        }
+      }
       if (
         kind === "checkouts" &&
         !equal(
@@ -178,6 +199,11 @@ export async function listRecords<T>(kind: Collection): Promise<T[]> {
   }
 }
 export async function deleteRecord(kind: Collection, id: string) {
+  if (kind === "presets")
+    throw new ApiError(
+      409,
+      "Archive presets to preserve their version history.",
+    );
   if (kind === "orders")
     throw new ApiError(
       409,

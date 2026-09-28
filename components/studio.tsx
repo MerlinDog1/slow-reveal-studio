@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -29,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
+import { PreviewDialog } from "@/components/preview-dialog";
 import {
   DEFAULT_SETTINGS,
   PRESETS,
@@ -479,13 +481,6 @@ export function Studio({
     };
   }, [loadReference]);
   useEffect(() => {
-    const escape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setZoomPreview(false);
-    };
-    window.addEventListener("keydown", escape);
-    return () => window.removeEventListener("keydown", escape);
-  }, []);
-  useEffect(() => {
     if (!source || !modeAvailable) {
       setGeometry(null);
       setRendering(false);
@@ -885,16 +880,107 @@ export function Studio({
         ([key, value]) => settings[key as keyof RenderSettings] === value,
       ),
     )?.[0] ?? "custom";
-  const svg = geometry
-    ? toSvg(geometry, view === "template" ? "template" : "finished", {
-        includeSafeArea: safeArea,
-      })
-    : "";
+  const templateView = view === "template";
+  const svg = useMemo(
+    () =>
+      geometry
+        ? toSvg(geometry, templateView ? "template" : "finished", {
+            includeSafeArea: safeArea,
+          })
+        : "",
+    [geometry, templateView, safeArea],
+  );
   const currentRef = REFERENCE_IMAGES.find((r) => r.id === referenceId);
+  const artworkPreview = (
+    <>
+      <div
+        className="canvas-paper"
+        style={
+          {
+            aspectRatio: `${settings.widthMm}/${settings.heightMm}`,
+            "--art-ratio": settings.widthMm / settings.heightMm,
+          } as CSSProperties
+        }
+      >
+        {view === "original" && croppedUrl ? (
+          <img
+            className="artwork-image"
+            src={croppedUrl}
+            alt={`Cropped original: ${sourceName}`}
+          />
+        ) : geometry ? (
+          <div
+            className="rendered-svg"
+            dangerouslySetInnerHTML={{ __html: svg }}
+          />
+        ) : (
+          <div className="canvas-placeholder">
+            <Layers size={32} />
+            <p>
+              {source
+                ? "Finding the picture in the dots…"
+                : "A photograph. A little possibility."}
+            </p>
+            <button
+              className="button"
+              onClick={() => fileInput.current?.click()}
+            >
+              Choose a photo
+            </button>
+          </div>
+        )}
+        {view === "compare" && croppedUrl && geometry && (
+          <>
+            <img
+              className="comparison-image"
+              src={croppedUrl}
+              alt="Original photograph for comparison"
+              style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}
+            />
+            <div className="comparison-divider" style={{ left: `${compare}%` }}>
+              <span>↔</span>
+            </div>
+            <input
+              aria-label="Original and artwork comparison position"
+              className="comparison-range"
+              type="range"
+              min={0}
+              max={100}
+              value={compare}
+              onChange={(e) => setCompare(Number(e.target.value))}
+            />
+            <span className="compare-label left">Original</span>
+            <span className="compare-label right">Finished</span>
+          </>
+        )}
+        {(rendering || busy) && (
+          <div className="render-indicator" role="status">
+            <LoaderCircle size={16} className="spin" />
+            {busy || "Rendering"}
+          </div>
+        )}
+      </div>
+      <span className="dimension-line">
+        {settings.widthMm / 10} × {settings.heightMm / 10} cm ·{" "}
+        {view === "template"
+          ? "Your printed guide"
+          : view === "original"
+            ? "Your starting point"
+            : "Your finished canvas"}
+      </span>
+    </>
+  );
 
   return (
     <div className="studio-page">
       <SiteHeader studio />
+      <PreviewDialog
+        open={zoomPreview}
+        title={`Enlarged ${view} preview`}
+        onClose={() => setZoomPreview(false)}
+      >
+        <div className="canvas-stage">{artworkPreview}</div>
+      </PreviewDialog>
       <div className="studio-topline">
         <div>
           <span className="eyebrow">
@@ -1079,7 +1165,8 @@ export function Studio({
               className="icon-button"
               title="Enlarge preview"
               aria-label="Enlarge preview"
-              onClick={() => setZoomPreview(!zoomPreview)}
+              disabled={!geometry && !croppedUrl}
+              onClick={() => setZoomPreview(true)}
             >
               <Maximize size={17} />
             </button>
@@ -1088,7 +1175,7 @@ export function Studio({
             id="artwork-preview"
             role="tabpanel"
             aria-labelledby={`preview-tab-${view}`}
-            className={`canvas-stage ${zoomPreview ? "enlarged" : ""} ${dragging ? "dragging" : ""}`}
+            className={`canvas-stage ${dragging ? "dragging" : ""}`}
             onDragOver={(e) => {
               e.preventDefault();
               setDragging(true);
@@ -1100,93 +1187,7 @@ export function Studio({
               void upload(e.dataTransfer.files[0]);
             }}
           >
-            {zoomPreview && (
-              <button
-                className="preview-close button light small"
-                onClick={() => setZoomPreview(false)}
-              >
-                <X size={16} />
-                Close enlarged view
-              </button>
-            )}
-            <div
-              className="canvas-paper"
-              style={
-                {
-                  aspectRatio: `${settings.widthMm}/${settings.heightMm}`,
-                  "--art-ratio": settings.widthMm / settings.heightMm,
-                } as CSSProperties
-              }
-            >
-              {view === "original" && croppedUrl ? (
-                <img
-                  className="artwork-image"
-                  src={croppedUrl}
-                  alt={`Cropped original: ${sourceName}`}
-                />
-              ) : geometry ? (
-                <div
-                  className="rendered-svg"
-                  dangerouslySetInnerHTML={{ __html: svg }}
-                />
-              ) : (
-                <div className="canvas-placeholder">
-                  <Layers size={32} />
-                  <p>
-                    {source
-                      ? "Finding the picture in the dots…"
-                      : "A photograph. A little possibility."}
-                  </p>
-                  <button
-                    className="button"
-                    onClick={() => fileInput.current?.click()}
-                  >
-                    Choose a photo
-                  </button>
-                </div>
-              )}
-              {view === "compare" && croppedUrl && geometry && (
-                <>
-                  <img
-                    className="comparison-image"
-                    src={croppedUrl}
-                    alt="Original photograph for comparison"
-                    style={{ clipPath: `inset(0 ${100 - compare}% 0 0)` }}
-                  />
-                  <div
-                    className="comparison-divider"
-                    style={{ left: `${compare}%` }}
-                  >
-                    <span>↔</span>
-                  </div>
-                  <input
-                    aria-label="Original and artwork comparison position"
-                    className="comparison-range"
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={compare}
-                    onChange={(e) => setCompare(Number(e.target.value))}
-                  />
-                  <span className="compare-label left">Original</span>
-                  <span className="compare-label right">Finished</span>
-                </>
-              )}
-              {(rendering || busy) && (
-                <div className="render-indicator" role="status">
-                  <LoaderCircle size={16} className="spin" />
-                  {busy || "Rendering"}
-                </div>
-              )}
-            </div>
-            <span className="dimension-line">
-              {settings.widthMm / 10} × {settings.heightMm / 10} cm ·{" "}
-              {view === "template"
-                ? "Your printed guide"
-                : view === "original"
-                  ? "Your starting point"
-                  : "Your finished canvas"}
-            </span>
+            {artworkPreview}
           </div>
           <div className="preview-bottom">
             <span>
@@ -2014,6 +2015,19 @@ export function Studio({
                     PDF and PNG: 150 dpi. Print at 100% scale. Production
                     samples require review before printing.
                   </p>
+                  {settings.mode === "dots" && (
+                    <p className="fine-print">
+                      Testing a canvas and marker combination?{" "}
+                      <a
+                        href="/production-coupons/srs-dot-coupons.pdf"
+                        download
+                      >
+                        Download the measured dot test sheets (PDF)
+                      </a>
+                      . These are unvalidated test candidates. Print at actual
+                      size and measure the calibration marks before use.
+                    </p>
+                  )}
                 </>
               ) : (
                 <>

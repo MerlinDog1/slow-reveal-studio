@@ -187,13 +187,15 @@ export type Order = {
 
 export type OrderNotification = {
   id: string;
-  type: "confirmation" | "dispatch" | "request-photo";
-  templateVersion: 1 | 2;
+  type: "confirmation" | "dispatch" | "request-photo" | "revised-proof";
+  templateVersion: 1 | 2 | 3;
   createdAt: string;
-  status: "pending" | "sending" | "sent";
+  status: "pending" | "sending" | "sent" | "superseded";
   attempts: number;
   lastAttemptAt?: string;
   sentAt?: string;
+  supersededAt?: string;
+  revisionId?: string;
   note?: string;
   tracking?: string;
 };

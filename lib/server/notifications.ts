@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { sendEmail } from "./email";
 import { orderStatusLink } from "./order-access";
-import { ApiError } from "./security";
+import { ApiError, digest } from "./security";
 import { getRecord, replaceOrder } from "./store";
 import type { Order, OrderNotification } from "./schema";
 
@@ -28,6 +28,64 @@ export function newNotification(
     tracking,
   };
 }
+/** A stable UUID creates one provider idempotency key per order/revision, never per delivery attempt. */
+export function revisedProofNotification(
+  orderId: string,
+  revisionId: string,
+): OrderNotification {
+  const hash = digest(`slow-reveal/revised-proof/v1:${orderId}:${revisionId}`);
+  const id = `${hash.slice(0, 8)}-${hash.slice(8, 12)}-8${hash.slice(13, 16)}-${((parseInt(hash[16], 16) & 3) | 8).toString(16)}${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+  return {
+    ...newNotification("revised-proof"),
+    id,
+    revisionId,
+    templateVersion: 3,
+  };
+}
+function proofNoticeNeeded(order: Order, notification: OrderNotification) {
+  if (
+    order.paymentStatus !== "paid" ||
+    order.dataDeletedAt ||
+    !["awaiting-review", "hold", "approved"].includes(order.reviewStatus)
+  )
+    return false;
+  const revision = order.revisions.find(
+    (item) => item.id === notification.revisionId,
+  );
+  return (
+    !!revision?.customerProofRequired &&
+    revision.id === order.currentRevisionId &&
+    !order.customerProofApprovals?.some(
+      (approval) =>
+        approval.revisionId === revision.id &&
+        approval.snapshotHash === revision.package.snapshotHash,
+    )
+  );
+}
+/** Called before the order CAS: revision and outbox entry commit together. */
+export function queueRevisedProof(order: Order): {
+  order: Order;
+  notification?: OrderNotification;
+} {
+  const notification =
+    order.notifications?.find(
+      (item) =>
+        item.type === "revised-proof" &&
+        item.revisionId === order.currentRevisionId,
+    ) ?? revisedProofNotification(order.id, order.currentRevisionId);
+  if (!proofNoticeNeeded(order, notification)) return { order };
+  const now = new Date().toISOString();
+  const notifications = (order.notifications ?? []).map((item) =>
+    item.type === "revised-proof" &&
+    item.status === "pending" &&
+    !proofNoticeNeeded(order, item)
+      ? { ...item, status: "superseded" as const, supersededAt: now }
+      : item,
+  );
+  if (!notifications.some((item) => item.id === notification.id))
+    notifications.push(notification);
+  return { order: { ...order, notifications }, notification };
+}
 export function notificationSummary(
   notification: OrderNotification,
 ): NotificationResult {
@@ -36,11 +94,13 @@ export function notificationSummary(
     type: notification.type,
     status: notification.status,
     message:
-      notification.status === "sent"
-        ? "Customer email sent."
-        : notification.status === "sending"
-          ? "Customer email delivery is in progress."
-          : "The order update is saved, but its customer email has not been sent. Retry the notification.",
+      notification.status === "superseded"
+        ? "This proof notification is no longer needed. Its revision was replaced, approved, or closed."
+        : notification.status === "sent"
+          ? "Customer email sent."
+          : notification.status === "sending"
+            ? "Customer email delivery is in progress."
+            : "The order update is saved, but its customer email has not been sent. Retry the notification.",
   };
 }
 export function notificationMessage(
@@ -49,6 +109,25 @@ export function notificationMessage(
 ) {
   const number = `SRS-${order.id.slice(0, 8).toUpperCase()}`;
   const link = orderStatusLink(order.originalSnapshot);
+  if (notification.type === "revised-proof") {
+    if (
+      !notification.revisionId ||
+      !order.revisions.some(
+        (revision) =>
+          revision.id === notification.revisionId &&
+          revision.customerProofRequired,
+      )
+    )
+      throw new ApiError(
+        409,
+        "The revised proof notification is not attached to an eligible artwork revision.",
+      );
+    return {
+      subject: "Your revised Slow Reveal proof is ready to review",
+      text: `Order ${number}\nThe studio has prepared revised artwork. Please open your private order page and review both the finished artwork and printed guide template, then approve the current proof there. Studio print approval remains a separate review.\n\nThis update concerns artwork revision ${notification.revisionId}. The link always shows the current proof and order status, including any later changes.\n\nReview your private proof: ${link}\nKeep this link private: it grants access to your order.`,
+      idempotencyKey: `notification-${notification.id}`,
+    };
+  }
   if (notification.type === "confirmation")
     return {
       subject: "Your Slow Reveal order is awaiting review",
@@ -86,12 +165,30 @@ export async function deliverNotification(
     (item) => item.id === notificationId,
   );
   if (!notification) throw new ApiError(404, "Notification not found.");
-  if (notification.status === "sent") return notificationSummary(notification);
+  if (notification.status === "sent" || notification.status === "superseded")
+    return notificationSummary(notification);
   if (
     notification.status === "sending" &&
     Date.parse(notification.lastAttemptAt || "") > Date.now() - 120_000
   )
     return notificationSummary(notification);
+  if (
+    notification.type === "revised-proof" &&
+    !proofNoticeNeeded(order, notification)
+  ) {
+    const superseded: OrderNotification = {
+      ...notification,
+      status: "superseded",
+      supersededAt: new Date().toISOString(),
+    };
+    await replaceOrder(order, {
+      ...order,
+      notifications: order.notifications!.map((item) =>
+        item.id === notificationId ? superseded : item,
+      ),
+    });
+    return notificationSummary(superseded);
+  }
   if (!order.customerEmail)
     return {
       ...notificationSummary(notification),
@@ -142,6 +239,8 @@ export async function deliverNotification(
     );
     if (!current) throw new ApiError(404, "Notification not found.");
     if (current.status === "sent") return notificationSummary(current);
+    if (current.status === "superseded" && !sent)
+      return notificationSummary(current);
     const final: OrderNotification = {
       ...current,
       status: sent ? "sent" : "pending",

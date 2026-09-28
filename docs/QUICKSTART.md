@@ -60,6 +60,14 @@ For the reproducible renderer reference benchmark:
 npx tsx tests/benchmark-renderers.ts
 ```
 
+For measured dot, gap and guide tests before physical sampling:
+
+```powershell
+npm run coupons
+```
+
+This rebuilds the four-page A4 coupon PDF, individual SVGs, geometry, hash manifest and blank observation record under `output/pdf/`. A byte-identical PDF is available from the Dot Lab's export panel. Print at **100% / Actual size**, measure the X/Y calibration rules, and use the blank record for real findings. The filled pages are digital references; none of the candidate settings has physical approval. See [PRODUCTION.md](PRODUCTION.md).
+
 ## Production setup
 
 Follow `OPERATIONS.md` and the Supabase migrations. R2 must remain private and use the documented direct-upload CORS policy; original uploads and archive downloads use temporary signed URLs to avoid serverless body limits. Vercel's included cron route needs its independent secret and an actual schedule in the deployed project.

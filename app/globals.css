@@ -668,28 +668,7 @@ a svg {
   height: 100%;
   display: block;
 }
-.canvas-stage.enlarged {
-  position: fixed;
-  inset: 20px;
-  z-index: 20;
-  min-height: unset;
-  overflow: auto;
-}
-.canvas-stage.enlarged .canvas-paper {
-  height: 80vh;
-}
-.canvas-stage.enlarged:after {
-  content: "Use the preview expand button to return";
-  position: absolute;
-  bottom: 5px;
-  font-size: 12px;
-}
-.canvas-stage.enlarged ~ .preview-bottom {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 21;
-}
+
 .canvas-placeholder {
   height: 100%;
   padding: 30px;
@@ -2091,15 +2070,7 @@ a svg {
   .admin-table td {
     padding: 10px 5px;
   }
-  .canvas-stage.enlarged {
-    inset: 10px;
-    padding: 20px;
-  }
-  .canvas-stage.enlarged .canvas-paper {
-    width: 100%;
-    height: auto;
-    max-height: 85vh;
-  }
+
 }
 .admin-previews {
   display: grid;
@@ -2132,12 +2103,7 @@ a svg {
   gap: 10px;
   margin-top: 20px;
 }
-.preview-close {
-  position: fixed;
-  right: 35px;
-  top: 35px;
-  z-index: 22;
-}
+
 .canonical-proof {
   margin-top: 20px;
   border: 1px solid var(--line);
@@ -2261,9 +2227,7 @@ a svg {
 .studio-topline h1 {
   font-size: 34px;
 }
-.canvas-stage.enlarged:after {
-  display: none;
-}
+
 @media (max-width: 900px) {
   .studio-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -2354,10 +2318,7 @@ a svg {
   .control-content {
     padding: 25px;
   }
-  .preview-close {
-    top: 20px;
-    right: 20px;
-  }
+
   .toast {
     max-width: 90%;
   }
@@ -2372,14 +2333,7 @@ a svg {
   width: min(100%, calc(420px * var(--art-ratio)));
   height: auto !important;
 }
-.canvas-stage.enlarged .canvas-paper {
-  width: min(100%, calc(80vh * var(--art-ratio)));
-  height: auto !important;
-  max-height: 80vh;
-}
-.canvas-stage.enlarged {
-  justify-content: center;
-}
+
 .studies-page {
   max-width: 1300px;
 }
@@ -2578,3 +2532,40 @@ a svg {
 .srs-guide-scale-drawing { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
 .srs-guide-scale-drawing svg { min-width: 780px; }
 .srs-guide-scale-drawing:focus-visible { outline: 2px solid var(--green); outline-offset: 5px; }
+
+.preview-dialog {
+  padding: 0;
+  width: calc(100vw - 32px);
+  max-width: 1440px;
+  max-height: calc(100dvh - 32px);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--canvas);
+}
+.preview-dialog::backdrop {
+  background: #1e1e1c99;
+}
+.preview-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--canvas);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.preview-dialog-heading h2 {
+  margin: 0;
+  font-size: 24px;
+}
+.preview-dialog .canvas-stage {
+  min-height: 0;
+  padding: 20px 24px;
+}
+.preview-dialog .canvas-paper {
+  width: min(100%, calc(70dvh * var(--art-ratio)));
+  max-height: none;
+}

@@ -22,6 +22,8 @@ export { currentPackage } from "./orders";
 import {
   deliverNotification,
   newNotification,
+  queueRevisedProof,
+  notificationSummary,
   type NotificationResult,
   type NotificationTransport,
 } from "./notifications";
@@ -235,17 +237,25 @@ export async function updateOrder(
       );
     next = applyReviewAction(order, body.action, body.note, body.tracking);
   }
-  const customerNotification =
+  let customerNotification =
     body.action === "dispatch" || body.action === "request-photo"
       ? newNotification(body.action, body.note, body.tracking)
       : undefined;
+  if (body.action === "regenerate") {
+    const queued = queueRevisedProof(next);
+    next = queued.order;
+    customerNotification = queued.notification;
+  }
   if (actor)
     next.audit = next.audit.map((entry, index) =>
       index < order.audit.length
         ? entry
         : { ...entry, actorId: actor.userId, actorKind: actor.kind },
     );
-  if (customerNotification)
+  if (
+    customerNotification &&
+    !next.notifications?.some((item) => item.id === customerNotification!.id)
+  )
     next.notifications = [...(next.notifications ?? []), customerNotification];
   try {
     await replaceOrder(order, next);
@@ -254,15 +264,28 @@ export async function updateOrder(
     throw error;
   }
   let notification: NotificationResult | undefined;
-  if (body.action === "dispatch" || body.action === "request-photo") {
-    notification = await deliverNotification(
-      id,
-      customerNotification!.id,
-      transport,
-    );
+  if (customerNotification) {
+    try {
+      notification = await deliverNotification(
+        id,
+        customerNotification.id,
+        transport,
+      );
+    } catch {
+      // Artwork already committed. Surface the durable outbox rather than suggesting regeneration be retried.
+      const latest = await getRecord<Order>("orders", id).catch(() => null);
+      const saved =
+        latest?.notifications?.find(
+          (item) => item.id === customerNotification!.id,
+        ) ?? customerNotification;
+      notification = notificationSummary(saved);
+      if (saved.status !== "sent" && saved.status !== "superseded")
+        notification.message =
+          "The order update is saved, but customer email delivery could not be confirmed. Retry this notification; do not regenerate the artwork again.";
+    }
   }
   return {
-    order: (await getRecord<Order>("orders", id))!,
+    order: (await getRecord<Order>("orders", id).catch(() => null)) ?? next,
     ...(notification ? { notification } : {}),
   };
 }

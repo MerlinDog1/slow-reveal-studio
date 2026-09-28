@@ -2,6 +2,17 @@
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
 
+## Print calibration, PNG dimensions and proof handoff - 28 September
+
+- Final integrated `npm run typecheck`, `npm test` and `npm run build` passed. Tests: **75 cases, 73 passed, zero failed, two existing opt-in browser checks skipped**. The release still generates only the Dot Lab by default. All 40 production trace manifests exclude private `.data/` files; formatting and `git diff --check` pass.
+- Lab PNG export now replaces the browser resolution chunk with matching physical DPI: 150 DPI for the template and 50 DPI for the smaller finished preview in the ZIP. Focused tests decode the result with Sharp, verify pixel/alpha and other PNG chunks are unchanged, validate CRCs and check physical dimensions within pixel/pixels-per-metre rounding. PDF page dimensions remain explicit millimetres.
+- Four A4 coupon pages contain 34 unique diameter/gap/guide-width/opacity candidates, shared guide and outlined-font serialization, X/Y 100 mm rules and a 20 mm square. The filled-reference sheets are digital targets. The observation record has no filled measurements or approvals.
+- Poppler rendered all four final PDF pages for visual inspection: no clipping/overlap was found. `pdfinfo` and independent `pypdf` checks confirmed four 210 x 297 mm page boxes with 2480 x 3508 pixel image resources. The local public PDF endpoint returned 200, `application/pdf`, and bytes identical to the canonical PDF (1,089,166 bytes; SHA-256 `b17c7549a644bdc481143edcb97e0bec2063abde7842fa11541b34fe64acd32b`). This verifies digital dimensions, not printer scaling or material performance.
+- The enlarged preview uses a native modal. In the in-app browser, opening focused Close; background controls disappeared from the accessible modal view; the comparison slider remained keyboard-operable; Escape and Close restored focus to Enlarge. The 390 x 844 check had a 358 px dialog without horizontal content overflow. Closing removes the extra SVG tree. SVG serialization is memoized across comparison-position updates. No console warnings/errors were observed. [Screenshot](enlarged-preview-accessibility.png).
+- A lab PNG export was attempted through the in-app browser, but its download-event API timed out without returning a file. No browser error appeared. Automated metadata/export-boundary tests passed; a captured end-to-end browser download is still not claimed.
+- Revised customer-proof emails are queued atomically with eligible administrator-generated revisions. Tests cover one stable notification per revision, failure/retry without re-rendering, private-link access, exclusion of internal notes/personalisation/photo metadata, stale revision rejection, suppressed obsolete notices, missing key/email and concurrent delivery. Independent review found no material issue. No real email was sent. An email already accepted by a provider cannot be recalled after a later change; messages identify their revision and point to current order status.
+- No dependency or lockfile changes. All physical trials, real service delivery/RLS/auth and commercial/legal approvals remain open. Docker is installed but its local engine was unavailable, so the PostgreSQL migration regression remains unexecuted.
+
 ## Operator accounts, shared presets and customer guides — 28 September
 
 - `npm run typecheck`: passed after the final account, preset, catalogue and guide integration.

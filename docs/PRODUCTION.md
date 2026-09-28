@@ -48,20 +48,32 @@ Before approval, compare the package against the order and check: geometry hash/
 
 These values are **test candidates**, not approved customer presets. Run a coupon before every new substrate/ink/marker combination and after meaningful lot or machine changes.
 
-| Factor | Candidate sweep | Capture |
-|---|---|---|
-| Circle diameter | 0.8, 1.0, 1.2, 1.5, 2, 3, 4, 5, 6mm | Filling accuracy, comfortable minimum/maximum, single-press versus colouring action |
-| Gap between marks | 0.2, 0.4, 0.6, 0.8, 1mm | Accidental joins, guide separation, marker spread |
-| Guide width | 0.08, 0.12, 0.16, 0.20, 0.30mm | Line continuity across grain and visibility after completion |
-| Guide opacity/colour | 10/20/30/40%; neutral and warm greys | Indoor readability, show-through and RIP treatment |
-| Substrate | Fine/medium primed cotton, roll, board, stretched | Print flatness, grain, adhesion, deflection and stretching cracks |
-| Marker | Fine/broad black, white, metallic; then limited colours | Dot shape, coverage, ink yield, bleed, drag, odour, smudge and drying time |
-| Inversion / white ink | Approved dark substrate and ink sequence only | Opaque coverage, curing, registration and guide visibility |
-| Mosaic | Square, rounded square, hexagon; 1/2/4/6/8 colours | Fill reach, symbol readability, colour confusion, overpainting and waste |
-| Contour | Several simplification/line widths | Trace continuity, false paths, ambiguous crossings and pen lifts |
-| Lines | Horizontal/vertical/wave/interrupted variations | Ruler slip, smearing, hand clearance, precision and fatigue |
+| Factor                | Candidate sweep                                         | Capture                                                                             |
+| --------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Circle diameter       | 0.8, 1.0, 1.2, 1.5, 2, 3, 4, 5, 6mm                     | Filling accuracy, comfortable minimum/maximum, single-press versus colouring action |
+| Gap between marks     | 0.2, 0.4, 0.6, 0.8, 1mm                                 | Accidental joins, guide separation, marker spread                                   |
+| Guide width           | 0.08, 0.12, 0.16, 0.20, 0.30mm                          | Line continuity across grain and visibility after completion                        |
+| Guide opacity/colour  | 10/20/30/40%; neutral and warm greys                    | Indoor readability, show-through and RIP treatment                                  |
+| Substrate             | Fine/medium primed cotton, roll, board, stretched       | Print flatness, grain, adhesion, deflection and stretching cracks                   |
+| Marker                | Fine/broad black, white, metallic; then limited colours | Dot shape, coverage, ink yield, bleed, drag, odour, smudge and drying time          |
+| Inversion / white ink | Approved dark substrate and ink sequence only           | Opaque coverage, curing, registration and guide visibility                          |
+| Mosaic                | Square, rounded square, hexagon; 1/2/4/6/8 colours      | Fill reach, symbol readability, colour confusion, overpainting and waste            |
+| Contour               | Several simplification/line widths                      | Trace continuity, false paths, ambiguous crossings and pen lifts                    |
+| Lines                 | Horizontal/vertical/wave/interrupted variations         | Ruler slip, smearing, hand clearance, precision and fatigue                         |
 
 For every coupon, record printer/RIP version, ink set and lot, profile/pass/curing settings, substrate supplier/SKU/lot, pretreatment, pen SKU/lot, humidity/temperature, print date, cure interval, images and measurements. Test adhesion/abrasion using an operator-agreed method appropriate to the substrate; do not describe informal testing as certification. Compare before/after filling under normal indoor light and at intended viewing distance.
+
+### Printable Dot coupon pack
+
+The repository includes a reproducible [four-page A4 coupon PDF](../output/pdf/srs-dot-coupons.pdf), a [blank observation record](../output/pdf/srs-dot-coupons-observation-record.md) and a [file manifest](../output/pdf/srs-dot-coupons-manifest.json). The same PDF is available from the Dot Lab at `/production-coupons/srs-dot-coupons.pdf`. These are **unvalidated physical test inputs**, not printed samples, customer presets or approved production settings.
+
+Pages 1 and 2 are guide sheets. Pages 3 and 4 are filled digital references serialized from exactly the same circles. The pack contains 34 unique candidate rows/cells: nine diameters (eight repeats, 2 mm finished edge gaps), five gaps (eight 3 mm circles per row) and all 20 combinations of the five guide widths with four opacities (1, 3 and 5 mm circles in each cell). Diameter/gap rows use a 0.16 mm guide at 30% opacity. The 0.2 mm gap intentionally tests below the renderer's current 0.25 mm safeguard. Guides are inset so their outside ink boundary matches the filled-circle boundary; gap values refer to those boundaries. Every candidate is labelled with its ID and values; annotations and calibration marks remain solid black.
+
+Print at **100% / Actual size**, with Fit to page disabled. Each page includes a horizontal and vertical 100 mm rule plus a 20 × 20 mm square. Measure between end-tick centres and square centre-lines, not outside stroke edges. Record both axes and the square on each printed guide page; agree tolerance with the printer operator before interpreting a trial. The SVG root and PDF page box are 210 × 297 mm. The PDF embeds 2480 × 3508 pixel images at that exact physical size, matching the existing 300 DPI Sharp/jsPDF production pipeline. Use the [individual SVG files and geometry](../output/pdf/srs-dot-coupons/) when vector input is required; type is outlined through the shared renderer fonts.
+
+Regenerate with `npm run coupons`. The pure helper is `lib/production-coupons.ts`; the generator is `scripts/build-production-coupons.ts`. The manifest records shared renderer/font versions, source and artifact SHA-256 values, dimensions, runtime versions, calibration coordinates and the byte-identical public PDF copy. Its PDF metadata date is fixed solely for reproducibility, not a print or trial date. Review PNGs are generated under ignored `.data/qa/coupons`; they are not customer data. Geometry and serialization are deterministic; compare output hashes within the recorded dependency/runtime versions.
+
+This first pack tests neutral black opacity on a transparent background. It does not provide warm-grey variants, a white-ink spot separation, substrate/marker approvals, bleed/wrap trials or alternative-mode coupons. Those matrix items and full-canvas user trials remain separate physical work. Fill the observation record only after real measurements and hand completion; digital filled references cannot supply those observations.
 
 ## Full-canvas user trial
 

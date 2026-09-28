@@ -695,7 +695,8 @@ export function AdminDesk({
                         {notification.status} · {notification.attempts} attempt
                         {notification.attempts === 1 ? "" : "s"}
                       </span>
-                      {notification.status !== "sent" && (
+                      {(notification.status === "pending" ||
+                        notification.status === "sending") && (
                         <button
                           className="text-button"
                           disabled={busy}

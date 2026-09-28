@@ -24,6 +24,7 @@ export function PreviewDialog({
     if (!open || !dialog) return;
     const overflow = document.body.style.overflow;
     dialog.showModal();
+    dialog.scrollTop = 0;
     document.body.style.overflow = "hidden";
     return () => {
       dialog.close();

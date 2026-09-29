@@ -44,6 +44,7 @@ import {
   toSvg,
   effectiveGuideColor,
   isOpticalMode,
+  supportsPalette,
   usesOpticalColour,
   type RenderGeometry,
   type RenderMode,
@@ -1696,12 +1697,13 @@ export function Studio({
                       className={settings.mode === m.id ? "selected" : ""}
                       aria-pressed={settings.mode === m.id}
                       onClick={() => {
+                        if (m.id === settings.mode) return;
                         track("renderer_selected", { mode: m.id, productId });
                         update({
                           mode: m.id,
                           ...(isOpticalMode(m.id) || m.id === "cross-stitch"
                             ? {
-                                palette: isOpticalMode(settings.mode)
+                                palette: supportsPalette(settings.mode)
                                   ? (settings.palette ??
                                     getMarkerPalette(
                                       DEFAULT_MARKER_PROFILE_ID,

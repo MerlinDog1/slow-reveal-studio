@@ -63,7 +63,7 @@ test("public prototype previews cannot save unapproved customer artwork or persi
       .png()
       .toBuffer();
     const modes = getPreviewModes();
-    assert.equal(modes.length, 6);
+    assert.equal(modes.length, 7);
     for (const mode of modes.filter((value) => value !== "dots")) {
       const input = {
         mode,

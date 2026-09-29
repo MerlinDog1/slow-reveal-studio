@@ -2,6 +2,7 @@ import { analyzeImage } from "./sampling";
 import { renderOptical, TV_COLUMN_RATIO } from "./optical";
 import { renderStipple } from "./stipple";
 import { renderFibonacci, renderFibonacciColour } from "./fibonacci";
+import { renderCrossStitch } from "./cross-stitch";
 import {
   pathLength,
   renderContours,
@@ -169,15 +170,17 @@ export function renderImage(
           ? renderFibonacci(context)
           : [];
   const cells =
-    s.mode === "mosaic"
-      ? renderMosaic(context)
-      : s.mode === "fibonacci" && s.palette
-        ? renderFibonacciColour(context)
-        : isOpticalMode(s.mode)
-          ? renderOptical(context)
-          : s.mode === "line-amplification"
-            ? renderLines(context)
-            : [];
+    s.mode === "cross-stitch"
+      ? renderCrossStitch(context)
+      : s.mode === "mosaic"
+        ? renderMosaic(context)
+        : s.mode === "fibonacci" && s.palette
+          ? renderFibonacciColour(context)
+          : isOpticalMode(s.mode)
+            ? renderOptical(context)
+            : s.mode === "line-amplification"
+              ? renderLines(context)
+              : [];
   const contourInset = 0.5;
   const paths =
     s.mode === "contour"
@@ -201,6 +204,7 @@ export function renderImage(
     0,
   );
   const cellArea = cells.reduce((area, cell) => {
+    if (s.mode === "cross-stitch" && cell.label === "0") return area;
     if (!cell.points) {
       if (usesOpticalColour(s)) {
         const r = cell.radius ?? 0;
@@ -225,7 +229,9 @@ export function renderImage(
   const seconds =
     s.mode === "contour"
       ? traceLength / 3 + count * 4
-      : count *
+      : (s.mode === "cross-stitch"
+          ? cells.filter((cell) => cell.label !== "0").length * 2
+          : count) *
           (["dots", "stipple", "fibonacci"].includes(s.mode) ? 1.6 : 2.2) +
         inkArea / 8;
   if (input.width < s.widthMm || input.height < s.heightMm)
@@ -268,13 +274,26 @@ export function renderImage(
     warnings.push(
       "Every Line Amplification kit must include a ruler or straight edge.",
     );
+  if (s.mode === "cross-stitch") {
+    warnings.push(
+      "Cross Stitch uses a uniform guide grid. Fill each numbered X with two diagonal strokes; 0 means leave that cross blank. Numbers may still hint at the image. Guide visibility and concealment need physical trials.",
+    );
+    if (maxDiameter * 0.28 < 0.5)
+      warnings.push(
+        "Cross strokes are narrower than 0.5 mm. Increase mark size for a more practical marker trial.",
+      );
+    if (!cells.some((cell) => cell.label !== "0"))
+      warnings.push(
+        "All crosses are blank paper. Adjust the photograph or tone controls before making a kit.",
+      );
+  }
   if (s.palette && !supportsPalette(s.mode))
     warnings.push(
-      "Limited palettes apply to Mosaic Fill, Fibonacci Spiral, Colour Blend and TV Weave only.",
+      "Limited palettes apply to Mosaic Fill, Fibonacci Spiral, Colour Blend, TV Weave and Cross Stitch only.",
     );
   if (s.palette && supportsPalette(s.mode)) {
     warnings.push(
-      `${s.mode === "mosaic" ? "Mosaic" : s.mode === "fibonacci" ? "Fibonacci Spiral" : s.mode === "colour-blend" ? "Colour Blend" : "TV Weave"} colour key: ${s.palette.map((hex, i) => `${i + 1} = ${hex}`).join(", ")}. Supply matching markers and a separate colour legend.`,
+      `${s.mode === "mosaic" ? "Mosaic" : s.mode === "fibonacci" ? "Fibonacci Spiral" : s.mode === "cross-stitch" ? "Cross Stitch" : s.mode === "colour-blend" ? "Colour Blend" : "TV Weave"} colour key: ${s.palette.map((hex, i) => `${i + 1} = ${hex}`).join(", ")}. Supply matching markers and a separate colour legend.`,
     );
     if (
       maxDiameter < 3 ||
@@ -306,9 +325,10 @@ export function renderImage(
     ...(text ? { text } : {}),
     stats: {
       markCount: count,
-      estimatedCompletionMinutes: count
-        ? Math.max(1, Math.round(seconds / 60))
-        : 0,
+      estimatedCompletionMinutes:
+        count && (s.mode !== "cross-stitch" || inkArea > 0)
+          ? Math.max(1, Math.round(seconds / 60))
+          : 0,
       inkAreaMm2: round(inkArea),
       sourceWidth: input.width,
       sourceHeight: input.height,

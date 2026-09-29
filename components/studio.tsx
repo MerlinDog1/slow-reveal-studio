@@ -38,6 +38,7 @@ import { assertSubjectMaskBinding, type SubjectMask } from "@/lib/subject-mask";
 import {
   DEFAULT_SETTINGS,
   PRESETS,
+  CROSS_STITCH_PRESETS,
   RENDERER_VERSION,
   renderImage,
   toSvg,
@@ -50,10 +51,13 @@ import {
 } from "@/lib/renderers";
 import { INKS, formatPrice } from "@/lib/catalog";
 import { MOSAIC_MARKER_PALETTE } from "@/lib/mosaic-palette";
+import { OPTICAL_MARKER_PALETTE } from "@/lib/optical-palette";
 import {
-  OPTICAL_MARKER_PALETTE,
-  defaultOpticalPalette,
-} from "@/lib/optical-palette";
+  DEFAULT_MARKER_PROFILE_ID,
+  MARKER_PALETTE_PROFILES,
+  getMarkerPalette,
+  identifyMarkerPalette,
+} from "@/lib/marker-palettes";
 import {
   parseStudioCatalogue,
   productDimensions,
@@ -87,6 +91,7 @@ import {
 } from "@/lib/browser-storage";
 import { exportArtwork } from "@/lib/export-artwork";
 import { track } from "@/lib/analytics";
+import { ArtworkPreview } from "@/components/artwork-preview";
 
 type View = "finished" | "template" | "original" | "compare";
 const MODES: { id: RenderMode; name: string; description: string }[] = [
@@ -100,6 +105,11 @@ const MODES: { id: RenderMode; name: string; description: string }[] = [
     id: "mosaic",
     name: "Mosaic Fill",
     description: "Small shapes. A bigger picture.",
+  },
+  {
+    id: "cross-stitch",
+    name: "Cross Stitch",
+    description: "An even grid. A hidden picture in colour.",
   },
   {
     id: "line-amplification",
@@ -185,11 +195,25 @@ export function Studio({
     ...DEFAULT_SETTINGS,
     ...PRESETS.standard,
     mode: startingMode,
-    ...(isOpticalMode(startingMode)
-      ? { palette: defaultOpticalPalette() }
+    ...(isOpticalMode(startingMode) || startingMode === "cross-stitch"
+      ? { palette: getMarkerPalette(DEFAULT_MARKER_PROFILE_ID, 16) }
       : {}),
+    ...(startingMode === "cross-stitch" ? CROSS_STITCH_PRESETS.standard : {}),
   });
   const [preset, setPreset] = useState("standard");
+  const markerProfile = identifyMarkerPalette(settings.palette);
+  const prototypeColours =
+    settings.mode === "mosaic" ? MOSAIC_MARKER_PALETTE : OPTICAL_MARKER_PALETTE;
+  const prototypePaletteCount =
+    settings.palette &&
+    (settings.mode === "mosaic" ? [2, 4, 6, 8] : [8]).includes(
+      settings.palette.length,
+    ) &&
+    settings.palette.every(
+      (colour, index) => colour.toLowerCase() === prototypeColours[index],
+    )
+      ? settings.palette.length
+      : undefined;
   const [crop, setCrop] = useState<Crop>(DEFAULT_CROP);
   const [source, setSource] = useState<string | null>(null);
   const [sourceBlob, setSourceBlob] = useState<Blob | null>(null);
@@ -382,7 +406,12 @@ export function Studio({
         );
         return;
       }
-      setSettings((s) => ({ ...s, ...patch }));
+      setSettings((s) => {
+        const next = { ...s, ...patch };
+        if (next.mode === "cross-stitch" && next.palette === undefined)
+          next.palette = getMarkerPalette(DEFAULT_MARKER_PROFILE_ID, 16);
+        return next;
+      });
       setSaved(false);
     },
     [subjectMask, settings.mode, settings.widthMm, settings.heightMm],
@@ -858,7 +887,12 @@ export function Studio({
   function choosePreset(key: keyof typeof PRESET_NAMES) {
     setPreset(key);
     track("preset_selected", { mode: settings.mode, productId, preset: key });
-    update({ ...PRESETS[key], detailPreservation: 0, guideColor: undefined });
+    update({
+      ...PRESETS[key],
+      ...(settings.mode === "cross-stitch" ? CROSS_STITCH_PRESETS[key] : {}),
+      detailPreservation: 0,
+      guideColor: undefined,
+    });
   }
   function choosePublishedPreset(preset: PublishedPreset) {
     try {
@@ -965,8 +999,13 @@ export function Studio({
   const activePreset =
     (settings.detailPreservation ?? 0) === 0 &&
     settings.guideColor === undefined
-      ? (Object.entries(PRESETS).find(([, p]) =>
-          Object.entries(p).every(
+      ? (Object.entries(PRESETS).find(([name, p]) =>
+          Object.entries({
+            ...p,
+            ...(settings.mode === "cross-stitch"
+              ? CROSS_STITCH_PRESETS[name as keyof typeof CROSS_STITCH_PRESETS]
+              : {}),
+          }).every(
             ([key, value]) => settings[key as keyof RenderSettings] === value,
           ),
         )?.[0] ?? "custom")
@@ -1019,10 +1058,7 @@ export function Studio({
           alt={`Cropped original: ${sourceName}`}
         />
       ) : geometry ? (
-        <div
-          className="rendered-svg"
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
+        <ArtworkPreview svg={svg} finished={!templateView} />
       ) : (
         <div className="canvas-placeholder">
           <Layers size={32} />
@@ -1663,12 +1699,18 @@ export function Studio({
                         track("renderer_selected", { mode: m.id, productId });
                         update({
                           mode: m.id,
-                          ...(isOpticalMode(m.id)
+                          ...(isOpticalMode(m.id) || m.id === "cross-stitch"
                             ? {
                                 palette: isOpticalMode(settings.mode)
                                   ? (settings.palette ??
-                                    defaultOpticalPalette())
-                                  : defaultOpticalPalette(),
+                                    getMarkerPalette(
+                                      DEFAULT_MARKER_PROFILE_ID,
+                                      16,
+                                    ))
+                                  : getMarkerPalette(
+                                      DEFAULT_MARKER_PROFILE_ID,
+                                      16,
+                                    ),
                                 invert: false,
                               }
                             : m.id === "fibonacci" &&
@@ -1680,6 +1722,10 @@ export function Studio({
                                   invert: false,
                                 }
                               : {}),
+                          ...(m.id === "cross-stitch" &&
+                          settings.mode !== "cross-stitch"
+                            ? CROSS_STITCH_PRESETS.standard
+                            : {}),
                         });
                       }}
                     >
@@ -1705,6 +1751,15 @@ export function Studio({
                   {settings.palette
                     ? "Follow the sunflower spirals, filling each numbered dot with its matching pen. Step back to see the colours blend. Keep the white gaps."
                     : "Follow the sunflower spirals, filling each circle with one ink. Larger dots create shadows; smaller dots reveal the light. Keep the spaces between them."}
+                </p>
+              )}
+              {settings.mode === "cross-stitch" && (
+                <p className="fine-print">
+                  Every guide cross has the same size and position. Fill two
+                  short diagonal strokes in its numbered colour; 0 means leave
+                  blank. The numbers may still hint at the picture. This is a
+                  prototype, with concealment and marker readability awaiting
+                  physical trials.
                 </p>
               )}
               {settings.mode === "dots" && (lab || subjectMask) && (
@@ -1757,7 +1812,8 @@ export function Studio({
                   <div className="control-divider" />
                 </div>
               )}
-              {((lab && settings.mode === "mosaic") ||
+              {(settings.mode === "mosaic" ||
+                settings.mode === "cross-stitch" ||
                 isOpticalMode(settings.mode) ||
                 settings.mode === "fibonacci") && (
                 <>
@@ -1789,28 +1845,45 @@ export function Studio({
                     </p>
                   )}
                   <label className="select-field">
-                    Marker palette
+                    {settings.mode === "mosaic"
+                      ? "Mosaic colour style"
+                      : "Marker palette"}
                     <select
-                      value={settings.palette?.length ?? 1}
+                      value={
+                        markerProfile
+                          ? `${markerProfile.profile.id}:${markerProfile.count}`
+                          : prototypePaletteCount
+                            ? String(prototypePaletteCount)
+                            : settings.palette
+                              ? "saved"
+                              : "1"
+                      }
                       onChange={(e) => {
-                        const n = Number(e.target.value);
+                        const selected = e.target.value;
+                        if (selected === "saved") return;
+                        const [profileId, count] = selected.split(":");
+                        const n = Number(count ?? selected);
                         update({
                           palette:
                             n === 1
                               ? undefined
-                              : (settings.mode === "mosaic"
-                                  ? MOSAIC_MARKER_PALETTE
-                                  : OPTICAL_MARKER_PALETTE
-                                ).slice(0, n),
-                          ...(settings.mode === "fibonacci" && n > 1
+                              : count
+                                ? getMarkerPalette(profileId, n as 16 | 32)
+                                : (settings.mode === "mosaic"
+                                    ? MOSAIC_MARKER_PALETTE
+                                    : OPTICAL_MARKER_PALETTE
+                                  ).slice(0, n),
+                          ...((settings.mode === "fibonacci" && n > 1) ||
+                          settings.mode === "cross-stitch"
                             ? { invert: false }
                             : {}),
                         });
                       }}
                     >
-                      {!isOpticalMode(settings.mode) && (
-                        <option value="1">Monochrome</option>
-                      )}
+                      {!isOpticalMode(settings.mode) &&
+                        settings.mode !== "cross-stitch" && (
+                          <option value="1">Monochrome — one ink</option>
+                        )}
                       {settings.mode === "mosaic" && (
                         <>
                           <option value="2">Two colours</option>
@@ -1818,22 +1891,51 @@ export function Studio({
                           <option value="6">Six colours</option>
                         </>
                       )}
-                      <option value="8">Eight colours</option>
-                      <option value="16">16 colours</option>
-                      {settings.mode === "mosaic" && (
-                        <option value="32">32 colours</option>
+                      <option value="8">
+                        Eight colours — prototype palette
+                      </option>
+                      {MARKER_PALETTE_PROFILES.flatMap((profile) =>
+                        ([16, 32] as const).map((count) => (
+                          <option
+                            key={`${profile.id}:${count}`}
+                            value={`${profile.id}:${count}`}
+                          >
+                            {profile.label} · {count} colours
+                          </option>
+                        )),
                       )}
-                      {settings.mode !== "mosaic" &&
-                        settings.palette &&
-                        ![8, 16].includes(settings.palette.length) && (
-                          <option value={settings.palette.length}>
-                            {settings.palette.length} colours (saved palette)
+                      {settings.palette &&
+                        !markerProfile &&
+                        !prototypePaletteCount && (
+                          <option value="saved">
+                            {settings.palette.length} colours — saved/custom
+                            palette
                           </option>
                         )}
                     </select>
                   </label>
+                  {settings.mode === "mosaic" && !settings.palette && (
+                    <p className="fine-print">
+                      One ink, with tile sizes creating light and shade. Select
+                      a numbered colour palette for coloured tiles.
+                    </p>
+                  )}
                   {settings.palette && (
                     <>
+                      {markerProfile && (
+                        <p className="fine-print">
+                          {markerProfile.profile.label}. Keys below include the
+                          manufacturer pen codes.{" "}
+                          {markerProfile.profile.disclaimer}{" "}
+                          <a
+                            href={markerProfile.profile.productUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            View marker set
+                          </a>
+                        </p>
+                      )}
                       <ol
                         className="mosaic-colour-key"
                         aria-label={
@@ -1845,20 +1947,31 @@ export function Studio({
                         {settings.palette.map((colour, index) => (
                           <li
                             key={colour}
-                            aria-label={`Colour ${index + 1}: ${colour}`}
+                            title={
+                              markerProfile
+                                ? `Pen ${markerProfile.profile.colours[index].code}: ${markerProfile.profile.colours[index].label} · ${colour} (digital approximation)`
+                                : colour
+                            }
+                            aria-label={`Colour ${index + 1}: ${colour}${markerProfile ? `; pen ${markerProfile.profile.colours[index].code}; ${markerProfile.profile.colours[index].label}` : ""}`}
                           >
                             <span
                               className="mosaic-colour-chip"
                               style={{ backgroundColor: colour }}
                               aria-hidden="true"
                             />
-                            <span>{index + 1}</span>
+                            <span>
+                              {index + 1}
+                              {markerProfile
+                                ? ` · ${markerProfile.profile.colours[index].code}`
+                                : ""}
+                            </span>
                           </li>
                         ))}
                       </ol>
                       <p className="fine-print">
-                        Match each template number to this colour key. Blank
-                        canvas stays unmarked.
+                        {settings.mode === "cross-stitch"
+                          ? "Match 1 and above to this colour key. Crosses marked 0 stay blank; no white pen is required."
+                          : "Match each template number to this colour key. Blank canvas stays unmarked."}
                       </p>
                     </>
                   )}
@@ -1943,7 +2056,7 @@ export function Studio({
               </div>
               <div className="control-divider" />
               <h3 className="field-heading">
-                {usesOpticalColour(settings)
+                {usesOpticalColour(settings) || settings.mode === "cross-stitch"
                   ? "Lettering and guide colour"
                   : "A colour that feels like you"}
               </h3>
@@ -2114,7 +2227,8 @@ export function Studio({
                           })
                         }
                       />
-                      {usesOpticalColour(settings)
+                      {usesOpticalColour(settings) ||
+                      settings.mode === "cross-stitch"
                         ? "Match guide to lettering colour"
                         : "Match guide to marker colour"}
                     </label>
@@ -2152,16 +2266,19 @@ export function Studio({
                       value={settings.guideWidthMm ?? 0.15}
                       onChange={(guideWidthMm) => update({ guideWidthMm })}
                     />
-                    {!usesOpticalColour(settings) && (
-                      <label className="check-label">
-                        <input
-                          type="checkbox"
-                          checked={settings.invert}
-                          onChange={(e) => update({ invert: e.target.checked })}
-                        />
-                        Invert tones (experimental)
-                      </label>
-                    )}
+                    {!usesOpticalColour(settings) &&
+                      settings.mode !== "cross-stitch" && (
+                        <label className="check-label">
+                          <input
+                            type="checkbox"
+                            checked={settings.invert}
+                            onChange={(e) =>
+                              update({ invert: e.target.checked })
+                            }
+                          />
+                          Invert tones (experimental)
+                        </label>
+                      )}
                     <button className="text-button" onClick={savePreset}>
                       <Save size={14} />
                       Save this preset

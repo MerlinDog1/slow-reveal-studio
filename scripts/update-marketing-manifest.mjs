@@ -14,6 +14,9 @@ const additional = JSON.parse(
 const digital = JSON.parse(
   await readFile(path.join(dir, "digital-studies.json"), "utf8"),
 );
+const presentation = JSON.parse(
+  await readFile(path.join(dir, "generated-presentation.json"), "utf8"),
+);
 const slots = [
   "home-hero",
   "dots-progression",
@@ -29,9 +32,16 @@ const slots = [
   "lines-progression",
   "size-comparison",
   "colour-options",
+  "family-making",
+  "macaw-on-wall",
 ];
 const map = new Map();
-for (const asset of [...existing.assets, ...additional, ...digital]) {
+for (const asset of [
+  ...existing.assets,
+  ...additional,
+  ...digital,
+  ...presentation,
+]) {
   map.set(asset.id, { ...map.get(asset.id), ...asset });
 }
 const assets = [];
@@ -61,7 +71,7 @@ const manifest = {
   assets,
   outstandingSlots: [],
   conceptSlotCoverage:
-    "14 of 14 populated: 10 generated concepts + 4 deterministic renderer studies",
+    "16 of 16 populated: 12 generated concepts + 4 deterministic renderer studies; additional mode comparisons have their own reveal/manifest.json",
   realProductionPhotographyStatus: "pending physical kit validation",
   ...(existing.optimisation ? { optimisation: existing.optimisation } : {}),
   updateCommands: [

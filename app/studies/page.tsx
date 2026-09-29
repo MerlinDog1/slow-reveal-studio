@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import marketing from "@/public/marketing/manifest.json";
 import { getPreviewModes } from "@/lib/mode-availability";
+import { RevealModes } from "@/components/reveal-modes";
 
 export const metadata = {
   title: "Studies in making",
@@ -102,6 +103,7 @@ export default function Studies() {
           materials and setting; they are not photographs of manufactured kits
           or customer results.
         </p>
+        <RevealModes availableModes={availableModes} />
         <div className="studies-grid">
           {visibleStudies.map(([file, title, caption]) => {
             const asset = marketing.assets.find(

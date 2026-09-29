@@ -89,7 +89,8 @@ export function toSvg(
   const paper =
     typeof options.background === "string"
       ? color(options.background)
-      : usesOpticalColour(s) && !geometry.circles.length
+      : (usesOpticalColour(s) || s.mode === "cross-stitch") &&
+          !geometry.circles.length
         ? "#ffffff"
         : s.invert
           ? "#1e1e1c"
@@ -113,6 +114,11 @@ export function toSvg(
     chunks.push(`<circle cx="${n(dot.x)}" cy="${n(dot.y)}" r="${n(radius)}"/>`);
   }
   for (const cell of geometry.cells) {
+    if (geometry.mode === "cross-stitch" && cell.label === "0") {
+      if (cell.color !== "#ffffff")
+        throw new Error("Cross Stitch blank keys must use unmarked paper.");
+      if (finished) continue;
+    }
     const fill = finished && cell.color ? ` fill="${color(cell.color)}"` : "";
     if (lineCurves) {
       const inset = finished ? 0 : guideWidth / 2;
@@ -145,7 +151,10 @@ export function toSvg(
       );
     }
     if (!finished && cell.label) {
-      const sizeMm = Math.min(1.8, cell.height * 0.5);
+      const sizeMm = Math.min(
+        1.8,
+        cell.height * (s.mode === "cross-stitch" ? 0.28 : 0.5),
+      );
       const metrics = measureLettering(cell.label, "sans-serif");
       chunks.push(
         outlinedText(

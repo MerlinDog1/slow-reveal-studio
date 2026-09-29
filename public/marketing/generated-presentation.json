@@ -1,0 +1,32 @@
+[
+  {
+    "id": "family-making",
+    "file": "/marketing/family-making-prototype.png",
+    "alt": "Illustrative family concept: two adults and two children adding small coloured marks to a partly completed dog portrait around a kitchen table.",
+    "generationArtifact": "exec-6876c42b-a750-488a-86fa-4dc475524a11.png",
+    "status": "generated-concept",
+    "isPhysicalProductEvidence": false,
+    "requiredCaption": "Illustrative prototype · AI-generated",
+    "generatedAt": "2026-09-29",
+    "tool": "built-in image_gen",
+    "promptFile": "/marketing/PROMPTS-PRESENTATION.md",
+    "sourceImages": [],
+    "qa": "Two plausible active marker grips, two observers, partly filled small-mark portrait. This is an invented family and illustrative canvas; marks, materials, scale and completion sequence are not production evidence.",
+    "licensing": "AI-generated project asset. No real customer, testimonial, manufacturer endorsement or physical-product certification implied."
+  },
+  {
+    "id": "macaw-on-wall",
+    "file": "/marketing/macaw-on-wall-prototype.png",
+    "alt": "Illustrative room concept: the studio’s colourful dotted macaw artwork framed above an oak cabinet.",
+    "generationArtifact": "exec-2eef068b-dbb5-4d22-aafd-9e4fc4b01c2c.png",
+    "status": "generated-concept",
+    "isPhysicalProductEvidence": false,
+    "requiredCaption": "Illustrative prototype · AI-generated",
+    "generatedAt": "2026-09-29",
+    "tool": "built-in image_gen edit with local image reference",
+    "promptFile": "/marketing/PROMPTS-PRESENTATION.md",
+    "sourceImages": ["/hero/macaw-finished.webp"],
+    "qa": "Whole frame is visible, straight geometry, plausible room lighting and recognisable supplied digital macaw design. Generative room placement may reinterpret marks; frame size, printing, pigment and canvas texture are not calibrated evidence.",
+    "licensing": "AI-generated room using this project's renderer-derived, AI-source macaw image. No customer home, actual product photograph or endorsement implied."
+  }
+]

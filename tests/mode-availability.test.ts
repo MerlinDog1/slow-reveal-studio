@@ -13,6 +13,7 @@ const activePreviews = [
   "colour-blend",
   "tv-weave",
   "fibonacci",
+  "cross-stitch",
 ];
 
 test("production never exposes experimental modes merely because they are listed or indexing is off", () => {
@@ -66,6 +67,7 @@ test("local development offers active labs and keeps Contour and Stipple retired
       "colour-blend",
       "tv-weave",
       "fibonacci",
+      "cross-stitch",
     ],
   );
   assert.deepEqual(
@@ -81,6 +83,7 @@ test("local development offers active labs and keeps Contour and Stipple retired
       "colour-blend",
       "tv-weave",
       "fibonacci",
+      "cross-stitch",
     ],
   );
   assert.deepEqual(
@@ -93,7 +96,7 @@ test("local development offers active labs and keeps Contour and Stipple retired
   );
 });
 
-test("hosted prototype opt-in exposes all six active previews while retaining retired exclusions", () => {
+test("hosted prototype opt-in exposes all seven active previews while retaining retired exclusions", () => {
   const environment = {
     NODE_ENV: "production",
     PUBLIC_PROTOTYPE_MODES_ENABLED: "true",

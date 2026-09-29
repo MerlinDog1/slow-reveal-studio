@@ -29,4 +29,4 @@ Marker selection, quantity, handling and drying instructions remain unresolved u
 Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.
 Line Amplification remains a research activity until ruler and completion trials pass.
 
-srs-kit-guide/1.0.0; renderer slow-reveal-geometry/1.7.0. No order identity or personal lettering is included in this guide.
+srs-kit-guide/1.1.0; renderer slow-reveal-geometry/1.8.0. No order identity or personal lettering is included in this guide.

@@ -483,6 +483,7 @@ export function Basket() {
                 "line-amplification": "Line Amplification",
                 "colour-blend": "Colour Blend",
                 "tv-weave": "TV Weave",
+                "cross-stitch": "Cross Stitch",
                 stipple: "Stipple Art",
                 fibonacci: "Fibonacci Spiral",
               }[(project.settings as RenderSettings).mode]

@@ -6,7 +6,6 @@ import {
   Flower2,
   Image,
   PenLine,
-  Package,
 } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { HeroArtwork } from "@/components/hero-artwork";
@@ -17,6 +16,7 @@ import {
 } from "@/components/making-guides";
 import { trustedPublicOrigin } from "@/lib/public-origin";
 import { getPreviewModes } from "@/lib/mode-availability";
+import { RevealModes } from "@/components/reveal-modes";
 
 export const metadata = {
   alternates: trustedPublicOrigin() ? { canonical: "/" } : undefined,
@@ -30,28 +30,29 @@ export default function Home() {
         <section className="home-hero home-hero-colour">
           <div className="hero-copy">
             <span className="eyebrow">
-              <span className="little-line" />A little time. A little wonder.
+              <span className="little-line" />
+              Your memory. The joy of making it.
             </span>
             <h1>
-              One little dot.
+              Put yourself
               <br />
               <em>
-                A whole new
+                in the
                 <br />
                 picture.
               </em>
             </h1>
             <p>
-              Start with a photograph you love. Add a little colour, a little
-              patience, and a moment to yourself. Watch something wonderful come
-              together, one dot at a time.
+              A favourite face. A place you miss. That very good dog. Turn a
+              photograph you love into an artwork that reveals itself, one small
+              mark at a time.
             </p>
             <Link href="/create" className="button">
               Create your own
               <ArrowUpRight size={18} />
             </Link>
             <a className="colour-hero-how" href="#how-it-works">
-              Discover the lovely part <ArrowRight size={16} />
+              Watch the reveal <ArrowRight size={16} />
             </a>
             <div className="hero-reassurance">
               <span>
@@ -97,7 +98,7 @@ export default function Home() {
                 n: "02",
                 icon: PenLine,
                 title: "Enjoy the in-between",
-                text: "Your planned kit contains a faintly printed canvas, a matching marker and a simple guide. Make a little each day.",
+                text: "Follow the faint guide, one colour at a time. Make a little each day, or gather around the table and make it together.",
               },
               {
                 n: "03",
@@ -115,6 +116,71 @@ export default function Home() {
                 <p>{text}</p>
               </article>
             ))}
+          </div>
+        </section>
+        <RevealModes availableModes={availableModes} />
+        <section className="making-moments section">
+          <div className="moments-heading">
+            <span className="eyebrow">The picture is only half of it</span>
+            <h2>
+              A little time together.
+              <br />
+              <em>Something to keep.</em>
+            </h2>
+            <p>
+              Leave it on the table. Come back for a few more marks. The small
+              moments become part of the picture, too.
+            </p>
+          </div>
+          <div className="moments-grid">
+            <figure>
+              <div className="moment-photo">
+                <img
+                  src="/marketing/web/family-making-1280.webp"
+                  srcSet="/marketing/web/family-making-640.webp 640w, /marketing/web/family-making-1280.webp 1280w"
+                  sizes="(max-width: 700px) 100vw, 57vw"
+                  width={1536}
+                  height={1024}
+                  loading="lazy"
+                  alt="Illustrative family concept: two adults and two children adding small coloured marks to a partly completed dog portrait around a kitchen table"
+                />
+              </div>
+              <figcaption>
+                <small className="moment-disclosure">
+                  Illustrative prototype · AI-generated
+                </small>
+                <span>01 / The making</span>
+                <h3>A table everyone can come back to.</h3>
+                <p>
+                  A shared project, a quiet afternoon, a colour each. There’s no
+                  need to finish it all today.
+                </p>
+              </figcaption>
+            </figure>
+            <figure>
+              <div className="moment-photo">
+                <img
+                  src="/marketing/web/macaw-on-wall-1280.webp"
+                  srcSet="/marketing/web/macaw-on-wall-640.webp 640w, /marketing/web/macaw-on-wall-1280.webp 1280w"
+                  sizes="(max-width: 700px) 100vw, 43vw"
+                  width={1536}
+                  height={1024}
+                  loading="lazy"
+                  alt="Illustrative room concept: the studio’s colourful dotted macaw artwork framed above an oak cabinet"
+                />
+              </div>
+              <figcaption>
+                <small className="moment-disclosure">
+                  Illustrative prototype · AI-generated
+                </small>
+                <span>02 / The keeping</span>
+                <h3>A place on the wall. A story behind it.</h3>
+                <p>
+                  The photograph starts the story. The time you spend making it
+                  adds another chapter.
+                </p>
+              </figcaption>
+            </figure>
           </div>
         </section>
         <section className="signature-section section">
@@ -178,9 +244,14 @@ export default function Home() {
                     TV Weave <ArrowUpRight size={14} />
                   </Link>
                 )}
+                {availableModes.includes("cross-stitch") && (
+                  <Link href="/lab/cross-stitch">
+                    Cross Stitch <ArrowUpRight size={14} />
+                  </Link>
+                )}
               </div>
             )}
-            {process.env.NODE_ENV === "development" && (
+            {availableModes.length > 1 && (
               <p className="fine-print">
                 Alternative modes are experiments until physical making tests
                 are complete.
@@ -200,7 +271,7 @@ export default function Home() {
           <div className="kit-list">
             {[
               "A canvas guide, made from your photograph",
-              "A marker selected for your canvas",
+              "Markers matched to your chosen colour key",
               "A simple guide to getting started",
               "Your finished preview, to keep beside you",
             ].map((text, i) => (
@@ -247,14 +318,14 @@ export default function Home() {
             <h2>
               Before your
               <br />
-              <em>first little dot.</em>
+              <em>first little mark.</em>
             </h2>
           </div>
           <div className="faq-list">
             {[
               {
                 q: "Do I need to be artistic?",
-                a: "The canvas gives you a guide to follow. You fill the circles at your own pace. Start with Easy for fewer, larger dots and a more relaxed making experience.",
+                a: "The template gives you marks to fill at your own pace. Start with Easy for fewer, larger marks and a more relaxed making experience. Each mode has its own making guide.",
               },
               {
                 q: "What makes a good photograph?",
@@ -263,6 +334,10 @@ export default function Home() {
               {
                 q: "Can I see the template before I decide?",
                 a: "Yes. Switch between your original photo, finished artwork and printed template in the studio. Both artwork views are drawn from the same marks, so you can see exactly how the image is constructed.",
+              },
+              {
+                q: "Which styles keep the picture a surprise?",
+                a: "Try Colour Blend, TV Weave, colour Fibonacci Spiral or Cross Stitch. Their repeated marks reveal the image through colour as you work. Cross Stitch keeps the same grid even in blank areas. Number patterns can still give clues, so concealment depends on your photograph and settings. Compare the template before choosing.",
               },
               {
                 q: "Can I add names or a date?",

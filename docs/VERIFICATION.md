@@ -1,6 +1,16 @@
-# Verification record — 28 September 2026
+# Verification record — 29 September 2026
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
+
+## Reveal, coded marker palettes and presentation — 29 September
+
+- `npm run typecheck`, `npm test` and `npm run build` passed: **217 tests total, 215 passed, zero failed, two existing optional browser checks skipped**. Separate Edge browser checks below cover the changed UI. Production build used the hosted-prototype flag with checkout and physical approval disabled; all seven lab routes are prerendered. Private `.data` files are excluded from all traced server bundles. `git diff --check` passed.
+- Desktop (1280 px) and mobile (390 px) homepage checks found no missing images, failed image requests, page errors or horizontal overflow. All four guide/finished cards switch to their paired assets. Family and wall concepts have visible 11 px HTML disclosures; the initial faint overlays were replaced after review. Customer Mosaic switches between monochrome and the named 32-colour key; Cross Stitch shows the 16/32 selectors, code legend and blank-zero instructions. Hero/social and both version-bound PDFs were regenerated; all twelve A4 pages were visually checked and artifact/source hashes verified.
+
+- Fit sampling has four focused tests covering dimensions/memory limits, unchanged SVG internals, exact subpixel area averaging and alpha edges. A dense-dot synthetic raster comparison against a 16× reference reduced RMS error from 13.225 to 1.873 out of 255. This is digital sampling evidence, not a pigment or print-quality claim.
+- Local Edge/Playwright browser checks verified TV Weave at Fit (4× sampling), unchanged SVG at 200%, vector templates, Compare at 63%, rapid mode/zoom changes, and zero page errors. Mobile Colour Blend at 390 × 844/DPR 2 verified Fit, 200%, Compare at 42% and no horizontal overflow. Screenshots and reports are under ignored `.data/qa/2026-09-29/`. The normal CUA entry point failed with a missing kernel-assets path, so these checks used the installed Edge browser through Playwright.
+- Cross Stitch regressions cover deterministic full-grid positions/shapes across different sources, physical bounds/gaps, palette assignment, blank zero semantics, mark and ink statistics, SVG pairing, schemas/restore, public mode policy and real local/server guide packages. Named marker-profile tests check exact ordered identification, real chart codes, nested subsets and rejection of historical/custom arrays. Guide tests check code correspondence and A4 annotation bounds.
+- All eight new reveal-study WebPs were inspected and checked against their manifest hashes and dimensions. Templates and finished artwork derive from the same per-mode geometry; the sixteen-colour Ohuhu subset is a chart approximation. The two new lifestyle scenes were inspected and retain their AI-generated captions and original files. No physical approval follows from any digital check.
 
 ## Hosted prototype modes — 28 September
 

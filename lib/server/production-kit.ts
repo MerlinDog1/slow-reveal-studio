@@ -99,6 +99,10 @@ export async function createProductionKit(
     },
     settings: geometry.settings,
     palette: guide.legend,
+    ...(guide.markerProfile ? { markerProfile: guide.markerProfile } : {}),
+    ...(geometry.mode === "cross-stitch"
+      ? { blankCrosses: guide.blankCellCount, paperKey: "0" }
+      : {}),
     materials: guide.materials.map((item) => ({
       ...item,
       stock: { sku: null, batchOrLot: null, quantity: null },
@@ -131,8 +135,13 @@ export async function createProductionKit(
     "DIGITAL COLOUR KEY - PHYSICAL MARKERS MUST BE ASSIGNED",
     ...guide.legend.map(
       (entry) =>
-        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}: ${entry.color}${supportsPalette(geometry.mode) ? `; ${entry.usedCellCount} ${geometry.mode === "mosaic" ? "cells" : "marks"}` : ""}. Marker SKU and quantity unassigned.`,
+        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}${entry.markerCode ? ` / pen ${entry.markerCode}` : ""}: ${entry.color}${supportsPalette(geometry.mode) ? `; ${entry.usedCellCount} ${geometry.mode === "mosaic" ? "cells" : "marks"}` : ""}. Marker SKU and quantity unassigned.`,
     ),
+    ...(geometry.mode === "cross-stitch"
+      ? [
+          `Key 0: ${guide.blankCellCount ?? 0} crosses remain unmarked; no marker or stock quantity is required for paper.`,
+        ]
+      : []),
     "",
     "UNRESOLVED",
     ...packing.unresolved,

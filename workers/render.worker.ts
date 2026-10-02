@@ -11,11 +11,13 @@ export interface RenderWorkerRequest {
   input: PixelImage;
   settings: RenderSettings;
   subjectMask?: SubjectMask;
+  progressive?: boolean;
 }
 export interface RenderWorkerResponse {
   id: number | string;
   geometry?: RenderGeometry;
   error?: string;
+  draft?: boolean;
 }
 
 const scope = globalThis as unknown as {
@@ -25,6 +27,19 @@ const scope = globalThis as unknown as {
 
 scope.onmessage = ({ data }) => {
   try {
+    if (data.progressive && data.settings.spacingMm < 4)
+      scope.postMessage({
+        id: data.id,
+        draft: true,
+        geometry: renderImage(
+          data.input,
+          {
+            ...data.settings,
+            spacingMm: Math.max(4.2, data.settings.spacingMm * 2),
+          },
+          data.subjectMask,
+        ),
+      });
     scope.postMessage({
       id: data.id,
       geometry: renderImage(data.input, data.settings, data.subjectMask),

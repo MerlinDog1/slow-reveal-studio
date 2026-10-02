@@ -251,10 +251,6 @@ export function validateRestorableProject(
       widthMm: settings.widthMm,
       heightMm: settings.heightMm,
     });
-    if (settings.mode !== "dots")
-      throw new Error(
-        "Manual subject selections are supported in Signature Dots only.",
-      );
     project.subjectMask = mask;
   } else if ((settings.subjectMaskStrength ?? 0) > 0) {
     throw new Error(

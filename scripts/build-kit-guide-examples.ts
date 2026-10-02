@@ -162,6 +162,8 @@ async function main() {
     "lib/renderers/optical.ts",
     "lib/renderers/stipple.ts",
     "lib/renderers/fibonacci.ts",
+    "lib/renderers/creative.ts",
+    "lib/renderers/creative-lines.ts",
     "lib/renderers/index.ts",
     "lib/renderers/modes.ts",
     "lib/renderers/sampling.ts",

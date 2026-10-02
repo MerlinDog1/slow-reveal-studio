@@ -1,3 +1,10 @@
+import {
+  creativeTone,
+  circleInAperture,
+  cellInAperture,
+  apertureContains,
+} from "./creative";
+import { renderCreativeLines } from "./creative-lines";
 import { analyzeImage } from "./sampling";
 import { renderOptical, TV_COLUMN_RATIO } from "./optical";
 import { renderStipple } from "./stipple";
@@ -101,8 +108,6 @@ export function renderImage(
       "The subject mask does not match this canvas size. Clear it or redraw the selection.",
     );
   const maskActive = s.subjectMaskStrength! > 0;
-  if (maskActive && s.mode !== "dots")
-    throw new Error("Manual subject masks currently apply to Dots only.");
   if (maskActive && !mask)
     throw new Error(
       "Paint a subject selection before increasing subject mask strength.",
@@ -122,7 +127,11 @@ export function renderImage(
       "Inverted artwork uses a light marker on dark canvas; white ink and substrate need a print test.",
     );
   }
-  const tone = analyzeImage(input, s);
+  const tone = creativeTone(
+    analyzeImage(input, s),
+    s,
+    s.mode === "dots" || usesOpticalColour(s) ? undefined : maskSampler,
+  );
   const bounds = {
     x: s.safeMarginMm,
     y: s.safeMarginMm,
@@ -137,8 +146,14 @@ export function renderImage(
       "Personalised text is small at this size. Shorten it for a clearer result.",
     );
   const requestedPitch = s.spacingMm / Math.sqrt(s.density);
+  const ribbonFactor =
+    s.mode === "line-amplification" &&
+    s.linePattern &&
+    s.linePattern !== "horizontal"
+      ? 3
+      : 1;
   const areaPitch = Math.sqrt(
-    (bounds.width * bounds.height) /
+    (bounds.width * bounds.height * ribbonFactor) /
       (MAX_MARKS * 0.82 * (s.mode === "tv-weave" ? TV_COLUMN_RATIO : 1)),
   );
   // Keep a 0.25 mm clear gap, including the rounding precision, between adjacent dots.
@@ -160,7 +175,7 @@ export function renderImage(
     maxDiameter,
     subjectMask: maskSampler,
   };
-  const circles =
+  let circles =
     s.mode === "dots"
       ? renderDots(context)
       : s.mode === "stipple"
@@ -168,7 +183,7 @@ export function renderImage(
         : s.mode === "fibonacci" && !s.palette
           ? renderFibonacci(context)
           : [];
-  const cells =
+  let cells =
     s.mode === "mosaic"
       ? renderMosaic(context)
       : s.mode === "fibonacci" && s.palette
@@ -176,10 +191,12 @@ export function renderImage(
         : isOpticalMode(s.mode)
           ? renderOptical(context)
           : s.mode === "line-amplification"
-            ? renderLines(context)
+            ? s.linePattern && s.linePattern !== "horizontal"
+              ? renderCreativeLines(context)
+              : renderLines(context)
             : [];
   const contourInset = 0.5;
-  const paths =
+  let paths =
     s.mode === "contour"
       ? renderContours({
           ...context,
@@ -191,6 +208,11 @@ export function renderImage(
           },
         })
       : [];
+  circles = circles.filter((c) => circleInAperture(s, bounds, c));
+  cells = cells.filter((c) => cellInAperture(s, bounds, c));
+  paths = paths.filter((p) =>
+    p.points.every((point) => apertureContains(s, bounds, point, p.width / 2)),
+  );
   const count = circles.length + cells.length + paths.length;
   if (count > MAX_MARKS)
     throw new Error(

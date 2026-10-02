@@ -20,11 +20,6 @@ export function validateSubjectMask(
       409,
       "Select a subject mask or set its strength to zero.",
     );
-  if ((settings.subjectMaskStrength ?? 0) > 0 && settings.mode !== "dots")
-    throw new ApiError(
-      400,
-      "Subject masks are currently available in Dots only.",
-    );
   if (mask) {
     try {
       assertSubjectMaskBinding(mask, binding);

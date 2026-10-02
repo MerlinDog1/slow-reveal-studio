@@ -1,3 +1,4 @@
+import { creativeSettingsChanged } from "../creative-review";
 import { z } from "zod";
 import type { AdminIdentity } from "./admin-auth";
 import { randomUUID } from "node:crypto";
@@ -240,6 +241,7 @@ export async function updateOrder(
       customerProofRequired:
         latest?.customerProofRequired ||
         base.invert !== settings.invert ||
+        creativeSettingsChanged(base, settings) ||
         (base.detailPreservation ?? 0) !== (settings.detailPreservation ?? 0) ||
         effectiveGuideColor(base) !== effectiveGuideColor(settings) ||
         (!!currentMask &&

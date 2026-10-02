@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { PreviewCameraContext } from "./artwork-canvas";
 import { Minus, Plus, Maximize } from "lucide-react";
 
 const LEVELS = [1, 1.5, 2, 3, 4, 6, 8, 12, 16];
@@ -298,7 +299,11 @@ export function PreviewViewport({
             visibility: size.width ? "visible" : "hidden",
           }}
         >
-          {children}
+          <PreviewCameraContext.Provider
+            value={`${camera.zoom}:${camera.x}:${camera.y}:${size.width}:${size.height}`}
+          >
+            {children}
+          </PreviewCameraContext.Provider>
         </div>
       </div>
       <div className="preview-zoom-footer">

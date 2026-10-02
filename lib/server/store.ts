@@ -1,7 +1,7 @@
+import { replaceFile } from "./atomic-file";
 import {
   mkdir,
   readFile,
-  rename,
   writeFile,
   readdir,
   unlink,
@@ -181,7 +181,11 @@ export async function putRecord<T>(
   }
   const temporary = `${file}.${randomUUID()}.tmp`;
   await writeFile(temporary, JSON.stringify(payload), { mode: 0o600 });
-  await rename(temporary, file);
+  try {
+    await replaceFile(temporary, file);
+  } finally {
+    await unlink(temporary).catch(() => {});
+  }
   return true;
 }
 export async function listRecords<T>(kind: Collection): Promise<T[]> {

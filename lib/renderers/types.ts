@@ -60,6 +60,20 @@ export interface RenderSettings {
   cellShape?: "square" | "rounded" | "hexagon";
   /** Supplied marker colours. Unmarked white canvas is an additional paper tone. */
   palette?: string[];
+  /** Optional creative controls. Omission retains the original rendering behaviour. */
+  colourCompensation?: number;
+  shadowLift?: number;
+  focusX?: number;
+  focusY?: number;
+  focusRadius?: number;
+  focusBrightness?: number;
+  focusDetail?: number;
+  selectiveColour?: boolean;
+  compositionShape?: "rectangle" | "circle" | "oval";
+  spiralX?: number;
+  spiralY?: number;
+  spiralRotation?: number;
+  linePattern?: "horizontal" | "spiral" | "flow" | "crosshatch";
   text?: PersonalizedText;
 }
 
@@ -130,7 +144,7 @@ export interface SvgOptions {
   title?: string;
 }
 
-export const RENDERER_VERSION = "slow-reveal-geometry/1.7.0";
+export const RENDERER_VERSION = "slow-reveal-geometry/1.8.0";
 export const MAX_MARKS = 60_000;
 export const DEFAULT_SETTINGS: RenderSettings = {
   mode: "dots",
@@ -229,6 +243,41 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
   };
   if (!RENDER_MODE_IDS.includes(s.mode))
     throw new Error("Unknown rendering mode.");
+  const optionalRanges: [keyof RenderSettings, number, number][] = [
+    ["colourCompensation", 0, 1],
+    ["shadowLift", 0, 1],
+    ["focusX", 0, 1],
+    ["focusY", 0, 1],
+    ["focusRadius", 0.05, 1],
+    ["focusBrightness", -0.5, 0.5],
+    ["focusDetail", 0, 1],
+    ["spiralX", 0, 1],
+    ["spiralY", 0, 1],
+    ["spiralRotation", 0, 360],
+  ];
+  for (const [key, lo, hi] of optionalRanges) {
+    const value = s[key];
+    if (
+      value !== undefined &&
+      (typeof value !== "number" ||
+        !Number.isFinite(value) ||
+        value < lo ||
+        value > hi)
+    )
+      throw new Error(`${key} must be between ${lo} and ${hi}.`);
+  }
+  if (s.selectiveColour !== undefined && typeof s.selectiveColour !== "boolean")
+    throw new Error("Selective colour must be true or false.");
+  if (
+    s.compositionShape !== undefined &&
+    !["rectangle", "circle", "oval"].includes(s.compositionShape)
+  )
+    throw new Error("Choose a rectangular, circular or oval composition.");
+  if (
+    s.linePattern !== undefined &&
+    !["horizontal", "spiral", "flow", "crosshatch"].includes(s.linePattern)
+  )
+    throw new Error("Choose a supported line pattern.");
   const ranges: [keyof RenderSettings, number, number][] = [
     ["widthMm", 30, 1500],
     ["heightMm", 30, 1500],

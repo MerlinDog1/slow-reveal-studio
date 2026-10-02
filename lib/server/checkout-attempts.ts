@@ -183,6 +183,18 @@ export async function beginCheckout(
         409,
         "This mode or inverted substrate is still in physical testing.",
       );
+    if (
+      design.mode === "line-amplification" &&
+      design.settings.linePattern &&
+      design.settings.linePattern !== "horizontal" &&
+      !(process.env.PHYSICALLY_VALIDATED_LINE_PATTERNS ?? "")
+        .split(",")
+        .includes(design.settings.linePattern)
+    )
+      throw new ApiError(
+        409,
+        "This experimental line pattern still needs its own physical approval.",
+      );
     const price = quote(
       catalogue,
       design.productId,
@@ -253,7 +265,7 @@ export async function beginCheckout(
         ],
         allow_promotion_codes: true,
         metadata: { orderId, snapshotHash: body.proofHash },
-        customer_email: design.email,
+        ...(design.email ? { customer_email: design.email } : {}),
         expires_at: Math.floor((now + 23 * 3600_000) / 1000),
       },
       state: "producing",

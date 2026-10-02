@@ -1,15 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ArrowUpRight, Maximize2, Pause, Play, RotateCcw } from "lucide-react";
 import { revealedCount, type HeroRevealData } from "@/lib/hero-reveal";
 import { PreviewDialog } from "@/components/preview-dialog";
 import { PreviewViewport } from "@/components/preview-viewport";
 import study from "@/public/hero/manifest.json";
 
+const HeroSubjects = lazy(() =>
+  import("./hero-subjects").then((m) => ({ default: m.HeroSubjects })),
+);
+
 type View = "making" | "original" | "guide";
 
 export function HeroArtwork() {
+  const [subject, setSubject] = useState("macaw");
+  const [pullBack, setPullBack] = useState(false);
   const frame = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const nib = useRef<HTMLSpanElement>(null);
@@ -137,7 +150,8 @@ export function HeroArtwork() {
       !inView ||
       !tabVisible ||
       expanded ||
-      view !== "making"
+      view !== "making" ||
+      subject !== "macaw"
     )
       return;
     let raf = 0,
@@ -157,7 +171,17 @@ export function HeroArtwork() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [data, motion, playing, inView, tabVisible, view, expanded, paint]);
+  }, [
+    data,
+    motion,
+    playing,
+    inView,
+    tabVisible,
+    view,
+    expanded,
+    paint,
+    subject,
+  ]);
 
   const complete = count === study.markCount;
   const animated = Boolean(data && motion);
@@ -178,9 +202,30 @@ export function HeroArtwork() {
         </span>
         <span>NO. 001 — SCARLET MACAW</span>
       </div>
-      <div className="colour-hero-stage">
+      <label className="hero-subject">
+        Choose a study
+        <select aria-label="Choose a study" value={subject} onChange={(e) => setSubject(e.target.value)}>
+          <option value="macaw">Scarlet macaw</option>
+          <option value="portrait">Portrait</option>
+          <option value="light-pet">Golden retriever</option>
+          <option value="landscape">Mountain landscape</option>
+        </select>
+      </label>
+      {subject !== "macaw" && (
+        <Suspense fallback={<p>Opening study…</p>}>
+          <HeroSubjects subject={subject} />
+        </Suspense>
+      )}
+      <div
+        className="colour-hero-stage"
+        style={subject !== "macaw" ? { display: "none" } : undefined}
+      >
         <div className="colour-hero-halo" aria-hidden="true" />
-        <div className="colour-hero-paper" ref={frame}>
+        <div
+          className="colour-hero-paper"
+          ref={frame}
+          style={{ overflow: "hidden" }}
+        >
           <img
             src={
               view === "original"
@@ -202,6 +247,13 @@ export function HeroArtwork() {
           />
           <canvas
             ref={canvas}
+            style={
+              pullBack && motion && !complete
+                ? {
+                    transform: `scale(${1 + 2 * (1 - count / study.markCount) ** 2})`,
+                  }
+                : undefined
+            }
             aria-hidden="true"
             className={
               animated && !complete && view === "making" ? "is-visible" : ""
@@ -243,7 +295,10 @@ export function HeroArtwork() {
           SMALL MARKS. SOMETHING EXTRAORDINARY.
         </span>
       </div>
-      <div className="colour-hero-console">
+      <div
+        className="colour-hero-console"
+        style={subject !== "macaw" ? { display: "none" } : undefined}
+      >
         <div className="colour-hero-status">
           <span>
             {view === "original"
@@ -267,6 +322,41 @@ export function HeroArtwork() {
         <div className="colour-hero-track" aria-hidden="true">
           <span style={{ width: `${(count / study.markCount) * 100}%` }} />
         </div>
+        <label className="range-field">
+          Explore the reveal
+          <input
+            aria-label="Hero reveal position"
+            type="range"
+            min={0}
+            max={study.markCount}
+            value={count}
+            disabled={!data}
+            onChange={(e) => {
+              const target = Number(e.target.value);
+              setPlaying(false);
+              setView("making");
+              current.current = target;
+              setCount(target);
+              paint(target, true);
+              let lo = 0,
+                hi = 24000;
+              for (let i = 0; i < 20; i++) {
+                const mid = (lo + hi) / 2;
+                if (revealedCount(mid, study.markCount) < target) lo = mid;
+                else hi = mid;
+              }
+              elapsed.current = hi;
+            }}
+          />
+        </label>
+        <label className="check-label">
+          <input
+            type="checkbox"
+            checked={pullBack}
+            onChange={(e) => setPullBack(e.target.checked)}
+          />
+          Pull back from individual dots
+        </label>
         <div className="colour-hero-controls">
           <div className="colour-hero-views" aria-label="Artwork views">
             {(

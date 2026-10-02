@@ -29,6 +29,10 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import { CreativeControls } from "./creative-controls";
+import { StudioWorkbench } from "./studio-workbench";
+import { useStudioHistory } from "./use-studio-history";
+import { ArtworkCanvas } from "./artwork-canvas";
 import { SiteHeader } from "@/components/site-header";
 import { PreviewDialog } from "@/components/preview-dialog";
 import { PreviewViewport } from "@/components/preview-viewport";
@@ -189,6 +193,9 @@ export function Studio({
       ? { palette: defaultOpticalPalette() }
       : {}),
   });
+  const [lockPalette, setLockPalette] = useState(false);
+  const [lockTone, setLockTone] = useState(false);
+  const [lockCrop, setLockCrop] = useState(false);
   const [preset, setPreset] = useState("standard");
   const [crop, setCrop] = useState<Crop>(DEFAULT_CROP);
   const [source, setSource] = useState<string | null>(null);
@@ -256,6 +263,23 @@ export function Studio({
   const products = catalogue?.products ?? [];
   const finishes = catalogue?.finishes ?? [];
   const modeAvailable = availableModes.includes(settings.mode);
+  const historyValue = useMemo(
+    () => ({ settings, crop, subjectMask, productId, finishId, inkId }),
+    [settings, crop, subjectMask, productId, finishId, inkId],
+  );
+  const history = useStudioHistory(
+    historyValue,
+    (snapshot) => {
+      setSettings(snapshot.settings);
+      setCrop(snapshot.crop);
+      setSubjectMask(snapshot.subjectMask);
+      setProductId(snapshot.productId);
+      setFinishId(snapshot.finishId);
+      setInkId(snapshot.inkId);
+      setSaved(false);
+    },
+    sourceSha256,
+  );
   useEffect(() => {
     const controller = new AbortController();
     let disposed = false;
@@ -372,20 +396,39 @@ export function Studio({
     (patch: Partial<RenderSettings>) => {
       if (
         subjectMask &&
-        ((patch.mode !== undefined && patch.mode !== settings.mode) ||
-          (patch.widthMm !== undefined && patch.widthMm !== settings.widthMm) ||
+        ((patch.widthMm !== undefined && patch.widthMm !== settings.widthMm) ||
           (patch.heightMm !== undefined &&
             patch.heightMm !== settings.heightMm))
       ) {
         setError(
-          "Clear the manual subject selection before changing the style or canvas size.",
+          "Clear the manual subject selection before changing canvas size.",
         );
         return;
       }
-      setSettings((s) => ({ ...s, ...patch }));
+      const allowed = { ...patch };
+      if (lockPalette) delete allowed.palette;
+      if (lockTone)
+        for (const key of [
+          "contrast",
+          "brightness",
+          "gamma",
+          "shadowLift",
+          "edgeEmphasis",
+          "threshold",
+          "autoExposure",
+        ] as const)
+          delete allowed[key];
+      setSettings((s) => ({ ...s, ...allowed }));
       setSaved(false);
     },
-    [subjectMask, settings.mode, settings.widthMm, settings.heightMm],
+    [
+      subjectMask,
+      settings.mode,
+      settings.widthMm,
+      settings.heightMm,
+      lockPalette,
+      lockTone,
+    ],
   );
   useEffect(() => {
     const w = new Worker(
@@ -393,24 +436,27 @@ export function Studio({
     );
     worker.current = w;
     w.onmessage = (event) => {
-      const { id, geometry: next, error: workerError } = event.data;
+      const { id, geometry: next, error: workerError, draft } = event.data;
       if (id !== renderId.current) return;
-      setRendering(false);
+      setRendering(!!draft);
       setRenderMs(Math.round(performance.now() - startTime.current));
-      if (workerError) setError(workerError);
-      else {
+      if (workerError) {
+        setError(workerError);
+        setGeometry(null);
+      } else {
         setGeometry(next);
         setError("");
       }
     };
     w.onerror = () => {
+      setGeometry(null);
       setError(
         "The renderer stopped. Try a less detailed preset or reload the studio.",
       );
       setRendering(false);
     };
     return () => {
-      w.terminate();
+      worker.current?.terminate();
     };
   }, []);
   useEffect(() => {
@@ -572,11 +618,20 @@ export function Studio({
           width: pixels.width,
           height: pixels.height,
         };
-        if (worker.current)
-          worker.current.postMessage({ id, input, settings, subjectMask }, [
-            pixels.data.buffer,
-          ]);
-        else {
+        if (worker.current) {
+          const old = worker.current;
+          const next = new Worker(
+            new URL("../workers/render.worker.ts", import.meta.url),
+          );
+          next.onmessage = old.onmessage;
+          next.onerror = old.onerror;
+          old.terminate();
+          worker.current = next;
+          next.postMessage(
+            { id, input, settings, subjectMask, progressive: true },
+            [pixels.data.buffer],
+          );
+        } else {
           setGeometry(renderImage(input, settings, subjectMask));
           setRendering(false);
         }
@@ -972,15 +1027,6 @@ export function Studio({
         )?.[0] ?? "custom")
       : "custom";
   const templateView = view === "template";
-  const svg = useMemo(
-    () =>
-      geometry
-        ? toSvg(geometry, templateView ? "template" : "finished", {
-            includeSafeArea: safeArea,
-          })
-        : "",
-    [geometry, templateView, safeArea],
-  );
   const currentRef = REFERENCE_IMAGES.find((r) => r.id === referenceId);
   function clearSubjectSelection() {
     setSubjectMask(undefined);
@@ -1019,9 +1065,10 @@ export function Studio({
           alt={`Cropped original: ${sourceName}`}
         />
       ) : geometry ? (
-        <div
-          className="rendered-svg"
-          dangerouslySetInnerHTML={{ __html: svg }}
+        <ArtworkCanvas
+          geometry={geometry}
+          variant={templateView ? "template" : "finished"}
+          safeArea={safeArea}
         />
       ) : (
         <div className="canvas-placeholder">
@@ -1172,6 +1219,20 @@ export function Studio({
           </h1>
         </div>
         <div className="studio-top-actions">
+          <button
+            className="text-button"
+            onClick={history.undo}
+            disabled={!history.canUndo || !!busy}
+          >
+            Undo
+          </button>
+          <button
+            className="text-button"
+            onClick={history.redo}
+            disabled={!history.canRedo || !!busy}
+          >
+            Redo
+          </button>
           <button className="text-button" onClick={restore} disabled={!!busy}>
             Open saved design
           </button>
@@ -1411,6 +1472,72 @@ export function Studio({
             *Making time is an uncalibrated estimate. Preview colours and
             printed guides need physical sample testing.
           </p>
+          <div className="setting-locks" aria-label="Keep favourite settings">
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={lockCrop}
+                onChange={(e) => setLockCrop(e.target.checked)}
+              />
+              Lock crop
+            </label>
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={lockPalette}
+                onChange={(e) => setLockPalette(e.target.checked)}
+              />
+              Lock palette
+            </label>
+            <label className="check-label">
+              <input
+                type="checkbox"
+                checked={lockTone}
+                onChange={(e) => setLockTone(e.target.checked)}
+              />
+              Lock tone
+            </label>
+          </div>
+          {geometry && !rendering && source && sourceBlob && (
+            <StudioWorkbench
+              geometry={geometry}
+              photo={croppedUrl}
+              source={source}
+              identity={sourceSha256}
+              modes={availableModes}
+              project={{
+                id: "current",
+                name: sourceName,
+                updatedAt: new Date().toISOString(),
+                image: sourceBlob,
+                settings,
+                crop,
+                subjectMask,
+                productId,
+                finishId,
+                referenceId,
+                rendererVersion: RENDERER_VERSION,
+              }}
+              openProject={(project, needsReview) => {
+                if (needsReview) {
+                  setPendingRestore(project);
+                  return;
+                }
+                const request = ++restoreRequest.current;
+                selectionOrigin.current = "restore";
+                void openRestoredProject(project, request).catch((e) =>
+                  setProjectIssue(
+                    e instanceof Error ? e.message : "Could not open project.",
+                  ),
+                );
+              }}
+              apply={(next, nextCrop) => {
+                update(next);
+                if (!lockCrop && !subjectMask) setCrop(nextCrop);
+                setSaved(false);
+              }}
+            />
+          )}
           <div className="reference-section">
             <div className="section-title">
               <h2>Find a little inspiration</h2>
@@ -1495,7 +1622,7 @@ export function Studio({
                 <button
                   className="icon-button"
                   aria-label="Reset crop"
-                  disabled={!!subjectMask}
+                  disabled={!!subjectMask || lockCrop}
                   onClick={() => {
                     setCrop(DEFAULT_CROP);
                     setSaved(false);
@@ -1656,7 +1783,6 @@ export function Studio({
                   {modeOptions.map((m) => (
                     <button
                       key={m.id}
-                      disabled={!!subjectMask && m.id !== settings.mode}
                       className={settings.mode === m.id ? "selected" : ""}
                       aria-pressed={settings.mode === m.id}
                       onClick={() => {
@@ -1707,7 +1833,7 @@ export function Studio({
                     : "Follow the sunflower spirals, filling each circle with one ink. Larger dots create shadows; smaller dots reveal the light. Keep the spaces between them."}
                 </p>
               )}
-              {settings.mode === "dots" && (lab || subjectMask) && (
+              {(lab || subjectMask) && (
                 <div className="subject-selection-controls">
                   <h3>Manual subject selection</h3>
                   <p className="fine-print">
@@ -1791,6 +1917,7 @@ export function Studio({
                   <label className="select-field">
                     Marker palette
                     <select
+                      aria-label="Marker palette"
                       value={settings.palette?.length ?? 1}
                       onChange={(e) => {
                         const n = Number(e.target.value);
@@ -1823,9 +1950,12 @@ export function Studio({
                       {settings.mode === "mosaic" && (
                         <option value="32">32 colours</option>
                       )}
-                      {settings.mode !== "mosaic" &&
-                        settings.palette &&
-                        ![8, 16].includes(settings.palette.length) && (
+                      {settings.palette &&
+                        !(
+                          settings.mode === "mosaic"
+                            ? [2, 4, 6, 8, 16, 32]
+                            : [8, 16]
+                        ).includes(settings.palette.length) && (
                           <option value={settings.palette.length}>
                             {settings.palette.length} colours (saved palette)
                           </option>
@@ -1864,7 +1994,18 @@ export function Studio({
                   )}
                 </>
               )}
+              <CreativeControls
+                settings={settings}
+                update={update}
+                photo={croppedUrl}
+              />
               <h3 className="field-heading">How would you like to make it?</h3>
+              <p className="fine-print">
+                Finer detail means more marks and smaller guides. Inspect the
+                template at actual size; for tiny numbers, choose a larger
+                canvas or a coarser preset. The making companion checks label
+                sizes and provides a printable sample.
+              </p>
               {presetsStatus === "loading" && (
                 <p className="fine-print" role="status">
                   Loading studio presets. Built-in choices are ready below.

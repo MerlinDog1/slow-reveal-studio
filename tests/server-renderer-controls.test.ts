@@ -366,13 +366,22 @@ test("production proofs and package manifests bind detail and actual guide colou
     );
   }));
 
-test("admin detail and effective guide changes require fresh customer proof without mutating paid artwork", async () =>
+test("admin creative, detail and effective guide changes require fresh customer proof without mutating paid artwork", async () =>
   isolated(async () => {
     const legacy = await fixture({
       detailPreservation: undefined,
       guideColor: undefined,
     });
     for (const patch of [
+      { colourCompensation: 0.4 },
+      { shadowLift: 0.2 },
+      { focusBrightness: 0.1 },
+      { focusDetail: 0.8 },
+      { focusX: 0.2 },
+      { spiralX: 0.25 },
+      { compositionShape: "circle" as const },
+      { linePattern: "spiral" as const },
+      { palette: ["#112233", "#bb8877"] },
       { detailPreservation: 0.5 },
       { guideColor: "#AABBCC" },
     ]) {

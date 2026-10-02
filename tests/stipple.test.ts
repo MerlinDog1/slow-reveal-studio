@@ -227,7 +227,7 @@ test("stipple settings, private saves, presets and restore share the same mode a
   );
   assert.throws(
     () => renderImage(source(0), settings({ subjectMaskStrength: 1 })),
-    /Dots only/,
+    /Paint a subject selection/,
   );
 });
 

@@ -315,7 +315,7 @@ for (const mode of MODES) {
           image(() => [0, 0, 0, 255]),
           settings(mode, { subjectMaskStrength: 1 }),
         ),
-      /Dots only/,
+      /Paint a subject selection/,
     );
     assert.deepEqual(getAvailableModes({ NODE_ENV: "production" }), ["dots"]);
     assert.ok(getAvailableModes({ NODE_ENV: "development" }).includes(mode));

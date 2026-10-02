@@ -1,0 +1,77 @@
+{
+  "renderer": "slow-reveal-geometry/1.8.0",
+  "cases": [
+    {
+      "name": "dots",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 585,
+      "templateSha256": "10a377a571705be185993f9b14c58e147aa6d58ffb4dbeb1e3cbe7ba5d21affb",
+      "importedInCorel": false
+    },
+    {
+      "name": "mosaic",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 525,
+      "templateSha256": "c8e665e1d1e41b8e1b47818a36c9f681b3f937a35546c9b1822b52d51ff825e4",
+      "importedInCorel": false
+    },
+    {
+      "name": "fibonacci",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 354,
+      "templateSha256": "80bde5e6c8c8a73bfc0aeeb81b6253b2e4dec9156949ecba71bdcb92c0e57733",
+      "importedInCorel": false
+    },
+    {
+      "name": "colour-blend",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 506,
+      "templateSha256": "1777aa7e3f6746a1fa1b1629bab75c81a3d797716b2e055c47bc088ca9122c37",
+      "importedInCorel": false
+    },
+    {
+      "name": "tv-weave",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 677,
+      "templateSha256": "04d7569e882635628345af32dc463d087c6d1b7c02f1445fa4e5207eb0b04e04",
+      "importedInCorel": false
+    },
+    {
+      "name": "line-amplification",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 111,
+      "templateSha256": "ab476948ec0867016fb0863fc9dce082c74eb6279473dcc1604c4e7661ba31a1",
+      "importedInCorel": false
+    },
+    {
+      "name": "lines-spiral",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 789,
+      "templateSha256": "51d34040562f78b65d80439f9f06593f3da5712b601583d7534a41a65b5fe2ff",
+      "importedInCorel": false
+    },
+    {
+      "name": "lines-flow",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 759,
+      "templateSha256": "e6780cb219b693a45ea47c9ec08f839a2f5f35a48bea7a4da24e94903988a1b9",
+      "importedInCorel": false
+    },
+    {
+      "name": "lines-crosshatch",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 827,
+      "templateSha256": "0f6ae6bc3e1611ed0a7a1966dfda5c6745784f7157ba6bfae8af6931e830b126",
+      "importedInCorel": false
+    }
+  ]
+}

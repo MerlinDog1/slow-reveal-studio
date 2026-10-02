@@ -345,7 +345,7 @@ test("manual mask suppresses background after inversion and edge emphasis withou
   }
 });
 
-test("active masks require valid selection and Dots mode; frozen serialized selections yield deterministic SVG", () => {
+test("active masks require valid selection across modes; frozen serialized selections yield deterministic SVG", () => {
   assert.equal(
     normalizeSettings(settings({ subjectMaskStrength: undefined }))
       .subjectMaskStrength,
@@ -365,14 +365,8 @@ test("active masks require valid selection and Dots mode; frozen serialized sele
     "contour",
     "line-amplification",
   ] as RenderMode[])
-    assert.throws(
-      () =>
-        renderImage(
-          source(),
-          settings({ mode, subjectMaskStrength: 1 }),
-          mask(),
-        ),
-      /Dots only/,
+    assert.doesNotThrow(() =>
+      renderImage(source(), settings({ mode, subjectMaskStrength: 1 }), mask()),
     );
   assert.throws(
     () =>
@@ -474,7 +468,6 @@ test("restoration preserves valid private masks, rejects missing/stale selection
     { subjectMask: { ...selection, data: "broken" } },
     { crop: { ...binding.crop, zoom: 1.1 } },
     { settings: { ...saved.settings, widthMm: 121 } },
-    { settings: { ...saved.settings, mode: "mosaic" } },
   ])
     assert.throws(
       () =>

@@ -20,6 +20,10 @@ export const PRESET_SETTING_KEYS = [
   "autoExposure",
   "palette",
   "cellShape",
+  "colourCompensation",
+  "shadowLift",
+  "compositionShape",
+  "linePattern",
 ] as const;
 export type PresetSettings = Pick<
   RenderSettings,

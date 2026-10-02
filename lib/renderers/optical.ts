@@ -7,6 +7,25 @@ const linear = (value: number) =>
   value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
 export { linear as linearChannel, WEIGHTS as COLOUR_WEIGHTS };
 
+/** Approximate spatial coverage, keeping paper separate from marker pigment. */
+export function colourCandidates(
+  palette: string[],
+  coverage: number,
+  strength = 0,
+) {
+  return [
+    [1, 1, 1],
+    ...palette.map((hex) =>
+      [1, 3, 5].map((at) => {
+        const pigment = linear(parseInt(hex.slice(at, at + 2), 16) / 255);
+        return (
+          pigment + strength * (1 - clamp(coverage, 0.05, 1)) * (1 - pigment)
+        );
+      }),
+    ),
+  ];
+}
+
 /** Shared exposure/tonal adjustment for numbered spatial-colour modes. */
 export function sampleOpticalColour(
   c: ModeContext,
@@ -20,7 +39,7 @@ export function sampleOpticalColour(
     v = (y - b.y) / b.height;
   const local = tone.sample(u, v, ru, rv);
   const edge = (local - tone.sample(u, v, ru * 3, rv * 3)) * s.edgeEmphasis;
-  return tone
+  const rgb = tone
     .color(u, v, ru * 2, rv * 2)
     .map((value) =>
       clamp(
@@ -34,6 +53,10 @@ export function sampleOpticalColour(
         ) - edge,
       ),
     );
+  if (!c.subjectMask) return rgb;
+  const coverage = 1 - (s.subjectMaskStrength ?? 0) * (1 - c.subjectMask(u, v));
+  // Suppress background after all tone/edge operations, including dark exposure adjustments.
+  return rgb.map((value) => 1 - (1 - value) * coverage);
 }
 
 /** Serpentine diffusion along staggered neighbours in linear RGB. Every mark uses one pen;
@@ -58,12 +81,9 @@ export function renderOptical(c: ModeContext): Cell[] {
   const x0 = b.x + (b.width - (baseCols - 1) * dx) / 2;
   const y0 = b.y + (b.height - (rows - 1) * dy) / 2;
   const palette = s.palette!;
-  const candidates = [
-    [1, 1, 1],
-    ...palette.map((hex) =>
-      [1, 3, 5].map((at) => linear(parseInt(hex.slice(at, at + 2), 16) / 255)),
-    ),
-  ];
+  const coverage =
+    (markWidth * markHeight - (4 - Math.PI) * (markWidth / 2) ** 2) / (dx * dy);
+  const candidates = colourCandidates(palette, coverage, s.colourCompensation);
   let current = new Float64Array((baseCols + 2) * 3);
   let next = new Float64Array(current.length);
   const cells: Cell[] = [];

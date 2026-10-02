@@ -1,6 +1,16 @@
-# Verification record — 28 September 2026
+# Verification record — 2 October 2026
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
+
+## Creative workbench — 2 October
+
+- Required commands: typecheck and Next production build pass. Full suite with RENDERER_BROWSER_QA=1 and PHOTO_BROWSER_QA=1: **208/208 passing, no skips**. New checks cover creative setting bounds and server preservation, shifted/rotated Fibonacci clearance and apertures, ribbon bounds and SVG size, deterministic palette locks, A4 samples and section accounting, backup checksums/capability exclusion, bounded rename failures, interrupted Stripe responses, concurrent production, timeout reconciliation and mismatched sessions.
+- Headless Edge exercised local /lab/fibonacci at 1440 px: source-specific 16-colour palette, changed centre, undo/redo, all six style comparisons, pen highlighting, section completion, A4 SVG download, saved alternative and project backup. A separate browser restored that backup through normal validation and downloaded an actual 3,303,689-byte WebM reveal. /trials accepted a clearly synthetic local QA record; another homepage demo rendered. No page errors were recorded. These were synthetic/local browser exercises, not customer or physical trials.
+- 390 px studio viewport had a 390 px page width, with no horizontal overflow. Inspected screenshots of the studio, comparisons, calibrated-size view and wall mockup. Temporary QA files are ignored under .data; customer originals were not used or published.
+- Synthetic compatibility ZIP contains nine cases with matching template/finished geometry and a 100 mm ruler. CorelDRAW and production RIP imports have not been performed in this update.
+- Hero, social, coupon and making-guide artifacts regenerated for renderer 1.8.0. Existing neutral settings retain their primitives; paid historical geometry is not regenerated in place.
+- Follow-up checks pass for paid creative/palette changes requiring new customer proof while preserving prior snapshots, and for complete optical mask suppression even with negative brightness. Worker failures clear any coarse draft, preventing draft export after a failed final render.
+- HEIC codec, real marker/canvas measurements, physical completion photography, representative screen-reader/touch-device tests, PostgreSQL migrations and external provider verification remain outstanding. BUILD_STATUS.md maps the complete 45-item request to code and remaining evidence.
 
 ## Colour Fibonacci Spiral — 28 September
 

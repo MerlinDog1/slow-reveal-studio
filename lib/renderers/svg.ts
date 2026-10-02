@@ -80,7 +80,9 @@ export function toSvg(
   const finished = variant === "finished";
   // Desktop SVG importers can misread zero-radius rectangle primitives.
   // Lines use independent closed curves with explicit styles and no group inheritance.
-  const lineCurves = geometry.mode === "line-amplification";
+  const lineCurves =
+    geometry.mode === "line-amplification" &&
+    (!s.linePattern || s.linePattern === "horizontal");
   // Guide colour changes only template ink, including outlined labels and text.
   const ink = finished ? color(s.inkColor) : effectiveGuideColor(s);
   const width = n(geometry.widthMm),

@@ -1,19 +1,26 @@
 import type { ModeContext } from "./modes";
 import { clamp, round, type Circle, type Point, type Cell } from "./types";
-import { COLOUR_WEIGHTS, linearChannel, sampleOpticalColour } from "./optical";
+import {
+  COLOUR_WEIGHTS,
+  linearChannel,
+  sampleOpticalColour,
+  colourCandidates,
+} from "./optical";
 
 /** Sunflower phyllotaxis: equal-area radial growth and golden-angle rotation.
  * The pattern is fixed in millimetres; the photograph changes dot area only. */
 function fibonacciSites(c: ModeContext): Point[] {
   const { bounds: b, pitch, maxDiameter } = c;
-  const cx = b.x + b.width / 2,
-    cy = b.y + b.height / 2;
+  const cx = b.x + b.width * (c.settings.spiralX ?? 0.5),
+    cy = b.y + b.height * (c.settings.spiralY ?? 0.5);
   const halfWidth = (b.width - maxDiameter) / 2,
     halfHeight = (b.height - maxDiameter) / 2;
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
   const radialScale = pitch * 0.62;
   const count = Math.ceil(
-    (halfWidth ** 2 + halfHeight ** 2) / radialScale ** 2,
+    ((halfWidth + Math.abs(cx - b.x - b.width / 2)) ** 2 +
+      (halfHeight + Math.abs(cy - b.y - b.height / 2)) ** 2) /
+      radialScale ** 2,
   );
   const sites: Point[] = [];
   // Keep candidate spacing independent of tone, including at the spiral's core.
@@ -21,12 +28,17 @@ function fibonacciSites(c: ModeContext): Point[] {
   const columns = Math.ceil(b.width / pitch) + 2;
   for (let i = 0; i < count; i++) {
     const radius = radialScale * Math.sqrt(i + 0.5);
-    const angle = i * goldenAngle;
+    const angle =
+      i * goldenAngle + ((c.settings.spiralRotation ?? 0) * Math.PI) / 180;
     const dx = radius * Math.cos(angle),
       dy = radius * Math.sin(angle);
-    if (Math.abs(dx) > halfWidth || Math.abs(dy) > halfHeight) continue;
     const x = cx + dx,
       y = cy + dy;
+    if (
+      Math.abs(x - b.x - b.width / 2) > halfWidth + 1e-10 ||
+      Math.abs(y - b.y - b.height / 2) > halfHeight + 1e-10
+    )
+      continue;
     const gx = Math.floor((x - b.x) / pitch),
       gy = Math.floor((y - b.y) / pitch);
     let clear = true;
@@ -79,14 +91,8 @@ export function renderFibonacciColour(c: ModeContext): Cell[] {
   const { settings: s, bounds: b, pitch, maxDiameter } = c;
   const sites = fibonacciSites(c);
   const palette = s.palette!;
-  const candidates = [
-    [1, 1, 1],
-    ...palette.map((hex) =>
-      [1, 3, 5].map((at) =>
-        linearChannel(parseInt(hex.slice(at, at + 2), 16) / 255),
-      ),
-    ),
-  ];
+  const coverage = (maxDiameter / 2) ** 2 / (pitch * 0.62) ** 2;
+  const candidates = colourCandidates(palette, coverage, s.colourCompensation);
   const columns = Math.ceil(b.width / pitch) + 3;
   const buckets = new Map<number, number[]>();
   sites.forEach(({ x, y }, index) => {

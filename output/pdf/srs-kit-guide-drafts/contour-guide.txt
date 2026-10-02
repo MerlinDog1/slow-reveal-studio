@@ -1,0 +1,30 @@
+SLOW REVEAL STUDIO - DRAFT FOR PHYSICAL TRIAL
+Trace the paths
+400 x 500 mm artwork. Guide status: draft-for-physical-trial.
+
+MAKING TRIAL
+1. Find one guide path
+Start with a short section and follow the printed route. Separate paths remain separate.
+2. Trace along the guide
+Use the trial marker to follow the path. The finished reference shows the intended line, not a filled region.
+3. Keep the open spaces
+Do not fill between paths or connect their ends unless the printed guide already connects them.
+4. Compare and record
+Compare the traced section with the digital reference. Record control, line width and where the guide remains visible.
+
+DIGITAL COLOUR KEY
+Single ink: #1e1e1c. Physical marker assignment unresolved.
+Leave unmarked canvas unmarked; it is not an additional numbered colour.
+
+OPERATOR: PACKING REQUIREMENTS - NOT PACKING CONFIRMATION
+[ ] Printed canvas: 400 x 500 mm; substrate and finish require trial approval.
+[ ] Mode-appropriate marker for single ink #1e1e1c; tip, SKU, lot and quantity unassigned.
+[ ] Printed making guide and colour key; this draft still requires a physical comprehension trial.
+
+UNRESOLVED BEFORE PHYSICAL APPROVAL
+Draft for physical trials. This guide does not approve a product, material combination or production setting.
+Digital colour swatches are references, not verified matches to physical marker ink.
+Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.
+Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.
+
+srs-kit-guide/1.1.0; renderer slow-reveal-geometry/1.9.0. No order identity or personal lettering is included in this guide.

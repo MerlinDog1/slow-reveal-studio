@@ -1,0 +1,35 @@
+SLOW REVEAL STUDIO - DRAFT FOR PHYSICAL TRIAL
+Fill the cells
+400 x 500 mm artwork. Guide status: draft-for-physical-trial.
+
+MAKING TRIAL
+1. Check the key first
+For numbered cells, match the printed number to the key on page 2. The operator must first assign and test the physical markers.
+2. Fill within each cell
+Fill the outlined cell with its assigned colour. In a single-ink design, use the selected ink for every cell.
+3. Keep the blank spaces
+Leave areas without cells unmarked. Blank paper is not an extra numbered marker colour.
+4. Compare and record
+Compare a small filled area with the digital reference. Record number readability, colour matching and coverage.
+
+DIGITAL COLOUR KEY
+Key 1: #1e1e1c; 3268 cells. Physical marker assignment unresolved.
+Key 2: #445e7c; 190 cells. Physical marker assignment unresolved.
+Key 3: #7b8b77; 0 cells. Physical marker assignment unresolved.
+Key 4: #b97a68; 147 cells. Physical marker assignment unresolved.
+Leave unmarked canvas unmarked; it is not an additional numbered colour.
+
+OPERATOR: PACKING REQUIREMENTS - NOT PACKING CONFIRMATION
+[ ] Printed canvas: 400 x 500 mm; substrate and finish require trial approval.
+[ ] Marker matching key 1 (#1e1e1c); SKU, lot and quantity unassigned.
+[ ] Marker matching key 2 (#445e7c); SKU, lot and quantity unassigned.
+[ ] Marker matching key 4 (#b97a68); SKU, lot and quantity unassigned.
+[ ] Printed making guide and colour key; this draft still requires a physical comprehension trial.
+
+UNRESOLVED BEFORE PHYSICAL APPROVAL
+Draft for physical trials. This guide does not approve a product, material combination or production setting.
+Digital colour swatches are references, not verified matches to physical marker ink.
+Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.
+Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.
+
+srs-kit-guide/1.1.0; renderer slow-reveal-geometry/1.9.0. No order identity or personal lettering is included in this guide.

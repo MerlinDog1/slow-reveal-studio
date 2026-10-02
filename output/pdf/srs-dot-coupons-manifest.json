@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "packVersion": "srs-dot-coupons/1.0.0",
+  "rendererVersion": "slow-reveal-geometry/1.9.0",
+  "fontVersion": "srs-outlines/1.0.0:6670bff0c25c4547",
+  "physicalValidation": "NOT PERFORMED - unvalidated test candidates; all observation fields remain blank",
+  "page": {
+    "widthMm": 210,
+    "heightMm": 297,
+    "dpi": 300,
+    "count": 4,
+    "widthPx": 2480,
+    "heightPx": 3508,
+    "pdfWidthPt": 595.2755905511812,
+    "pdfHeightPt": 841.8897637795276
+  },
+  "interpretation": {
+    "pdf": "300 DPI raster embedded at exact A4 physical size; SVGs retain vectors and outlined type",
+    "guides": "Neutral black opacity candidates on a transparent background; not a white ink or warm-grey separation",
+    "calibration": "Measure tick centres and square centre-lines; not outside stroke edges",
+    "printInstruction": "100% / Actual size, never Fit to page",
+    "syntheticStatistics": "No photographs; zero source-image/time statistics are not applicable",
+    "fixedPdfMetadataDate": "2000-01-01T00:00:00Z (reproducibility metadata, not a physical trial date)",
+    "runtime": {
+      "node": "v22.13.1",
+      "sharp": "0.35.5",
+      "vips": "8.18.7",
+      "jspdf": "4.2.1"
+    }
+  },
+  "calibration": {
+    "strokeWidthMm": 0.2,
+    "horizontal": {
+      "from": [
+        25,
+        259
+      ],
+      "to": [
+        125,
+        259
+      ],
+      "lengthMm": 100
+    },
+    "vertical": {
+      "from": [
+        190,
+        70
+      ],
+      "to": [
+        190,
+        170
+      ],
+      "lengthMm": 100
+    },
+    "square": {
+      "from": [
+        148,
+        247
+      ],
+      "to": [
+        168,
+        267
+      ],
+      "widthMm": 20,
+      "heightMm": 20
+    }
+  },
+  "uniqueSamples": 34,
+  "sheets": [
+    {
+      "id": "marks-guide",
+      "page": 1,
+      "variant": "template",
+      "sampleIds": [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08",
+        "D09",
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05"
+      ],
+      "sampleGeometrySha256": "cc48b06ede2b95264f3a8039d95526ece8437b1bdf8711d0143b690a2e1638c4",
+      "calibrationSha256": "da4025456c13332ddc306a22bea2f1a8a78dc912b79acbeb66450d29991b97ff",
+      "svg": "output/pdf/srs-dot-coupons/marks-guide.svg",
+      "png": ".data/qa/coupons/marks-guide.png"
+    },
+    {
+      "id": "guides-guide",
+      "page": 2,
+      "variant": "template",
+      "sampleIds": [
+        "W01-O10",
+        "W01-O20",
+        "W01-O30",
+        "W01-O40",
+        "W02-O10",
+        "W02-O20",
+        "W02-O30",
+        "W02-O40",
+        "W03-O10",
+        "W03-O20",
+        "W03-O30",
+        "W03-O40",
+        "W04-O10",
+        "W04-O20",
+        "W04-O30",
+        "W04-O40",
+        "W05-O10",
+        "W05-O20",
+        "W05-O30",
+        "W05-O40"
+      ],
+      "sampleGeometrySha256": "1838ae62020b95f7c1a5a3d7b3c189ef175eb6f755111bbda9947f870fe3291f",
+      "calibrationSha256": "da4025456c13332ddc306a22bea2f1a8a78dc912b79acbeb66450d29991b97ff",
+      "svg": "output/pdf/srs-dot-coupons/guides-guide.svg",
+      "png": ".data/qa/coupons/guides-guide.png"
+    },
+    {
+      "id": "marks-filled",
+      "page": 3,
+      "variant": "finished",
+      "sampleIds": [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D08",
+        "D09",
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05"
+      ],
+      "sampleGeometrySha256": "cc48b06ede2b95264f3a8039d95526ece8437b1bdf8711d0143b690a2e1638c4",
+      "calibrationSha256": "da4025456c13332ddc306a22bea2f1a8a78dc912b79acbeb66450d29991b97ff",
+      "svg": "output/pdf/srs-dot-coupons/marks-filled.svg",
+      "png": ".data/qa/coupons/marks-filled.png"
+    },
+    {
+      "id": "guides-filled",
+      "page": 4,
+      "variant": "finished",
+      "sampleIds": [
+        "W01-O10",
+        "W01-O20",
+        "W01-O30",
+        "W01-O40",
+        "W02-O10",
+        "W02-O20",
+        "W02-O30",
+        "W02-O40",
+        "W03-O10",
+        "W03-O20",
+        "W03-O30",
+        "W03-O40",
+        "W04-O10",
+        "W04-O20",
+        "W04-O30",
+        "W04-O40",
+        "W05-O10",
+        "W05-O20",
+        "W05-O30",
+        "W05-O40"
+      ],
+      "sampleGeometrySha256": "1838ae62020b95f7c1a5a3d7b3c189ef175eb6f755111bbda9947f870fe3291f",
+      "calibrationSha256": "da4025456c13332ddc306a22bea2f1a8a78dc912b79acbeb66450d29991b97ff",
+      "svg": "output/pdf/srs-dot-coupons/guides-filled.svg",
+      "png": ".data/qa/coupons/guides-filled.png"
+    }
+  ],
+  "publicCopy": {
+    "canonical": "output/pdf/srs-dot-coupons.pdf",
+    "public": "public/production-coupons/srs-dot-coupons.pdf",
+    "sha256": "f8b69012fe0c7fa5c20254c3089d76001e3fe0eda7992e1c072012ee2bd66796",
+    "byteIdentical": true
+  },
+  "sourceHashes": [
+    {
+      "file": "lib/production-coupons.ts",
+      "sha256": "8fcb5245c3bb055596368c69b4d4f485011b11bf74c753eb96593dea0507f05d"
+    },
+    {
+      "file": "scripts/build-production-coupons.ts",
+      "sha256": "5dbeee4ef78231fa62421b5261d7f85b2dadaaf787c92a4cc24af27e5389791e"
+    },
+    {
+      "file": "lib/renderers/svg.ts",
+      "sha256": "17250e7ec9e6b876fe8c81cf1e00031da95df0642dad788cc77b4cb8421a048c"
+    },
+    {
+      "file": "lib/renderers/types.ts",
+      "sha256": "51070abd902cc28b8bfa8a6f580185593e573e78600ff607f4c07723d8414cb3"
+    },
+    {
+      "file": "lib/mosaic-palette.ts",
+      "sha256": "e6a4e0afe46f6200c209fe37985c4e2ed030cd9631b7e8316f649b1190738e67"
+    },
+    {
+      "file": "lib/optical-palette.ts",
+      "sha256": "fd6223c1e92d2ab4838f952b04538a40f74631b8543575bdf14ccebe815885b6"
+    },
+    {
+      "file": "lib/renderers/optical.ts",
+      "sha256": "e127c280752705108dd733bf547458475014a00b93692fed1a6b6c9821a571a9"
+    },
+    {
+      "file": "lib/renderers/stipple.ts",
+      "sha256": "2f2cd5cce83158bbae3a80c289f6b4ee32ca1f45d6ead57edeb71952d06e751f"
+    },
+    {
+      "file": "lib/renderers/fibonacci.ts",
+      "sha256": "0ec67e5863c6aed0ef975749222ba2e4fc33cba7eb00922c06b589e8393330a3"
+    },
+    {
+      "file": "lib/renderers/fonts.ts",
+      "sha256": "dbc8f3b1d1194651c76ec1f4205c2161d12116f5373b598eb083214084656c92"
+    },
+    {
+      "file": "lib/renderers/font-data.json",
+      "sha256": "72d7eb28c8a1e9829c0e3767bc689500db9287ace838ec623931805e270c9495"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256": "a86f3ffc077bda2cfe266220df8072d2ba3f365e4cc5cb9567ba03548ef5ced9"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "output/pdf/srs-dot-coupons/geometry.json",
+      "bytes": 251123,
+      "sha256": "db83be137f5c6283ec1d07c935a21d33d1fd43b536aef59bb6c7572f4f0b459b",
+      "mime": "application/json"
+    },
+    {
+      "file": "output/pdf/srs-dot-coupons-observation-record.md",
+      "bytes": 4574,
+      "sha256": "15e5d44b5952a4906415cda618d90fc33fb012c767318c352c6ffc585151488f",
+      "mime": "text/markdown"
+    },
+    {
+      "file": "output/pdf/srs-dot-coupons/marks-guide.svg",
+      "bytes": 350924,
+      "sha256": "7e3146c8a32eab764e80b73eb49ebf92c6528d8179aeae1326fe2375eea5160e",
+      "mime": "image/svg+xml",
+      "widthMm": 210,
+      "heightMm": 297
+    },
+    {
+      "file": ".data/qa/coupons/marks-guide.png",
+      "bytes": 284683,
+      "sha256": "41e30de84d64c2fa08e67b58886222cb983db729dcfd990fe561dca3ec81a82b",
+      "mime": "image/png",
+      "widthPx": 2480,
+      "heightPx": 3508,
+      "dpi": 300,
+      "ignoredReviewIntermediate": true
+    },
+    {
+      "file": "output/pdf/srs-dot-coupons/guides-guide.svg",
+      "bytes": 373811,
+      "sha256": "900e7ed51cb1ed71d8c35be1e0d60b0d9081f477a0ceac7b9edc839547539310",
+      "mime": "image/svg+xml",
+      "widthMm": 210,
+      "heightMm": 297
+    },
+    {
+      "file": ".data/qa/coupons/guides-guide.png",
+      "bytes": 281426,
+      "sha256": "00e38703924772aecd1f62be2be582342e780a424942757971880aa1f75faa1d",
+      "mime": "image/png",
+      "widthPx": 2480,
+      "heightPx": 3508,
+      "dpi": 300,
+      "ignoredReviewIntermediate": true
+    },
+    {
+      "file": "output/pdf/srs-dot-coupons/marks-filled.svg",
+      "bytes": 357020,
+      "sha256": "375ad4ec9520320812357a13d0162d758822999008c98efd45a8517b78851276",
+      "mime": "image/svg+xml",
+      "widthMm": 210,
+      "heightMm": 297
+    },
+    {
+      "file": ".data/qa/coupons/marks-filled.png",
+      "bytes": 274930,
+      "sha256": "955be03c3ddc3df83a9dc6fb4be46729013a7db71a2369d23d49bf4553bc78ae",
+      "mime": "image/png",
+      "widthPx": 2480,
+      "heightPx": 3508,
+      "dpi": 300,
+      "ignoredReviewIntermediate": true
+    },
+    {
+      "file": "output/pdf/srs-dot-coupons/guides-filled.svg",
+      "bytes": 379034,
+      "sha256": "b0fa0c60b10d7509fc0d84edb303387e969540359c3ed1dd1182d7835311a21c",
+      "mime": "image/svg+xml",
+      "widthMm": 210,
+      "heightMm": 297
+    },
+    {
+      "file": ".data/qa/coupons/guides-filled.png",
+      "bytes": 279100,
+      "sha256": "7a2b0b1d78d0bb5a7b2ec4d47ebfe041ba221b8183cf013b5ad3f7beeec7f3c4",
+      "mime": "image/png",
+      "widthPx": 2480,
+      "heightPx": 3508,
+      "dpi": 300,
+      "ignoredReviewIntermediate": true
+    },
+    {
+      "file": "output/pdf/srs-dot-coupons.pdf",
+      "bytes": 1089166,
+      "sha256": "f8b69012fe0c7fa5c20254c3089d76001e3fe0eda7992e1c072012ee2bd66796",
+      "mime": "application/pdf",
+      "pageCount": 4,
+      "widthMm": 210,
+      "heightMm": 297,
+      "rasterDpi": 300
+    },
+    {
+      "file": "public/production-coupons/srs-dot-coupons.pdf",
+      "bytes": 1089166,
+      "sha256": "f8b69012fe0c7fa5c20254c3089d76001e3fe0eda7992e1c072012ee2bd66796",
+      "mime": "application/pdf",
+      "byteIdenticalTo": "output/pdf/srs-dot-coupons.pdf"
+    }
+  ]
+}

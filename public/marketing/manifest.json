@@ -1,0 +1,752 @@
+{
+  "schemaVersion": 2,
+  "assets": [
+    {
+      "id": "home-hero",
+      "file": "/marketing/home-hero-prototype.png",
+      "alt": "Illustrative prototype of hands filling circles on a dog portrait canvas at a sunlit table.",
+      "generationArtifact": "exec-f7763d4b-f247-4bde-b38b-5a1b6271b8f3.png",
+      "sha256": "18370b4ca208da20448eb0c44a54327468366a99ae4fecf63fb5b0514f479490",
+      "bytes": 3040901,
+      "qa": "Hands and nib appear plausible; clear partly filled dots. Dense fine marks and generated likeness are illustrative, not the application's production geometry.",
+      "width": 1536,
+      "height": 1024,
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project asset; no competitor or reference photograph used as input. No third-party endorsement or physical-product certification implied.",
+      "derivatives": [
+        {
+          "file": "/marketing/web/home-hero-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 57130,
+          "sha256": "d42757eada5a70153e3c2e44ca3028cfe5db3e7a900db6b49f73baf47f5b5954",
+          "sourceSha256": "18370b4ca208da20448eb0c44a54327468366a99ae4fecf63fb5b0514f479490"
+        },
+        {
+          "file": "/marketing/web/home-hero-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 195346,
+          "sha256": "a3fbb84d93f1945ba4bd19265649beb051724bfb53be9d0ba90457a47e03ef6d",
+          "sourceSha256": "18370b4ca208da20448eb0c44a54327468366a99ae4fecf63fb5b0514f479490"
+        }
+      ]
+    },
+    {
+      "id": "dots-progression",
+      "file": "/marketing/dots-progression-digital.png",
+      "alt": "One dot at a time.: the same licensed black-dog source beside its dots template, simulated partial completion and finished digital artwork.",
+      "status": "renderer-digital-study",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Digital rendering · simulated completion",
+      "generatedAt": "2026-09-27",
+      "tool": "shared TypeScript renderer + Sharp layout",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
+      "sourceImages": [
+        "/references/black-dog.jpg"
+      ],
+      "sourceAttribution": {
+        "author": "Mac Gaither",
+        "source": "https://unsplash.com/photos/black-labrador-retriever-ITGs9TnB9og",
+        "license": "Unsplash License",
+        "licenseUrl": "https://unsplash.com/license",
+        "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
+      },
+      "geometryFile": "/marketing/digital/dots-progression-geometry.json",
+      "geometrySha256": "279fe6b9d681e1c29567afc3c9033e1362749c67debdffa05b93686a73b1b2fe",
+      "deterministic": true,
+      "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
+      "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+      "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+      "width": 2200,
+      "height": 930,
+      "sha256": "7db0411323222d87b3bf060d646e06da5a61c0a8a9f55460185726ec3ce5d95c",
+      "bytes": 1693883,
+      "derivatives": [
+        {
+          "file": "/marketing/web/dots-progression-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 271,
+          "quality": 80,
+          "bytes": 15406,
+          "sha256": "95c0e18e97df389a5e54f25865a529e104644d2990588348557b6fc4092084c7",
+          "sourceSha256": "7db0411323222d87b3bf060d646e06da5a61c0a8a9f55460185726ec3ce5d95c"
+        },
+        {
+          "file": "/marketing/web/dots-progression-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 541,
+          "quality": 80,
+          "bytes": 127346,
+          "sha256": "79833274c90e2990386404027b005c8e975cc99cdd227bd5bcd3b575634cf059",
+          "sourceSha256": "7db0411323222d87b3bf060d646e06da5a61c0a8a9f55460185726ec3ce5d95c"
+        }
+      ]
+    },
+    {
+      "id": "dots-hand-detail",
+      "file": "/marketing/dots-hand-detail-prototype.png",
+      "alt": "Illustrative close-up of a hand filling one guide circle on a textured pet canvas.",
+      "qa": "Natural marker grip and circle contact; generated brown/black tonal areas are an illustrative colour concept, not evidence that one supplied black marker creates multiple pigments.",
+      "generationArtifact": "exec-bd307793-7e08-472e-873c-d62711397a11.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "30c33a7d39cabc708242f024940934b4d0f0ad829d51007c9748cc6b429ec03f",
+      "bytes": 3066570,
+      "derivatives": [
+        {
+          "file": "/marketing/web/dots-hand-detail-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 57236,
+          "sha256": "c008028e9cabe927d7c62e1b397e0e2735684f4fc0e985511514fab09b1a8357",
+          "sourceSha256": "30c33a7d39cabc708242f024940934b4d0f0ad829d51007c9748cc6b429ec03f"
+        },
+        {
+          "file": "/marketing/web/dots-hand-detail-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 175814,
+          "sha256": "1695636ba09abbb195edc50241df7328ec9e9383902c188a69b938b9756b11f8",
+          "sourceSha256": "30c33a7d39cabc708242f024940934b4d0f0ad829d51007c9748cc6b429ec03f"
+        }
+      ]
+    },
+    {
+      "id": "dots-guide-macro",
+      "file": "/marketing/dots-guide-macro-prototype.png",
+      "alt": "Illustrative prototype close-up of a black marker filling one outlined circle on textured cream canvas.",
+      "generationArtifact": "exec-a4aefe36-f1fe-487e-a66a-4aa026d5f9f0.png",
+      "sha256": "a5f0adbbfd2b18aaea58d28a3840f40a247e1b5206b6b7b8bc2a82256075611d",
+      "bytes": 2313248,
+      "qa": "Nib contacts a partly filled circle; separate guides and weave are visible. Relative diameter and apparent sharpness are generated, not physical measurements.",
+      "width": 1536,
+      "height": 1024,
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project asset; no competitor or reference photograph used as input. No third-party endorsement or physical-product certification implied.",
+      "derivatives": [
+        {
+          "file": "/marketing/web/dots-guide-macro-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 35132,
+          "sha256": "b06083a2d0e1d3907bd3030af530011c64ee9d0eab6f23d21c34908da1c3a8fc",
+          "sourceSha256": "a5f0adbbfd2b18aaea58d28a3840f40a247e1b5206b6b7b8bc2a82256075611d"
+        },
+        {
+          "file": "/marketing/web/dots-guide-macro-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 91366,
+          "sha256": "f541fce9fe434355b671d472db09e1caba215566712279a034a9d0860d36f63e",
+          "sourceSha256": "a5f0adbbfd2b18aaea58d28a3840f40a247e1b5206b6b7b8bc2a82256075611d"
+        }
+      ]
+    },
+    {
+      "id": "kit-flatlay",
+      "file": "/marketing/kit-flatlay-prototype.png",
+      "alt": "Illustrative prototype of a faint dog canvas template, two black markers, diagram leaflet and plain kraft packaging.",
+      "generationArtifact": "exec-37a3cbc5-a4e7-4026-9559-16ba67aaf9bc.png",
+      "sha256": "d3f36dbb23484d50ad64a8f4386aab478799272d334527ad70a53edc30549b7b",
+      "bytes": 3483124,
+      "qa": "Separate kit components, outlined canvas and no fake words or logo. The leaflet diagrams are visual concepts, not actual instructions. Pen quantity is illustrative.",
+      "width": 1536,
+      "height": 1024,
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project asset; no competitor or reference photograph used as input. No third-party endorsement or physical-product certification implied.",
+      "derivatives": [
+        {
+          "file": "/marketing/web/kit-flatlay-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 33292,
+          "sha256": "a5bcdd110838ede90ba64deab2bc834031773ac2461d5df18a3d6da7330ba03e",
+          "sourceSha256": "d3f36dbb23484d50ad64a8f4386aab478799272d334527ad70a53edc30549b7b"
+        },
+        {
+          "file": "/marketing/web/kit-flatlay-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 186568,
+          "sha256": "4550b11989bfdb2b813aee339e53f4d71a822b5fce68ac9fbcbeee3f01ec0804",
+          "sourceSha256": "d3f36dbb23484d50ad64a8f4386aab478799272d334527ad70a53edc30549b7b"
+        }
+      ]
+    },
+    {
+      "id": "finished-in-home",
+      "file": "/marketing/finished-in-home-prototype.png",
+      "alt": "Illustrative black-dot portrait in an oak frame on a sideboard in a softly lit home.",
+      "qa": "Framed dot portrait and home setting are plausible concepts. Fine stipple and frame dimensions are generated, not the renderer's exact geometry or a physical kit.",
+      "generationArtifact": "exec-2b3e8f96-1806-4af1-81d4-cdb8ee2add69.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "8740fb79f57bab939a03e4d512ab3e581c25e4aff97cda628385882b6a6836d4",
+      "bytes": 2605473,
+      "derivatives": [
+        {
+          "file": "/marketing/web/finished-in-home-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 39926,
+          "sha256": "8e4014ae294779d44979507e501da9a78bb8d23b397ca8a66a7f57f2c49c3209",
+          "sourceSha256": "8740fb79f57bab939a03e4d512ab3e581c25e4aff97cda628385882b6a6836d4"
+        },
+        {
+          "file": "/marketing/web/finished-in-home-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 142920,
+          "sha256": "35bac79aaf99ab59dea545238b31721cb8f1d862b8187c52ddb6cabc723e4bdd",
+          "sourceSha256": "8740fb79f57bab939a03e4d512ab3e581c25e4aff97cda628385882b6a6836d4"
+        }
+      ]
+    },
+    {
+      "id": "example-pet",
+      "file": "/marketing/example-pet-prototype.png",
+      "alt": "Illustrative black Labrador beside a near-complete dotted pet canvas and a hand holding a marker.",
+      "qa": "Separate dots and remaining guide circles are visible. Pet/likeness are fictional AI concepts, not a customer's result or exact software output.",
+      "generationArtifact": "exec-77352920-cc6d-4b5c-a4f3-30cd78cf1cf9.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "d42039435b349fadb440b561fe076da1885416c754d07025d8adc8a11bd36011",
+      "bytes": 3144891,
+      "derivatives": [
+        {
+          "file": "/marketing/web/example-pet-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 66536,
+          "sha256": "ab7c24ca8590c59e1e068ded96e7c689989777e399957873d304487e42343dbc",
+          "sourceSha256": "d42039435b349fadb440b561fe076da1885416c754d07025d8adc8a11bd36011"
+        },
+        {
+          "file": "/marketing/web/example-pet-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 220790,
+          "sha256": "49a3c9bd9d65f4a6d10f35c0908430794120afbce02afa8e5b593c1ee927280c",
+          "sourceSha256": "d42039435b349fadb440b561fe076da1885416c754d07025d8adc8a11bd36011"
+        }
+      ]
+    },
+    {
+      "id": "example-couple",
+      "file": "/marketing/example-couple-prototype.png",
+      "alt": "Illustrative wedding portrait dot canvas with hands filling remaining outlined circles.",
+      "qa": "Two adult subjects, guide-to-filled transition and natural hand positions inspected. Fictional scene and geometry; no customer or wedding endorsement.",
+      "generationArtifact": "exec-d55e425e-36a3-4146-a445-2079b7669e75.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "60f98fa35b53841dd040ebe6bcefe2839b025cb46c43f884c2790420f84ade84",
+      "bytes": 3345156,
+      "derivatives": [
+        {
+          "file": "/marketing/web/example-couple-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 62924,
+          "sha256": "a4e3b6659f5eae898da2ac9fe69004c3842a93a323588a9b413b710890a4a3c4",
+          "sourceSha256": "60f98fa35b53841dd040ebe6bcefe2839b025cb46c43f884c2790420f84ade84"
+        },
+        {
+          "file": "/marketing/web/example-couple-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 233608,
+          "sha256": "d0445fae72cc47f43f971232962fb1a7f640bc1929dfcb9c09a717015c5059e5",
+          "sourceSha256": "60f98fa35b53841dd040ebe6bcefe2839b025cb46c43f884c2790420f84ade84"
+        }
+      ]
+    },
+    {
+      "id": "example-place",
+      "file": "/marketing/example-place-prototype.png",
+      "alt": "Illustrative dot canvas of a British house being completed with a black marker.",
+      "qa": "House, source photo insert and canvas are all generated fictional elements. Generated inserted photograph must never be credited as a real source photo or evidence of renderer parity.",
+      "generationArtifact": "exec-64ca7e5c-b125-4525-b88a-7c46bc77e114.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "0ff58f0792ffe411a6e36361ad51791d495ba746af8f784598c7c68b9ce6031d",
+      "bytes": 3709821,
+      "derivatives": [
+        {
+          "file": "/marketing/web/example-place-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 66998,
+          "sha256": "2cbc784f7efce0d1b5ac5922ede6814bdada5119dc0eae97d0070d20210975f8",
+          "sourceSha256": "0ff58f0792ffe411a6e36361ad51791d495ba746af8f784598c7c68b9ce6031d"
+        },
+        {
+          "file": "/marketing/web/example-place-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 278332,
+          "sha256": "8309fcd27d4a7c181ac6777bd9a3816145df17cd54294554ec97ec7040d62429",
+          "sourceSha256": "0ff58f0792ffe411a6e36361ad51791d495ba746af8f784598c7c68b9ce6031d"
+        }
+      ]
+    },
+    {
+      "id": "mosaic-progression",
+      "file": "/marketing/mosaic-progression-digital.png",
+      "alt": "Small shapes. A bigger picture.: the same licensed building source beside its mosaic template, simulated partial completion and finished digital artwork.",
+      "status": "renderer-digital-study",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Digital rendering · simulated completion",
+      "generatedAt": "2026-09-27",
+      "tool": "shared TypeScript renderer + Sharp layout",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
+      "sourceImages": [
+        "/references/building.jpg"
+      ],
+      "sourceAttribution": {
+        "author": "T (@tanyabarrow; previously Tanya Barrow)",
+        "source": "https://unsplash.com/photos/thatched-roof-cottage-surrounded-by-trees-and-garden-ApgKMT5RpzY",
+        "license": "Unsplash License",
+        "licenseUrl": "https://unsplash.com/license",
+        "sha256": "05c60cadc1dc41cea1ba4759d8f85763b2cd4b7675c4bc6ff29252380c25844e"
+      },
+      "geometryFile": "/marketing/digital/mosaic-progression-geometry.json",
+      "geometrySha256": "5289971b39f548143c3c73da08061bc339e329e87e2c9239fcc18d4746b131aa",
+      "deterministic": true,
+      "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art. Palette: #1e1e1c, #68442f, #7b8b77, #c6a25a; template numbers map in that order.",
+      "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+      "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+      "width": 2200,
+      "height": 930,
+      "sha256": "8fc37b5d1f0fd6ac328cca83ea2b97f7e78e28ced2dd0e3d1b5021c3aa6fa47f",
+      "bytes": 1453681,
+      "derivatives": [
+        {
+          "file": "/marketing/web/mosaic-progression-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 271,
+          "quality": 80,
+          "bytes": 27334,
+          "sha256": "a7a4206ef6d9de19bba108cf230bdbf1c0505616c66dc9839a0abc290eed3b5e",
+          "sourceSha256": "8fc37b5d1f0fd6ac328cca83ea2b97f7e78e28ced2dd0e3d1b5021c3aa6fa47f"
+        },
+        {
+          "file": "/marketing/web/mosaic-progression-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 541,
+          "quality": 80,
+          "bytes": 112718,
+          "sha256": "385241efc98e2bbece6f4af77b20be14eb941d9c08226fa22bdcf7889ad31c2a",
+          "sourceSha256": "8fc37b5d1f0fd6ac328cca83ea2b97f7e78e28ced2dd0e3d1b5021c3aa6fa47f"
+        }
+      ]
+    },
+    {
+      "id": "contour-progression",
+      "file": "/marketing/contour-progression-digital.png",
+      "alt": "Follow the lines that matter.: the same licensed vehicle source beside its contour template, simulated partial completion and finished digital artwork.",
+      "status": "renderer-digital-study",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Digital rendering · simulated completion",
+      "generatedAt": "2026-09-27",
+      "tool": "shared TypeScript renderer + Sharp layout",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
+      "sourceImages": [
+        "/references/vehicle.jpg"
+      ],
+      "sourceAttribution": {
+        "author": "Nathan Dumlao",
+        "source": "https://unsplash.com/photos/vintage-white-car-Eh8PK-jlLCI/",
+        "license": "Unsplash License",
+        "licenseUrl": "https://unsplash.com/license",
+        "sha256": "5ff93fa03c053613f17e62138d844bdb8cdc3ad796cd72842732b60d6e235a36"
+      },
+      "geometryFile": "/marketing/digital/contour-progression-geometry.json",
+      "geometrySha256": "97867c2827646445b4695f646ac98b4db31d53e9511123b71804a54a9a1d6161",
+      "deterministic": true,
+      "qa": "Template and finished stages serialize exactly one geometry. Partial stage overlays a strict subset of those marks on the complete guide; no AI-drawn replacement art.",
+      "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+      "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+      "width": 2200,
+      "height": 930,
+      "sha256": "57a040eeb6eee530012534bcbde597e0d4dadb39a477a275f6410ca0ce418254",
+      "bytes": 915354,
+      "derivatives": [
+        {
+          "file": "/marketing/web/contour-progression-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 271,
+          "quality": 80,
+          "bytes": 11972,
+          "sha256": "cc3d1d49d135af66c25d322852b9a6546172958f2b4cb46e121d3e36d918983c",
+          "sourceSha256": "57a040eeb6eee530012534bcbde597e0d4dadb39a477a275f6410ca0ce418254"
+        },
+        {
+          "file": "/marketing/web/contour-progression-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 541,
+          "quality": 80,
+          "bytes": 36458,
+          "sha256": "97331fe61aad45a73fd6a7aaa08cc4ecabcc67578f81cdf8cb5d9bc4c4cd467e",
+          "sourceSha256": "57a040eeb6eee530012534bcbde597e0d4dadb39a477a275f6410ca0ce418254"
+        }
+      ]
+    },
+    {
+      "id": "lines-progression",
+      "file": "/marketing/lines-progression-prototype.png",
+      "alt": "Illustrative horizontal line cat portrait in progress, with a visible clear straight edge and black marker.",
+      "qa": "One canvas shows faint guides and completed strips, with clear ruler and plausible two-hand activity. Not an exact same-geometry software sequence or evidence of hand precision; physical ruler trials pending.",
+      "generationArtifact": "exec-f118c47b-7c44-4958-a33d-a2bf8bed245d.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "3e5c52f4a3d0839efdd40e9808ced178f63af9f48eca06854b6a41cf28ef30e2",
+      "bytes": 3069978,
+      "derivatives": [
+        {
+          "file": "/marketing/web/lines-progression-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 45962,
+          "sha256": "d01976b5b5c7eb9b741dc9f929be723558015b1508994f582e7c88c4df88b596",
+          "sourceSha256": "3e5c52f4a3d0839efdd40e9808ced178f63af9f48eca06854b6a41cf28ef30e2"
+        },
+        {
+          "file": "/marketing/web/lines-progression-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 172680,
+          "sha256": "a1344d24ba5fc18799d2a07aa6f1c774241aa86a57e962aad3490ae8e92102fe",
+          "sourceSha256": "3e5c52f4a3d0839efdd40e9808ced178f63af9f48eca06854b6a41cf28ef30e2"
+        }
+      ]
+    },
+    {
+      "id": "size-comparison",
+      "file": "/marketing/size-comparison-prototype.png",
+      "alt": "Illustrative display of five increasingly large botanical dot canvases in a warm home.",
+      "qa": "Five relative sizes are visible without numbers or measurement labels. Generated perspective and dimensions are approximate; this is not a true-scale comparison of the five catalogue products.",
+      "generationArtifact": "exec-08180fe5-024d-4294-81f4-3c1cdda05e75.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-27",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-ADDITIONAL.md",
+      "sourceImages": [],
+      "licensing": "AI-generated project concept. No external photograph used as input. No customer result, endorsement, exact software output or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "f864ce96ddec0648c2763f0d2bfe36a2fd51cdf0642625ade8634bf583797dc1",
+      "bytes": 2834741,
+      "derivatives": [
+        {
+          "file": "/marketing/web/size-comparison-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 43718,
+          "sha256": "d74c727258d4c4333454a44caebfcda794c1d3fe9651277e81012e0fdba6a9dd",
+          "sourceSha256": "f864ce96ddec0648c2763f0d2bfe36a2fd51cdf0642625ade8634bf583797dc1"
+        },
+        {
+          "file": "/marketing/web/size-comparison-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 142680,
+          "sha256": "40b68883f2e3ff38d70ffaa2419edc1dd92be23c7de06397c57f0047cfd0e340",
+          "sourceSha256": "f864ce96ddec0648c2763f0d2bfe36a2fd51cdf0642625ade8634bf583797dc1"
+        }
+      ]
+    },
+    {
+      "id": "colour-options",
+      "file": "/marketing/colour-options-digital.png",
+      "alt": "The same black-dog dot portrait geometry rendered in soft black, deep navy, warm sepia and forest green.",
+      "status": "renderer-digital-study",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Digital rendering · screen colours are illustrative",
+      "generatedAt": "2026-09-27",
+      "tool": "shared TypeScript renderer + Sharp layout",
+      "rendererVersion": "slow-reveal-geometry/1.3.0",
+      "sourceImages": [
+        "/references/black-dog.jpg"
+      ],
+      "sourceAttribution": {
+        "author": "Mac Gaither",
+        "source": "https://unsplash.com/photos/black-labrador-retriever-ITGs9TnB9og",
+        "license": "Unsplash License",
+        "licenseUrl": "https://unsplash.com/license",
+        "sha256": "c3e1934e51602caa222557eb9d916b1f4fe2985a29bf8739d2dba8b34df7dcfe"
+      },
+      "geometryFile": "/marketing/digital/colour-options-geometry.json",
+      "geometrySha256": "279fe6b9d681e1c29567afc3c9033e1362749c67debdffa05b93686a73b1b2fe",
+      "palette": [
+        {
+          "id": "black",
+          "label": "Soft black",
+          "color": "#1E1E1C"
+        },
+        {
+          "id": "navy",
+          "label": "Deep navy",
+          "color": "#233B56"
+        },
+        {
+          "id": "sepia",
+          "label": "Warm sepia",
+          "color": "#68442F"
+        },
+        {
+          "id": "forest",
+          "label": "Forest green",
+          "color": "#354E3B"
+        }
+      ],
+      "deterministic": true,
+      "qa": "All four variants retain exactly the same circle coordinates/radii. No physical marker appearance, metallic reflectance or material result is claimed.",
+      "licensing": "Derived from the attributed licensed reference photograph. No customer-result or endorsement claim.",
+      "reproduction": "node --import tsx scripts/build-marketing-assets.mjs",
+      "width": 2200,
+      "height": 930,
+      "sha256": "7d53be9831a16af87451a9ac8c05590a79f52604b2938aa62919c32072c0361f",
+      "bytes": 1612002,
+      "derivatives": [
+        {
+          "file": "/marketing/web/colour-options-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 271,
+          "quality": 80,
+          "bytes": 20668,
+          "sha256": "d9c50d4b7261243b3c282ec41df7e14e0682636e0acc141dedad9f3ec7d7b9c3",
+          "sourceSha256": "7d53be9831a16af87451a9ac8c05590a79f52604b2938aa62919c32072c0361f"
+        },
+        {
+          "file": "/marketing/web/colour-options-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 541,
+          "quality": 80,
+          "bytes": 192554,
+          "sha256": "207e9845c9633b81a4f8991e96393193d98233ed18d69569f936612535f08abd",
+          "sourceSha256": "7d53be9831a16af87451a9ac8c05590a79f52604b2938aa62919c32072c0361f"
+        }
+      ]
+    },
+    {
+      "id": "family-making",
+      "file": "/marketing/family-making-prototype.png",
+      "alt": "Illustrative family concept: two adults and two children adding small coloured marks to a partly completed dog portrait around a kitchen table.",
+      "generationArtifact": "exec-6876c42b-a750-488a-86fa-4dc475524a11.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-29",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-PRESENTATION.md",
+      "sourceImages": [],
+      "qa": "Two plausible active marker grips, two observers, partly filled small-mark portrait. This is an invented family and illustrative canvas; marks, materials, scale and completion sequence are not production evidence.",
+      "licensing": "AI-generated project asset. No real customer, testimonial, manufacturer endorsement or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "8292dc10e07ab360a6fd369d47f62a67088bded2b0988402f266faa1b7382cf4",
+      "bytes": 2721381,
+      "derivatives": [
+        {
+          "file": "/marketing/web/family-making-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 56484,
+          "sha256": "b92c2543a2a15fc808995d08662f137e1462481ab3731eb654dd8c04af52dde0",
+          "sourceSha256": "8292dc10e07ab360a6fd369d47f62a67088bded2b0988402f266faa1b7382cf4"
+        },
+        {
+          "file": "/marketing/web/family-making-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 163720,
+          "sha256": "2a7d28d655be9e289a53b7d5f7cd686eb8e4708263ca9ba60de14ccd64912f2b",
+          "sourceSha256": "8292dc10e07ab360a6fd369d47f62a67088bded2b0988402f266faa1b7382cf4"
+        }
+      ]
+    },
+    {
+      "id": "macaw-on-wall",
+      "file": "/marketing/macaw-on-wall-prototype.png",
+      "alt": "Illustrative room concept: the studio’s colourful dotted macaw artwork framed above an oak cabinet.",
+      "generationArtifact": "exec-2eef068b-dbb5-4d22-aafd-9e4fc4b01c2c.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-29",
+      "tool": "built-in image_gen edit with local image reference",
+      "promptFile": "/marketing/PROMPTS-PRESENTATION.md",
+      "sourceImages": [
+        "/hero/macaw-finished.webp"
+      ],
+      "qa": "Whole frame is visible, straight geometry, plausible room lighting and recognisable supplied digital macaw design. Generative room placement may reinterpret marks; frame size, printing, pigment and canvas texture are not calibrated evidence.",
+      "licensing": "AI-generated room using this project's renderer-derived, AI-source macaw image. No customer home, actual product photograph or endorsement implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "c79b9559d2c0ae45ba310f8217264d714347ca6fa8f10142dc5b35fc0b11e9f5",
+      "bytes": 2551779,
+      "derivatives": [
+        {
+          "file": "/marketing/web/macaw-on-wall-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 28890,
+          "sha256": "f170c4fde402ec5997673e09911a01986d4dbd09313898df2e39424f5487f840",
+          "sourceSha256": "c79b9559d2c0ae45ba310f8217264d714347ca6fa8f10142dc5b35fc0b11e9f5"
+        },
+        {
+          "file": "/marketing/web/macaw-on-wall-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 104880,
+          "sha256": "a8712ca7b2b82bc4f31455613a18406fe31f2088b1da30000d47f4a012deffab",
+          "sourceSha256": "c79b9559d2c0ae45ba310f8217264d714347ca6fa8f10142dc5b35fc0b11e9f5"
+        }
+      ]
+    }
+  ],
+  "outstandingSlots": [],
+  "conceptSlotCoverage": "16 of 16 populated: 12 generated concepts + 4 deterministic renderer studies; additional mode comparisons have their own reveal/manifest.json",
+  "realProductionPhotographyStatus": "pending physical kit validation",
+  "optimisation": {
+    "command": "node scripts/optimise-marketing-assets.mjs",
+    "format": "webp",
+    "widths": [
+      640,
+      1280
+    ],
+    "quality": 80,
+    "semanticChanges": false,
+    "originalsPreserved": true
+  },
+  "updateCommands": [
+    "node --import tsx scripts/build-marketing-assets.mjs",
+    "node scripts/update-marketing-manifest.mjs",
+    "node scripts/optimise-marketing-assets.mjs"
+  ]
+}

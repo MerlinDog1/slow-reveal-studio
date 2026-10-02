@@ -1,0 +1,85 @@
+{
+  "renderer": "slow-reveal-geometry/1.9.0",
+  "cases": [
+    {
+      "name": "dots",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 585,
+      "templateSha256": "1a9d0fefaf93df4c8909cce5c0317d4cc1959fa8e2a07379f94fbed200e30f6b",
+      "importedInCorel": false
+    },
+    {
+      "name": "mosaic",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 525,
+      "templateSha256": "eb2e6329d6682637379ef35a3b2c351965c453f202561c53011e8158cdb67009",
+      "importedInCorel": false
+    },
+    {
+      "name": "fibonacci",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 354,
+      "templateSha256": "3e42636ae0c52ad10db593a05db8678e648dee9b1dddcccbf183f87d7409102f",
+      "importedInCorel": false
+    },
+    {
+      "name": "colour-blend",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 506,
+      "templateSha256": "3799ade1ad5363921dbee4a5cd5264ba9a9beb8b094d1c08352dc6c8633571b6",
+      "importedInCorel": false
+    },
+    {
+      "name": "tv-weave",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 677,
+      "templateSha256": "d3b6ee212163f84e05a9db46758e9673cf34391538a5b03ba97a0f961400e21b",
+      "importedInCorel": false
+    },
+    {
+      "name": "line-amplification",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 111,
+      "templateSha256": "571c438ca775d4632850dde96e7382454e68c3365e5fa4a87a06f9870418326d",
+      "importedInCorel": false
+    },
+    {
+      "name": "cross-stitch",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 532,
+      "templateSha256": "aa618505ea21e5d63b6318a40d70f349ef6dba9040daece279749bbbe0abfaf5",
+      "importedInCorel": false
+    },
+    {
+      "name": "lines-spiral",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 789,
+      "templateSha256": "5e26805fe18b864d4f5e1792066cbc748c9903a01d46fe9ca22aaed3564f0938",
+      "importedInCorel": false
+    },
+    {
+      "name": "lines-flow",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 759,
+      "templateSha256": "04e6ebcf5cb0a5340a5eedccd3cdc7f56c08ecb51857b4b7adc4010764a9a4e0",
+      "importedInCorel": false
+    },
+    {
+      "name": "lines-crosshatch",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 827,
+      "templateSha256": "c4d9da397284590f61d170bc6696939c7b6f217eeb85b2acd31c88d9733ba301",
+      "importedInCorel": false
+    }
+  ]
+}

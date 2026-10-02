@@ -1,0 +1,90 @@
+{
+  "version": "srs-kit-guide/1.1.0",
+  "rendererVersion": "slow-reveal-geometry/1.9.0",
+  "status": "draft-for-physical-trial",
+  "mode": "line-amplification",
+  "dimensions": {
+    "widthMm": 400,
+    "heightMm": 500
+  },
+  "title": "Fill the horizontal strips",
+  "steps": [
+    {
+      "title": "Use a ruler or straight edge",
+      "body": "A ruler or straight edge is required for this activity. Align it with the long horizontal edge of a printed strip."
+    },
+    {
+      "title": "Fill the outlined strip",
+      "body": "Fill between the two printed boundaries. Follow the changing strip thickness; do not replace it with one thin centre line."
+    },
+    {
+      "title": "Keep the interruptions",
+      "body": "Leave blank gaps between strips unmarked. Move the straight edge carefully and observe any dragging or smearing during the trial."
+    },
+    {
+      "title": "Compare and record",
+      "body": "Compare with the digital reference. Record ruler handling, edge control and whether the narrow strips are comfortable to fill."
+    }
+  ],
+  "materials": [
+    {
+      "id": "canvas",
+      "label": "Printed canvas: 400 x 500 mm; substrate and finish require trial approval.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "marker-ink",
+      "label": "Mode-appropriate marker for single ink #1e1e1c; tip, SKU, lot and quantity unassigned.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "making-guide",
+      "label": "Printed making guide and colour key; this draft still requires a physical comprehension trial.",
+      "assignmentStatus": "unresolved"
+    },
+    {
+      "id": "straight-edge",
+      "label": "Ruler / straight edge: required for every Line Amplification kit.",
+      "assignmentStatus": "unresolved"
+    }
+  ],
+  "legend": [
+    {
+      "id": "ink",
+      "index": null,
+      "color": "#1e1e1c",
+      "usedCellCount": 2631
+    }
+  ],
+  "warnings": [
+    "Draft for physical trials. This guide does not approve a product, material combination or production setting.",
+    "Digital colour swatches are references, not verified matches to physical marker ink.",
+    "Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.",
+    "Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.",
+    "Line Amplification remains a research activity until ruler and completion trials pass."
+  ],
+  "sample": {
+    "circleIndices": [],
+    "cellIndices": [
+      1347,
+      1348,
+      1349,
+      1350,
+      1377,
+      1378,
+      1400,
+      1401,
+      1432,
+      1433,
+      1455,
+      1456
+    ],
+    "pathIndices": [],
+    "boundsMm": {
+      "x": 186.453,
+      "y": 236.0834,
+      "width": 29.1931,
+      "height": 23.6333
+    }
+  }
+}

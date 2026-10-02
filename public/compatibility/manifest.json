@@ -1,12 +1,12 @@
 {
-  "renderer": "slow-reveal-geometry/1.8.0",
+  "renderer": "slow-reveal-geometry/1.9.0",
   "cases": [
     {
       "name": "dots",
       "widthMm": 100,
       "heightMm": 140,
       "marks": 585,
-      "templateSha256": "10a377a571705be185993f9b14c58e147aa6d58ffb4dbeb1e3cbe7ba5d21affb",
+      "templateSha256": "1a9d0fefaf93df4c8909cce5c0317d4cc1959fa8e2a07379f94fbed200e30f6b",
       "importedInCorel": false
     },
     {
@@ -14,7 +14,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 525,
-      "templateSha256": "c8e665e1d1e41b8e1b47818a36c9f681b3f937a35546c9b1822b52d51ff825e4",
+      "templateSha256": "eb2e6329d6682637379ef35a3b2c351965c453f202561c53011e8158cdb67009",
       "importedInCorel": false
     },
     {
@@ -22,7 +22,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 354,
-      "templateSha256": "80bde5e6c8c8a73bfc0aeeb81b6253b2e4dec9156949ecba71bdcb92c0e57733",
+      "templateSha256": "3e42636ae0c52ad10db593a05db8678e648dee9b1dddcccbf183f87d7409102f",
       "importedInCorel": false
     },
     {
@@ -30,7 +30,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 506,
-      "templateSha256": "1777aa7e3f6746a1fa1b1629bab75c81a3d797716b2e055c47bc088ca9122c37",
+      "templateSha256": "3799ade1ad5363921dbee4a5cd5264ba9a9beb8b094d1c08352dc6c8633571b6",
       "importedInCorel": false
     },
     {
@@ -38,7 +38,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 677,
-      "templateSha256": "04d7569e882635628345af32dc463d087c6d1b7c02f1445fa4e5207eb0b04e04",
+      "templateSha256": "d3b6ee212163f84e05a9db46758e9673cf34391538a5b03ba97a0f961400e21b",
       "importedInCorel": false
     },
     {
@@ -46,7 +46,15 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 111,
-      "templateSha256": "ab476948ec0867016fb0863fc9dce082c74eb6279473dcc1604c4e7661ba31a1",
+      "templateSha256": "571c438ca775d4632850dde96e7382454e68c3365e5fa4a87a06f9870418326d",
+      "importedInCorel": false
+    },
+    {
+      "name": "cross-stitch",
+      "widthMm": 100,
+      "heightMm": 140,
+      "marks": 532,
+      "templateSha256": "aa618505ea21e5d63b6318a40d70f349ef6dba9040daece279749bbbe0abfaf5",
       "importedInCorel": false
     },
     {
@@ -54,7 +62,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 789,
-      "templateSha256": "51d34040562f78b65d80439f9f06593f3da5712b601583d7534a41a65b5fe2ff",
+      "templateSha256": "5e26805fe18b864d4f5e1792066cbc748c9903a01d46fe9ca22aaed3564f0938",
       "importedInCorel": false
     },
     {
@@ -62,7 +70,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 759,
-      "templateSha256": "e6780cb219b693a45ea47c9ec08f839a2f5f35a48bea7a4da24e94903988a1b9",
+      "templateSha256": "04e6ebcf5cb0a5340a5eedccd3cdc7f56c08ecb51857b4b7adc4010764a9a4e0",
       "importedInCorel": false
     },
     {
@@ -70,7 +78,7 @@
       "widthMm": 100,
       "heightMm": 140,
       "marks": 827,
-      "templateSha256": "0f6ae6bc3e1611ed0a7a1966dfda5c6745784f7157ba6bfae8af6931e830b126",
+      "templateSha256": "c4d9da397284590f61d170bc6696939c7b6f217eeb85b2acd31c88d9733ba301",
       "importedInCorel": false
     }
   ]

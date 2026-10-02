@@ -145,7 +145,7 @@ function examplePanels(geometry: RenderGeometry, model: KitGuideModel) {
       ),
     );
     parts.push(
-      `<rect x="${x}" y="${y}" width="88" height="62" fill="${isOpticalMode(geometry.mode) ? "#ffffff" : geometry.settings.invert ? "#1e1e1c" : "#f8f5ef"}" stroke="#d8dcd7" stroke-width="0.25"/>`,
+      `<rect x="${x}" y="${y}" width="88" height="62" fill="${isOpticalMode(geometry.mode) || geometry.mode === "cross-stitch" ? "#ffffff" : geometry.settings.invert ? "#1e1e1c" : "#f8f5ef"}" stroke="#d8dcd7" stroke-width="0.25"/>`,
     );
     parts.push(
       `<g data-guide-example="${variant}" data-scale="${scale}" transform="translate(${tx} ${ty}) scale(${scale}) translate(${-b.x} ${-b.y})">${body}</g>`,
@@ -221,13 +221,18 @@ function keyPage(
     parts.push(
       `<rect x="14" y="${y - 3.4}" width="7" height="5.8" rx="0.5" fill="${entry.color}" stroke="#9caaa0" stroke-width="0.2"/>`,
     );
-    const text = `${entry.index === null ? "Single ink" : `Key ${entry.id}`}  ${entry.color}${supportsPalette(model.mode) ? `  |  ${entry.usedCellCount} ${model.mode === "mosaic" ? "cells" : "marks"}${entry.usedCellCount ? "" : " (unused)"}` : ""}`;
+    const text = `${entry.index === null ? "Single ink" : `Key ${entry.id}`}${entry.markerCode ? ` / pen ${entry.markerCode}` : ""}  ${entry.color}${supportsPalette(model.mode) ? `  |  ${entry.usedCellCount} ${model.mode === "mosaic" ? "cells" : "marks"}${entry.usedCellCount ? "" : " (unused)"}` : ""}`;
     parts.push(label(text, 25, y + 0.8, 3.4));
     y += 8;
   }
   y += 3;
   const keyNote = paragraph(
-    "Blank canvas is not an additional numbered colour. These screen/print swatches do not verify a marker match. Assign physical markers by the key before the trial.",
+    (model.markerProfile
+      ? `Reference set: ${model.markerProfile.label}. `
+      : "") +
+      (model.mode === "cross-stitch"
+        ? `Key 0 means leave blank: ${model.blankCellCount ?? 0} crosses need no pen. These digital swatches are unverified. Assign and test the physical markers before the trial.`
+        : "Blank canvas is not an additional numbered colour. These screen/print swatches do not verify a marker match. Assign physical markers by the key before the trial."),
     14,
     y,
     182,

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
-import { getAvailableModes } from "@/lib/mode-availability";
+import { getPreviewModes } from "@/lib/mode-availability";
 export const metadata = { title: "Field notes" };
 export default function Journal() {
-  const alternative = getAvailableModes().find((mode) => mode !== "dots");
+  const alternative = getPreviewModes().find((mode) => mode !== "dots");
   return (
     <>
       <SiteHeader />

@@ -82,6 +82,10 @@ export async function prototypeKitFiles(
       packed: false,
     })),
     palette: guide.legend,
+    ...(guide.markerProfile ? { markerProfile: guide.markerProfile } : {}),
+    ...(geometry.mode === "cross-stitch"
+      ? { blankCrosses: guide.blankCellCount, paperKey: "0" }
+      : {}),
     note: "Requirements only. No material assignment, quantity or completed packing is confirmed.",
   };
   add(

@@ -19,11 +19,11 @@ export const metadata: Metadata = {
       process.env.PUBLIC_SITE_INDEXABLE === "true" && Boolean(publicOrigin),
   },
   title: {
-    default: "Slow Reveal Studio — Made from your photo. Finished by you.",
+    default: "Slow Reveal Studio — Put yourself in the picture.",
     template: "%s · Slow Reveal Studio",
   },
   description:
-    "Turn a meaningful photograph into a guided canvas you complete by hand. Explore dots, mosaic and line art in the Slow Reveal Studio.",
+    "Put yourself in the picture. Turn a favourite photo into a guided artwork that reveals itself through dots, colour, spirals and little marks made by you.",
   icons: { icon: "/favicon.svg" },
   ...(publicOrigin
     ? {
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
           type: "website",
           siteName: "Slow Reveal Studio",
           locale: "en_GB",
-          title: "Slow Reveal Studio — Made from your photo. Finished by you.",
+          title: "Slow Reveal Studio — Put yourself in the picture.",
           description:
-            "Explore a photograph as a guided dot-art activity. Digital studio prototype; physical samples are still being tested.",
+            "A photograph you love. A picture that takes its time. Explore the digital making studio; physical kits remain in development.",
           images: [
             {
               url: "/social/studio-og.png",

@@ -265,7 +265,12 @@ test("optical masks stay blank after negative brightness and contrast adjustment
     data: Buffer.alloc(dimensions.width * dimensions.height).toString("base64"),
     feather: 0,
   });
-  for (const mode of ["colour-blend", "tv-weave", "fibonacci"] as const) {
+  for (const mode of [
+    "colour-blend",
+    "tv-weave",
+    "fibonacci",
+    "cross-stitch",
+  ] as const) {
     const g = renderImage(
       image,
       settings({
@@ -277,6 +282,15 @@ test("optical masks stay blank after negative brightness and contrast adjustment
       }),
       mask,
     );
-    assert.equal(g.stats.markCount, 0);
+    if (mode === "cross-stitch") {
+      assert.ok(g.cells.length > 0, "Retain the uniform blank guide grid");
+      assert.ok(g.cells.every((cell) => cell.label === "0"));
+      const plan = makingPlan(g);
+      assert.equal(
+        plan.regions.reduce((sum, area) => sum + area.marks, 0),
+        0,
+      );
+      assert.ok(plan.regions.every((area) => area.colours.length === 0));
+    } else assert.equal(g.stats.markCount, 0);
   }
 });

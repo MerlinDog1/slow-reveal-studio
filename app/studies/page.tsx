@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import marketing from "@/public/marketing/manifest.json";
-import { getAvailableModes } from "@/lib/mode-availability";
+import { getPreviewModes } from "@/lib/mode-availability";
+import { RevealModes } from "@/components/reveal-modes";
 
 export const metadata = {
   title: "Studies in making",
@@ -82,7 +83,7 @@ const studies = [
   ],
 ];
 export default function Studies() {
-  const availableModes = getAvailableModes();
+  const availableModes = getPreviewModes();
   const visibleStudies = studies.filter(([file]) => {
     if (file.startsWith("mosaic-")) return availableModes.includes("mosaic");
     if (file.startsWith("contour-")) return availableModes.includes("contour");
@@ -102,6 +103,7 @@ export default function Studies() {
           materials and setting; they are not photographs of manufactured kits
           or customer results.
         </p>
+        <RevealModes availableModes={availableModes} />
         <div className="studies-grid">
           {visibleStudies.map(([file, title, caption]) => {
             const asset = marketing.assets.find(

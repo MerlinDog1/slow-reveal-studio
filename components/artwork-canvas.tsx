@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useRef } from "react";
 import { drawArtwork, type DrawingOptions } from "@/lib/draw-artwork";
 import type { RenderGeometry } from "@/lib/renderers";
+import { downsamplePreview, previewRasterPlan } from "@/lib/preview-sampling";
 
 export const PreviewCameraContext = createContext("");
 export function ArtworkCanvas({
@@ -36,17 +37,40 @@ export function ArtworkCanvas({
         );
       if (width <= 0 || height <= 0 || !paper.width) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      target.width = Math.max(1, Math.ceil(width * dpr));
-      target.height = Math.max(1, Math.ceil(height * dpr));
+      const plan =
+        variant === "finished"
+          ? previewRasterPlan(
+              width,
+              height,
+              dpr,
+              Number(camera.split(":")[0]) || 1,
+            )
+          : null;
+      target.width = plan?.width ?? Math.max(1, Math.ceil(width * dpr));
+      target.height = plan?.height ?? Math.max(1, Math.ceil(height * dpr));
       Object.assign(target.style, {
         left: `${left}px`,
         top: `${top}px`,
         width: `${width}px`,
         height: `${height}px`,
       });
-      const ctx = target.getContext("2d")!;
+      const sampled = plan ? document.createElement("canvas") : target;
+      if (plan) {
+        sampled.width = plan.sampleWidth;
+        sampled.height = plan.sampleHeight;
+      }
+      const ctx = sampled.getContext("2d", { willReadFrequently: !!plan })!;
       const scale = paper.width / geometry.widthMm;
-      ctx.setTransform(scale * dpr, 0, 0, scale * dpr, -left * dpr, -top * dpr);
+      const ratioX = sampled.width / width,
+        ratioY = sampled.height / height;
+      ctx.setTransform(
+        scale * ratioX,
+        0,
+        0,
+        scale * ratioY,
+        -left * ratioX,
+        -top * ratioY,
+      );
       drawArtwork(ctx, geometry, {
         variant,
         colour,
@@ -60,6 +84,22 @@ export function ArtworkCanvas({
           height: height / scale,
         },
       });
+      if (plan) {
+        const pixels = ctx.getImageData(0, 0, sampled.width, sampled.height);
+        const averaged = downsamplePreview(
+          pixels.data,
+          plan.width,
+          plan.height,
+          plan.samples,
+        );
+        target
+          .getContext("2d")!
+          .putImageData(new ImageData(averaged, plan.width, plan.height), 0, 0);
+        sampled.width = sampled.height = 0;
+      }
+      element.dataset.previewSampling = plan
+        ? `${plan.samples}x-area`
+        : "geometry";
     };
     let frame = requestAnimationFrame(draw);
     const schedule = () => {

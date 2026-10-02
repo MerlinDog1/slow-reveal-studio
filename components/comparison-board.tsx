@@ -9,6 +9,7 @@ import {
   type RenderSettings,
   isOpticalMode,
   usesOpticalColour,
+  CROSS_STITCH_PRESETS,
 } from "@/lib/renderers";
 import { MOSAIC_MARKER_PALETTE } from "@/lib/mosaic-palette";
 import { defaultOpticalPalette } from "@/lib/optical-palette";
@@ -21,6 +22,7 @@ const names: Partial<Record<RenderMode, string>> = {
   "line-amplification": "Line Study",
   "colour-blend": "Colour Blend",
   "tv-weave": "TV Weave",
+  "cross-stitch": "Cross Stitch",
 };
 type Study = {
   name: string;
@@ -64,11 +66,13 @@ export function ComparisonBoard({
               ...settings,
               mode,
               linePattern: "horizontal",
-              palette: isOpticalMode(mode)
-                ? (settings.palette ?? defaultOpticalPalette())
-                : mode === "fibonacci" || mode === "mosaic"
-                  ? settings.palette
-                  : undefined,
+              ...(mode === "cross-stitch" ? CROSS_STITCH_PRESETS.standard : {}),
+              palette:
+                isOpticalMode(mode) || mode === "cross-stitch"
+                  ? (settings.palette ?? defaultOpticalPalette())
+                  : mode === "fibonacci" || mode === "mosaic"
+                    ? settings.palette
+                    : undefined,
               invert: false,
             },
           }))
@@ -83,17 +87,18 @@ export function ComparisonBoard({
               settings,
               crop: { ...crop, zoom: Math.min(4, zoom * crop.zoom) },
             }))
-          : (settings.mode === "mosaic" ? [8, 16, 32] : [8, 16]).map(
-              (count) => ({
-                name: `${count} colours`,
-                crop,
-                settings: {
-                  ...settings,
-                  palette: MOSAIC_MARKER_PALETTE.slice(0, count),
-                  invert: false,
-                },
-              }),
-            );
+          : (["mosaic", "cross-stitch"].includes(settings.mode)
+              ? [8, 16, 32]
+              : [8, 16]
+            ).map((count) => ({
+              name: `${count} colours`,
+              crop,
+              settings: {
+                ...settings,
+                palette: MOSAIC_MARKER_PALETTE.slice(0, count),
+                invert: false,
+              },
+            }));
     setItems(next);
     void loadImage(source)
       .then((image) => {
@@ -169,7 +174,8 @@ export function ComparisonBoard({
         <button
           disabled={
             !settings.palette ||
-            (!usesOpticalColour(settings) && settings.mode !== "mosaic")
+            (!usesOpticalColour(settings) &&
+              !["mosaic", "cross-stitch"].includes(settings.mode))
           }
           onClick={() => setKind("colours")}
         >

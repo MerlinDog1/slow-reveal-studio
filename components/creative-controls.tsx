@@ -136,13 +136,14 @@ export function CreativeControls({
                 value={count}
                 onChange={(e) => setCount(Number(e.target.value))}
               >
-                {(s.mode === "mosaic" ? [2, 4, 8, 16, 32] : [2, 8, 16]).map(
-                  (n) => (
-                    <option key={n} value={n}>
-                      {n} colours
-                    </option>
-                  ),
-                )}
+                {(["mosaic", "cross-stitch"].includes(s.mode)
+                  ? [2, 4, 8, 16, 32]
+                  : [2, 8, 16]
+                ).map((n) => (
+                  <option key={n} value={n}>
+                    {n} colours
+                  </option>
+                ))}
               </select>
             </label>
             <button
@@ -203,7 +204,8 @@ export function CreativeControls({
                     value.format !== "slow-reveal-pen-palette" ||
                     !Array.isArray(colours) ||
                     colours.length < 2 ||
-                    colours.length > (s.mode === "mosaic" ? 32 : 16) ||
+                    colours.length >
+                      (["mosaic", "cross-stitch"].includes(s.mode) ? 32 : 16) ||
                     colours.some(
                       (c) =>
                         typeof c !== "string" || !/^#[a-f0-9]{6}$/i.test(c),
@@ -212,7 +214,7 @@ export function CreativeControls({
                       colours.length
                   )
                     throw new Error(
-                      "Use a distinct 2–16 colour palette (up to 32 for Mosaic).",
+                      "Use a distinct 2–16 colour palette (up to 32 for Mosaic or Cross Stitch).",
                     );
                   update({ palette: colours, invert: false });
                   setMessage(

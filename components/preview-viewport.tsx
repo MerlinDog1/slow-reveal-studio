@@ -6,6 +6,8 @@ import {
   useId,
   useRef,
   useState,
+  createContext,
+  useMemo,
   type ReactNode,
 } from "react";
 import { PreviewCameraContext } from "./artwork-canvas";
@@ -14,6 +16,11 @@ import { Minus, Plus, Maximize } from "lucide-react";
 const LEVELS = [1, 1.5, 2, 3, 4, 6, 8, 12, 16];
 type Camera = { zoom: number; x: number; y: number };
 const FIT: Camera = { zoom: 1, x: 0, y: 0 };
+export const PreviewDisplayContext = createContext({
+  width: 0,
+  height: 0,
+  zoom: 2,
+});
 const clamp = (value: number, limit: number) =>
   Math.max(-limit, Math.min(limit, value));
 
@@ -49,6 +56,14 @@ export function PreviewViewport({
     Math.min(size.width - 40, (size.height - 40) * aspectRatio),
   );
   const fitHeight = fitWidth / aspectRatio;
+  const display = useMemo(
+    () => ({
+      width: size.width ? fitWidth * camera.zoom : 0,
+      height: size.width ? fitHeight * camera.zoom : 0,
+      zoom: camera.zoom,
+    }),
+    [fitWidth, fitHeight, camera.zoom, size.width],
+  );
   const bound = useCallback(
     (next: Camera): Camera => ({
       zoom: next.zoom,
@@ -302,7 +317,9 @@ export function PreviewViewport({
           <PreviewCameraContext.Provider
             value={`${camera.zoom}:${camera.x}:${camera.y}:${size.width}:${size.height}`}
           >
-            {children}
+            <PreviewDisplayContext.Provider value={display}>
+              {children}
+            </PreviewDisplayContext.Provider>
           </PreviewCameraContext.Provider>
         </div>
       </div>

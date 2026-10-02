@@ -23,7 +23,7 @@ export function SiteHeader({ studio = false }: { studio?: boolean }) {
       <Brand />
       <nav aria-label="Main navigation">
         <Link href="/#how-it-works">How it works</Link>
-        <Link href="/lab/dots">The dot lab</Link>
+        <Link href="/studies">Find your reveal</Link>
         <Link href="/journal">Field notes</Link>
       </nav>
       <div className="header-actions">

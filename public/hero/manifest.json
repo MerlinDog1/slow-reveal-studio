@@ -1,6 +1,6 @@
 {
   "title": "A little wild colour",
-  "rendererVersion": "slow-reveal-geometry/1.8.0",
+  "rendererVersion": "slow-reveal-geometry/1.9.0",
   "mode": "colour-blend",
   "markCount": 52312,
   "paletteDescription": "Sixteen colours matched to this source image; physical marker matching unvalidated.",
@@ -33,7 +33,7 @@
   "reproduction": "node --import tsx scripts/build-hero.ts",
   "files": {
     "macaw-geometry.json": {
-      "sha256": "14a266425fcb5cac786ab12f319b81b425ee56a27da51fe137d72c571083284c",
+      "sha256": "48f151c1d6e76bcef057cc30284248f47a29a69494e4d693975a6b8af716324f",
       "bytes": 5511027
     },
     "macaw-dots.json": {
@@ -41,11 +41,11 @@
       "bytes": 1982772
     },
     "macaw-finished.svg": {
-      "sha256": "8f953468234ba51dcf09d92d9e4e2d84113f116b15ffb08989694477756f681d",
+      "sha256": "353f860fbf0199b4add4a5b5309de496d7e253c249de9483a600928588dec2b3",
       "bytes": 4752038
     },
     "macaw-template.svg": {
-      "sha256": "238b53c4fe2007987ac301dca99669d1b0c507b5836b45ffa68ad2fd9dc44f53",
+      "sha256": "10e19791ca283418bf980a67e172fa09c3ed3145ec23fb6744cf462333469b9e",
       "bytes": 40923325
     },
     "macaw-source.webp": {

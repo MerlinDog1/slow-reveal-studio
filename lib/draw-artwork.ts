@@ -48,7 +48,7 @@ export function drawArtwork(
     guide = effectiveGuideWidthMm(s);
   const ink = finished ? s.inkColor : effectiveGuideColor(s);
   ctx.fillStyle =
-    usesOpticalColour(s) && !g.circles.length
+    (usesOpticalColour(s) && !g.circles.length) || g.mode === "cross-stitch"
       ? "#ffffff"
       : s.invert
         ? "#1e1e1c"
@@ -86,6 +86,7 @@ export function drawArtwork(
   }
   for (const c of g.cells) {
     if (index++ >= limit) break;
+    if (finished && g.mode === "cross-stitch" && c.label === "0") continue;
     if (!visible(c.x, c.y, c.width, c.height)) continue;
     ctx.globalAlpha =
       (options.colour && c.color !== options.colour ? 0.09 : 1) *
@@ -115,7 +116,10 @@ export function drawArtwork(
     }
     if (finished) ctx.fill();
     else ctx.stroke();
-    const size = Math.min(1.8, c.height * 0.5);
+    const size = Math.min(
+      1.8,
+      c.height * (g.mode === "cross-stitch" ? 0.28 : 0.5),
+    );
     if (!finished && c.label && size * (options.pixelsPerMm ?? 1) >= 7) {
       const m = measureLettering(c.label, "sans-serif");
       lettering(ctx, {

@@ -25,9 +25,10 @@ export function makingPlan(g: RenderGeometry, columns = 4, rows = 4) {
     if (colour) area.colours.add(colour);
   };
   g.circles.forEach((c) => add(c.x, c.y, g.settings.inkColor));
-  g.cells.forEach((c) =>
-    add(c.x + c.width / 2, c.y + c.height / 2, c.color ?? g.settings.inkColor),
-  );
+  g.cells.forEach((c) => {
+    if (g.mode === "cross-stitch" && c.label === "0") return;
+    add(c.x + c.width / 2, c.y + c.height / 2, c.color ?? g.settings.inkColor);
+  });
   g.paths.forEach((p) => {
     if (p.points.length) add(p.points[0].x, p.points[0].y, g.settings.inkColor);
   });
@@ -36,7 +37,10 @@ export function makingPlan(g: RenderGeometry, columns = 4, rows = 4) {
   for (const cell of g.cells)
     if (cell.label) {
       const m = measureLettering(cell.label, "sans-serif"),
-        nominal = Math.min(1.8, cell.height * 0.5);
+        nominal = Math.min(
+          1.8,
+          cell.height * (g.mode === "cross-stitch" ? 0.28 : 0.5),
+        );
       const size = Math.min(nominal, (cell.width * 0.75) / (m.width / m.units));
       const capHeight = (size * (m.maxY - m.minY)) / m.units;
       smallestLabelMm = Math.min(smallestLabelMm, capHeight);

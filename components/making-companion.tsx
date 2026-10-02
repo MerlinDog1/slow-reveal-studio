@@ -57,6 +57,7 @@ export function MakingCompanion({
   const completedMarks = plan.regions
     .filter((r) => done.includes(r.id))
     .reduce((sum, r) => sum + r.marks, 0);
+  const totalMarks = plan.regions.reduce((sum, r) => sum + r.marks, 0);
   const exportSample = () => {
     try {
       downloadBlob(
@@ -139,13 +140,10 @@ export function MakingCompanion({
               </select>
             </label>
             <p>
-              {completedMarks.toLocaleString()} /{" "}
-              {g.stats.markCount.toLocaleString()} marks in completed sections
+              {completedMarks.toLocaleString()} / {totalMarks.toLocaleString()}{" "}
+              marks in completed sections
             </p>
-            <progress
-              max={Math.max(1, g.stats.markCount)}
-              value={completedMarks}
-            />
+            <progress max={Math.max(1, totalMarks)} value={completedMarks} />
             <div className="region-grid">
               {plan.regions.map((r, i) => (
                 <button

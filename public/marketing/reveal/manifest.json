@@ -1,0 +1,682 @@
+{
+  "schemaVersion": 1,
+  "title": "Four colour reveal modes — licensed portrait study",
+  "rendererVersion": "slow-reveal-geometry/1.9.0",
+  "isPhysicalEvidence": false,
+  "source": {
+    "id": "portrait",
+    "file": "/references/portrait.jpg",
+    "author": "Joe Gardner",
+    "source": "https://unsplash.com/photos/man-wearing-black-hat-6p8ngTH1bUI",
+    "downloadUrl": "https://images.unsplash.com/photo-1532123675048-773bd75df1b4?auto=format&fit=max&fm=jpg&q=85&w=1400",
+    "license": "Unsplash License",
+    "licenseUrl": "https://unsplash.com/license",
+    "licenseVerifiedAt": "2026-09-27",
+    "usage": "Renderer laboratory fixture; not a customer result or product endorsement",
+    "modifications": "Resized JPEG derivative at 1400px width, aspect ratio preserved, quality 85",
+    "width": 1400,
+    "height": 2100,
+    "bytes": 538963,
+    "sha256": "c539da5c8e48addde1dde35005e93c5d91ed732839c072e7f02eb1ff3f123393"
+  },
+  "sourcePreparation": {
+    "orientation": "EXIF auto orientation",
+    "crop": "centre cover to 4:5",
+    "rasterWidth": 800,
+    "rasterHeight": 1000,
+    "rgbaSha256": "13d4dfe2ed788d0449a03fecdde9dd78bd42779a3971c3e2d6cbe035788d2b4d",
+    "transparencyBackground": "#ffffff"
+  },
+  "markerPalette": {
+    "id": "ohuhu-nahuku-48-v1",
+    "label": "Ohuhu Nahuku · 48-pen pack",
+    "count": 16,
+    "status": "unvalidated",
+    "disclaimer": "Approximate colours sampled from the manufacturer's chart. Not measured paint colours; canvas coverage, 2 mm detail and durability remain untested. The 16 and 32 options are Studio selections from the same 48-pen pack.",
+    "productUrl": "https://uk.ohuhu.com/products/ohuhu-direct-ink-acrylic-markers-48-pack-nahuku?variant=51158468559135",
+    "chart": {
+      "url": "https://cdn.shopify.com/s/files/1/0555/4212/0735/files/Y30-80601-84Nahuku4.jpg?v=1756708704",
+      "sha256": "ffbbf7782d647ff756ddbb96573cdeb86998b73438a166687ec26604a89c3d4a",
+      "width": 1600,
+      "height": 1600,
+      "method": "Decode original JPEG to 8-bit RGB with Sharp 0.35.5; independent channel median of each specified 21 × 21 pixel region on the solid light-ground swatch. No physical calibration or colour correction.",
+      "labelSource": "studio-description",
+      "codeSource": "manufacturer-chart"
+    },
+    "colours": [
+      {
+        "code": "120",
+        "label": "Black",
+        "hex": "#22262b",
+        "sample": {
+          "left": 1024,
+          "top": 1277,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "BR519",
+        "label": "Brown",
+        "hex": "#583b33",
+        "sample": {
+          "left": 872,
+          "top": 1114,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "BR87",
+        "label": "Tan",
+        "hex": "#dea576",
+        "sample": {
+          "left": 1024,
+          "top": 1114,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "Y211",
+        "label": "Ochre",
+        "hex": "#cd880a",
+        "sample": {
+          "left": 407,
+          "top": 614,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "G321",
+        "label": "Deep green",
+        "hex": "#084e42",
+        "sample": {
+          "left": 718,
+          "top": 779,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "B719",
+        "label": "Blue",
+        "hex": "#016abc",
+        "sample": {
+          "left": 561,
+          "top": 947,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "BGY012",
+        "label": "Slate grey",
+        "hex": "#7d93a0",
+        "sample": {
+          "left": 1179,
+          "top": 1114,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "Y03",
+        "label": "Peach",
+        "hex": "#fcc99d",
+        "sample": {
+          "left": 1332,
+          "top": 446,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "R416",
+        "label": "Red",
+        "hex": "#e21117",
+        "sample": {
+          "left": 561,
+          "top": 446,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "YR310",
+        "label": "Orange",
+        "hex": "#fe8302",
+        "sample": {
+          "left": 1179,
+          "top": 446,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "Y45",
+        "label": "Golden yellow",
+        "hex": "#ffc605",
+        "sample": {
+          "left": 718,
+          "top": 614,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "YG57",
+        "label": "Light green",
+        "hex": "#95cc78",
+        "sample": {
+          "left": 1332,
+          "top": 614,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "BG28",
+        "label": "Turquoise",
+        "hex": "#23c9c9",
+        "sample": {
+          "left": 1024,
+          "top": 779,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "BG85",
+        "label": "Light blue",
+        "hex": "#85d2e2",
+        "sample": {
+          "left": 1332,
+          "top": 779,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "V017",
+        "label": "Violet",
+        "hex": "#6a5cb9",
+        "sample": {
+          "left": 1024,
+          "top": 947,
+          "width": 21,
+          "height": 21
+        }
+      },
+      {
+        "code": "R610",
+        "label": "Coral",
+        "hex": "#f98e8b",
+        "sample": {
+          "left": 718,
+          "top": 446,
+          "width": 21,
+          "height": 21
+        }
+      }
+    ]
+  },
+  "rasterization": {
+    "supersampling": {
+      "width": 1600,
+      "height": 2000,
+      "format": "png"
+    },
+    "output": {
+      "width": 640,
+      "height": 800,
+      "format": "webp",
+      "quality": 86,
+      "effort": 6
+    },
+    "kernel": "lanczos3",
+    "background": "shared toSvg default preview background",
+    "note": "Each pair serializes one identical geometry object. Geometry and SVG hashes retained; large intermediates are reproducible and not published."
+  },
+  "reproduction": "npx tsx scripts/build-reveal-studies.ts",
+  "sourceHashes": {
+    "lib/marker-palettes.ts": "f9a35a7f060dd12169c6760ad5677d85d7ec8402e076b747451d6552cff95c22",
+    "lib/mosaic-palette.ts": "e6a4e0afe46f6200c209fe37985c4e2ed030cd9631b7e8316f649b1190738e67",
+    "lib/optical-palette.ts": "fd6223c1e92d2ab4838f952b04538a40f74631b8543575bdf14ccebe815885b6",
+    "lib/renderers/creative-lines.ts": "7f75086e25896eb22825a8bcc6c69276008677ffe169960dcd69b1793585b0a7",
+    "lib/renderers/creative.ts": "17427afc73472eef50d28ec932c536af7d3cdd8004c69b079dd52301ea4e6a78",
+    "lib/renderers/cross-stitch.ts": "f17ac72a56384ece97011295f6d798428d19800627aa3c0e31d8e0bb785c4e98",
+    "lib/renderers/fibonacci.ts": "0ec67e5863c6aed0ef975749222ba2e4fc33cba7eb00922c06b589e8393330a3",
+    "lib/renderers/font-data.json": "72d7eb28c8a1e9829c0e3767bc689500db9287ace838ec623931805e270c9495",
+    "lib/renderers/fonts.ts": "dbc8f3b1d1194651c76ec1f4205c2161d12116f5373b598eb083214084656c92",
+    "lib/renderers/index.ts": "da8850988db844ccd088b5b5a0e71d6fc280ba498b60fc0a23e26164a81a9278",
+    "lib/renderers/modes.ts": "015bbe6b791375d84f69801bb8a5102de7499429733d3b34bc9680c38b5d5644",
+    "lib/renderers/optical.ts": "e127c280752705108dd733bf547458475014a00b93692fed1a6b6c9821a571a9",
+    "lib/renderers/sampling.ts": "7c5e9e9f34bc5620384afb654b0077616d3e15ead2687dfa9475b4d8d0cfb2c5",
+    "lib/renderers/stipple.ts": "2f2cd5cce83158bbae3a80c289f6b4ee32ca1f45d6ead57edeb71952d06e751f",
+    "lib/renderers/svg.ts": "17250e7ec9e6b876fe8c81cf1e00031da95df0642dad788cc77b4cb8421a048c",
+    "lib/renderers/types.ts": "51070abd902cc28b8bfa8a6f580185593e573e78600ff607f4c07723d8414cb3",
+    "lib/subject-mask.ts": "c6360f73da86bdafa732ee218f1f234b7df7f80db86290085e4a41e3bc2a1ab6",
+    "scripts/build-reveal-studies.ts": "c5367a56deacce350e0921e13d2338a70e4dfc3697a42eff2b18774ce9716d33"
+  },
+  "runtime": {
+    "node": "v22.13.1",
+    "sharp": {
+      "aom": "3.15.1",
+      "archive": "3.8.9",
+      "cairo": "1.18.6",
+      "cgif": "0.5.4",
+      "exif": "0.6.26",
+      "expat": "2.8.5",
+      "ffi": "3.8.0",
+      "fontconfig": "2.18.3",
+      "freetype": "2.14.3",
+      "fribidi": "1.0.17",
+      "glib": "2.90.0",
+      "harfbuzz": "14.5.0",
+      "heif": "1.23.5",
+      "highway": "1.4.0",
+      "imagequant": "2.4.1",
+      "lcms": "2.19.1",
+      "mozjpeg": "0826579",
+      "pango": "1.58.2",
+      "pixman": "0.46.4",
+      "png": "1.6.58",
+      "proxy-libintl": "0.5",
+      "rsvg": "2.63.2",
+      "tiff": "4.7.2",
+      "uhdr": "2.0.2",
+      "vips": "8.18.7",
+      "webp": "1.6.0",
+      "xml2": "2.15.4",
+      "zlib-ng": "2.3.3",
+      "sharp": "0.35.5"
+    }
+  },
+  "studies": [
+    {
+      "mode": "colour-blend",
+      "kind": "digital-renderer-study",
+      "isPhysicalEvidence": false,
+      "rendererVersion": "slow-reveal-geometry/1.9.0",
+      "settings": {
+        "mode": "colour-blend",
+        "widthMm": 400,
+        "heightMm": 500,
+        "spacingMm": 2.8,
+        "minDiameterMm": 0.7,
+        "maxDiameterMm": 2.4,
+        "contrast": 1.1,
+        "brightness": 0,
+        "gamma": 1,
+        "threshold": 0.035,
+        "edgeEmphasis": 0.35,
+        "detailPreservation": 0,
+        "density": 1,
+        "invert": false,
+        "inkColor": "#1e1e1c",
+        "guideOpacity": 0.3,
+        "safeMarginMm": 10,
+        "guideWidthMm": 0.15,
+        "autoExposure": true,
+        "subjectMaskStrength": 0,
+        "palette": [
+          "#22262b",
+          "#583b33",
+          "#dea576",
+          "#cd880a",
+          "#084e42",
+          "#016abc",
+          "#7d93a0",
+          "#fcc99d",
+          "#e21117",
+          "#fe8302",
+          "#ffc605",
+          "#95cc78",
+          "#23c9c9",
+          "#85d2e2",
+          "#6a5cb9",
+          "#f98e8b"
+        ]
+      },
+      "geometrySha256": "ff04cf6eaffdc28a0927264595ca6f31c288b9627a47963fce5da0f1792cb5f3",
+      "geometryBytes": 2404657,
+      "stats": {
+        "markCount": 26093,
+        "estimatedCompletionMinutes": 1203,
+        "inkAreaMm2": 118041.951,
+        "sourceWidth": 800,
+        "sourceHeight": 1000,
+        "effectiveSpacingMm": 2.8,
+        "effectiveMinDiameterMm": 0.7,
+        "effectiveMaxDiameterMm": 2.4,
+        "meanLuminance": 0.1133,
+        "tonalRange": 0.3373,
+        "exposureScale": 1.797
+      },
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
+        "This photo is dark. Try a tighter crop or increase brightness.",
+        "Automatic exposure lifted dark detail. Compare with the original and disable it for intentional low-key artwork.",
+        "Experimental mode: physical completion has not yet been validated.",
+        "Colour Blend colour key: 1 = #22262b, 2 = #583b33, 3 = #dea576, 4 = #cd880a, 5 = #084e42, 6 = #016abc, 7 = #7d93a0, 8 = #fcc99d, 9 = #e21117, 10 = #fe8302, 11 = #ffc605, 12 = #95cc78, 13 = #23c9c9, 14 = #85d2e2, 15 = #6a5cb9, 16 = #f98e8b. Supply matching markers and a separate colour legend.",
+        "Palette numbers may be hard to read below 3 mm wide. Increase spacing and mark size.",
+        "Neighbouring colours blend visually at a distance. White gaps and the actual marker colours limit contrast and colour range; this is not a calibrated ink simulation."
+      ],
+      "assets": [
+        {
+          "variant": "template",
+          "file": "/marketing/reveal/colour-blend-template.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 57904,
+          "sha256": "e1e7cdb23c3bee65d3f406e5e5270eb88a0ca1e24d12550343aa5099b9dfdb1c",
+          "svgSha256": "525f89c68aee7cca04e344e43e78020e01a93858f7dc5b33672bf6926228c53d",
+          "svgBytes": 11668259,
+          "supersampledPngSha256": "e76c8de10537f0aefaae293a0d2959974ce88b318c085919aec3df08326f062d",
+          "caption": "Digital numbered guide study from exact renderer geometry; physical guide visibility is untested."
+        },
+        {
+          "variant": "finished",
+          "file": "/marketing/reveal/colour-blend-finished.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 313312,
+          "sha256": "9f18fe2804226537f89a37de73bb7c3f94106aee997d08976acad84037653cd2",
+          "svgSha256": "73b10b47c9775729e9470ce4ee437645af5795a22bade63b805123ec6dc21346",
+          "svgBytes": 2037050,
+          "supersampledPngSha256": "00adcf517f6df7f0a0c132e8455d580e101e76a93fc6869f17d0cc57d8958b72",
+          "caption": "Digital finished-colour simulation from the same geometry; not a hand-completed canvas or calibrated paint result."
+        }
+      ]
+    },
+    {
+      "mode": "tv-weave",
+      "kind": "digital-renderer-study",
+      "isPhysicalEvidence": false,
+      "rendererVersion": "slow-reveal-geometry/1.9.0",
+      "settings": {
+        "mode": "tv-weave",
+        "widthMm": 400,
+        "heightMm": 500,
+        "spacingMm": 2.8,
+        "minDiameterMm": 0.7,
+        "maxDiameterMm": 2.4,
+        "contrast": 1.1,
+        "brightness": 0,
+        "gamma": 1,
+        "threshold": 0.035,
+        "edgeEmphasis": 0.35,
+        "detailPreservation": 0,
+        "density": 1,
+        "invert": false,
+        "inkColor": "#1e1e1c",
+        "guideOpacity": 0.3,
+        "safeMarginMm": 10,
+        "guideWidthMm": 0.15,
+        "autoExposure": true,
+        "subjectMaskStrength": 0,
+        "palette": [
+          "#22262b",
+          "#583b33",
+          "#dea576",
+          "#cd880a",
+          "#084e42",
+          "#016abc",
+          "#7d93a0",
+          "#fcc99d",
+          "#e21117",
+          "#fe8302",
+          "#ffc605",
+          "#95cc78",
+          "#23c9c9",
+          "#85d2e2",
+          "#6a5cb9",
+          "#f98e8b"
+        ]
+      },
+      "geometrySha256": "2dd7d42ba9991ed2fb9f86946f2ae5ee84c1581cf7645b3af79ccb1746d71239",
+      "geometryBytes": 3233856,
+      "stats": {
+        "markCount": 35097,
+        "estimatedCompletionMinutes": 1491,
+        "inkAreaMm2": 98063.7471,
+        "sourceWidth": 800,
+        "sourceHeight": 1000,
+        "effectiveSpacingMm": 2.8,
+        "effectiveMinDiameterMm": 0.7,
+        "effectiveMaxDiameterMm": 2.4,
+        "meanLuminance": 0.1133,
+        "tonalRange": 0.3373,
+        "exposureScale": 1.797
+      },
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
+        "This photo is dark. Try a tighter crop or increase brightness.",
+        "Automatic exposure lifted dark detail. Compare with the original and disable it for intentional low-key artwork.",
+        "Experimental mode: physical completion has not yet been validated.",
+        "TV Weave colour key: 1 = #22262b, 2 = #583b33, 3 = #dea576, 4 = #cd880a, 5 = #084e42, 6 = #016abc, 7 = #7d93a0, 8 = #fcc99d, 9 = #e21117, 10 = #fe8302, 11 = #ffc605, 12 = #95cc78, 13 = #23c9c9, 14 = #85d2e2, 15 = #6a5cb9, 16 = #f98e8b. Supply matching markers and a separate colour legend.",
+        "Palette numbers may be hard to read below 3 mm wide. Increase spacing and mark size.",
+        "Neighbouring colours blend visually at a distance. White gaps and the actual marker colours limit contrast and colour range; this is not a calibrated ink simulation."
+      ],
+      "assets": [
+        {
+          "variant": "template",
+          "file": "/marketing/reveal/tv-weave-template.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 44062,
+          "sha256": "fedc9cc07aacff267c3f5704b6b37731f5eff8b12061b4686f79c95d47a50911",
+          "svgSha256": "bd0067ffbbe9fa688aaa7836829f522d420b29e116ec50aadc5d2613082030fa",
+          "svgBytes": 15537283,
+          "supersampledPngSha256": "5624e89824db0be0d29920fb883234ebc87b66547ade514b9467315f8ab21c1e",
+          "caption": "Digital numbered guide study from exact renderer geometry; physical guide visibility is untested."
+        },
+        {
+          "variant": "finished",
+          "file": "/marketing/reveal/tv-weave-finished.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 286484,
+          "sha256": "4ff74a3e7c713e82e3abe9f9fa2b1b4fec8d7bcde78709f9e24f7bc1092b9f37",
+          "svgSha256": "8644c3eba27895f48028e22b1dc901cb957ecc72dd0cd8c024ea313e4728cedf",
+          "svgBytes": 2739832,
+          "supersampledPngSha256": "17861564196efa577c19d673d6592b697667d27703091cb73532a90cb65f46ec",
+          "caption": "Digital finished-colour simulation from the same geometry; not a hand-completed canvas or calibrated paint result."
+        }
+      ]
+    },
+    {
+      "mode": "fibonacci",
+      "kind": "digital-renderer-study",
+      "isPhysicalEvidence": false,
+      "rendererVersion": "slow-reveal-geometry/1.9.0",
+      "settings": {
+        "mode": "fibonacci",
+        "widthMm": 400,
+        "heightMm": 500,
+        "spacingMm": 2.8,
+        "minDiameterMm": 0.7,
+        "maxDiameterMm": 2.4,
+        "contrast": 1.1,
+        "brightness": 0,
+        "gamma": 1,
+        "threshold": 0.035,
+        "edgeEmphasis": 0.35,
+        "detailPreservation": 0,
+        "density": 1,
+        "invert": false,
+        "inkColor": "#1e1e1c",
+        "guideOpacity": 0.3,
+        "safeMarginMm": 10,
+        "guideWidthMm": 0.15,
+        "autoExposure": true,
+        "subjectMaskStrength": 0,
+        "palette": [
+          "#22262b",
+          "#583b33",
+          "#dea576",
+          "#cd880a",
+          "#084e42",
+          "#016abc",
+          "#7d93a0",
+          "#fcc99d",
+          "#e21117",
+          "#fe8302",
+          "#ffc605",
+          "#95cc78",
+          "#23c9c9",
+          "#85d2e2",
+          "#6a5cb9",
+          "#f98e8b"
+        ]
+      },
+      "geometrySha256": "f390753f1d402927f99f6abab5fdd8d29842db132d1fd12ef1749d09aa651242",
+      "geometryBytes": 1790345,
+      "stats": {
+        "markCount": 18751,
+        "estimatedCompletionMinutes": 677,
+        "inkAreaMm2": 84827.5255,
+        "sourceWidth": 800,
+        "sourceHeight": 1000,
+        "effectiveSpacingMm": 2.8,
+        "effectiveMinDiameterMm": 0.7,
+        "effectiveMaxDiameterMm": 2.4,
+        "meanLuminance": 0.1133,
+        "tonalRange": 0.3373,
+        "exposureScale": 1.797
+      },
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
+        "This photo is dark. Try a tighter crop or increase brightness.",
+        "Automatic exposure lifted dark detail. Compare with the original and disable it for intentional low-key artwork.",
+        "Experimental mode: physical completion has not yet been validated.",
+        "Fibonacci Spiral colour key: 1 = #22262b, 2 = #583b33, 3 = #dea576, 4 = #cd880a, 5 = #084e42, 6 = #016abc, 7 = #7d93a0, 8 = #fcc99d, 9 = #e21117, 10 = #fe8302, 11 = #ffc605, 12 = #95cc78, 13 = #23c9c9, 14 = #85d2e2, 15 = #6a5cb9, 16 = #f98e8b. Supply matching markers and a separate colour legend.",
+        "Palette numbers may be hard to read below 3 mm wide. Increase spacing and mark size.",
+        "Neighbouring colours blend visually at a distance. White gaps and the actual marker colours limit contrast and colour range; this is not a calibrated ink simulation."
+      ],
+      "assets": [
+        {
+          "variant": "template",
+          "file": "/marketing/reveal/fibonacci-template.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 80796,
+          "sha256": "9d47383593f999a10475967b874f4d5e410a60da90cd7d4fafcb8b76f9ede1a0",
+          "svgSha256": "772078249038e7a7ccb46be5a90908f1c3e5661b6ee7ae6a33afedd37031041c",
+          "svgBytes": 8436071,
+          "supersampledPngSha256": "7df8c30bf73b71d3e7d9e2705e0b1872c099bbd46fc918b1e9132649f18902d1",
+          "caption": "Digital numbered guide study from exact renderer geometry; physical guide visibility is untested."
+        },
+        {
+          "variant": "finished",
+          "file": "/marketing/reveal/fibonacci-finished.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 309796,
+          "sha256": "f465b1e040fb6f8ad199f6341d3264554502cffc8228f3235ef386cf4030f256",
+          "svgSha256": "9ee50d014b6cd66264e605f6a32c49e834241e1a162e210d923b184eaab17a3b",
+          "svgBytes": 1525807,
+          "supersampledPngSha256": "6dd753e8b33a9d30ccfd122be14eb329b2561a6f605e288703958bbe251edf03",
+          "caption": "Digital finished-colour simulation from the same geometry; not a hand-completed canvas or calibrated paint result."
+        }
+      ]
+    },
+    {
+      "mode": "cross-stitch",
+      "kind": "digital-renderer-study",
+      "isPhysicalEvidence": false,
+      "rendererVersion": "slow-reveal-geometry/1.9.0",
+      "settings": {
+        "mode": "cross-stitch",
+        "widthMm": 400,
+        "heightMm": 500,
+        "spacingMm": 5.5,
+        "minDiameterMm": 0.7,
+        "maxDiameterMm": 4.8,
+        "contrast": 1.1,
+        "brightness": 0,
+        "gamma": 1,
+        "threshold": 0.035,
+        "edgeEmphasis": 0.35,
+        "detailPreservation": 0,
+        "density": 1,
+        "invert": false,
+        "inkColor": "#1e1e1c",
+        "guideOpacity": 0.3,
+        "safeMarginMm": 10,
+        "guideWidthMm": 0.15,
+        "autoExposure": true,
+        "subjectMaskStrength": 0,
+        "palette": [
+          "#22262b",
+          "#583b33",
+          "#dea576",
+          "#cd880a",
+          "#084e42",
+          "#016abc",
+          "#7d93a0",
+          "#fcc99d",
+          "#e21117",
+          "#fe8302",
+          "#ffc605",
+          "#95cc78",
+          "#23c9c9",
+          "#85d2e2",
+          "#6a5cb9",
+          "#f98e8b"
+        ]
+      },
+      "geometrySha256": "ac1fd6a03712094f784110f5990ecd0c45a79864bc4db67e30ec4aa7c2b29d42",
+      "geometryBytes": 2274066,
+      "stats": {
+        "markCount": 6003,
+        "estimatedCompletionMinutes": 592,
+        "inkAreaMm2": 75865.496,
+        "sourceWidth": 800,
+        "sourceHeight": 1000,
+        "effectiveSpacingMm": 5.5,
+        "effectiveMinDiameterMm": 0.7,
+        "effectiveMaxDiameterMm": 4.8,
+        "meanLuminance": 0.1133,
+        "tonalRange": 0.3373,
+        "exposureScale": 1.797
+      },
+      "warnings": [
+        "Physical prototype pending: guide visibility, marker coverage and completion time need real canvas tests.",
+        "This photo is dark. Try a tighter crop or increase brightness.",
+        "Automatic exposure lifted dark detail. Compare with the original and disable it for intentional low-key artwork.",
+        "Experimental mode: physical completion has not yet been validated.",
+        "Cross Stitch uses a uniform guide grid. Fill each numbered X with two diagonal strokes; 0 means leave that cross blank. Numbers may still hint at the image. Guide visibility and concealment need physical trials.",
+        "Cross Stitch colour key: 1 = #22262b, 2 = #583b33, 3 = #dea576, 4 = #cd880a, 5 = #084e42, 6 = #016abc, 7 = #7d93a0, 8 = #fcc99d, 9 = #e21117, 10 = #fe8302, 11 = #ffc605, 12 = #95cc78, 13 = #23c9c9, 14 = #85d2e2, 15 = #6a5cb9, 16 = #f98e8b. Supply matching markers and a separate colour legend."
+      ],
+      "assets": [
+        {
+          "variant": "template",
+          "file": "/marketing/reveal/cross-stitch-template.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 98548,
+          "sha256": "b5257afa564505edd6b0be14172355bcd4e785da122f31b52fb7fb7941b2f543",
+          "svgSha256": "6c357caf52c0ce97fab1b6df2f7a78f2e96e9e2d29a210b2724883681291e3d5",
+          "svgBytes": 3605184,
+          "supersampledPngSha256": "15be7076cb1263d118dc2a687ed6d4cd05df72e352d70b8d454e10579af57e05",
+          "caption": "Digital numbered guide study from exact renderer geometry; physical guide visibility is untested."
+        },
+        {
+          "variant": "finished",
+          "file": "/marketing/reveal/cross-stitch-finished.webp",
+          "width": 640,
+          "height": 800,
+          "bytes": 294094,
+          "sha256": "cf2be26097cf8085fa2cf6b06d2b2647a4100a2d258076643263b8be2a63b448",
+          "svgSha256": "34cb08e2627bff36dc304259d0432641edf172e39550563c1a00abfe54787121",
+          "svgBytes": 1211984,
+          "supersampledPngSha256": "c3d14b0922d003f84c102bfc75a81e067f2b04c6c5be26517ec458c5174c9277",
+          "caption": "Digital finished-colour simulation from the same geometry; not a hand-completed canvas or calibrated paint result."
+        }
+      ]
+    }
+  ]
+}

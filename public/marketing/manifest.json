@@ -644,10 +644,94 @@
           "sourceSha256": "7d53be9831a16af87451a9ac8c05590a79f52604b2938aa62919c32072c0361f"
         }
       ]
+    },
+    {
+      "id": "family-making",
+      "file": "/marketing/family-making-prototype.png",
+      "alt": "Illustrative family concept: two adults and two children adding small coloured marks to a partly completed dog portrait around a kitchen table.",
+      "generationArtifact": "exec-6876c42b-a750-488a-86fa-4dc475524a11.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-29",
+      "tool": "built-in image_gen",
+      "promptFile": "/marketing/PROMPTS-PRESENTATION.md",
+      "sourceImages": [],
+      "qa": "Two plausible active marker grips, two observers, partly filled small-mark portrait. This is an invented family and illustrative canvas; marks, materials, scale and completion sequence are not production evidence.",
+      "licensing": "AI-generated project asset. No real customer, testimonial, manufacturer endorsement or physical-product certification implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "8292dc10e07ab360a6fd369d47f62a67088bded2b0988402f266faa1b7382cf4",
+      "bytes": 2721381,
+      "derivatives": [
+        {
+          "file": "/marketing/web/family-making-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 56484,
+          "sha256": "b92c2543a2a15fc808995d08662f137e1462481ab3731eb654dd8c04af52dde0",
+          "sourceSha256": "8292dc10e07ab360a6fd369d47f62a67088bded2b0988402f266faa1b7382cf4"
+        },
+        {
+          "file": "/marketing/web/family-making-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 163720,
+          "sha256": "2a7d28d655be9e289a53b7d5f7cd686eb8e4708263ca9ba60de14ccd64912f2b",
+          "sourceSha256": "8292dc10e07ab360a6fd369d47f62a67088bded2b0988402f266faa1b7382cf4"
+        }
+      ]
+    },
+    {
+      "id": "macaw-on-wall",
+      "file": "/marketing/macaw-on-wall-prototype.png",
+      "alt": "Illustrative room concept: the studio’s colourful dotted macaw artwork framed above an oak cabinet.",
+      "generationArtifact": "exec-2eef068b-dbb5-4d22-aafd-9e4fc4b01c2c.png",
+      "status": "generated-concept",
+      "isPhysicalProductEvidence": false,
+      "requiredCaption": "Illustrative prototype · AI-generated",
+      "generatedAt": "2026-09-29",
+      "tool": "built-in image_gen edit with local image reference",
+      "promptFile": "/marketing/PROMPTS-PRESENTATION.md",
+      "sourceImages": [
+        "/hero/macaw-finished.webp"
+      ],
+      "qa": "Whole frame is visible, straight geometry, plausible room lighting and recognisable supplied digital macaw design. Generative room placement may reinterpret marks; frame size, printing, pigment and canvas texture are not calibrated evidence.",
+      "licensing": "AI-generated room using this project's renderer-derived, AI-source macaw image. No customer home, actual product photograph or endorsement implied.",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "c79b9559d2c0ae45ba310f8217264d714347ca6fa8f10142dc5b35fc0b11e9f5",
+      "bytes": 2551779,
+      "derivatives": [
+        {
+          "file": "/marketing/web/macaw-on-wall-640.webp",
+          "format": "webp",
+          "width": 640,
+          "height": 427,
+          "quality": 80,
+          "bytes": 28890,
+          "sha256": "f170c4fde402ec5997673e09911a01986d4dbd09313898df2e39424f5487f840",
+          "sourceSha256": "c79b9559d2c0ae45ba310f8217264d714347ca6fa8f10142dc5b35fc0b11e9f5"
+        },
+        {
+          "file": "/marketing/web/macaw-on-wall-1280.webp",
+          "format": "webp",
+          "width": 1280,
+          "height": 853,
+          "quality": 80,
+          "bytes": 104880,
+          "sha256": "a8712ca7b2b82bc4f31455613a18406fe31f2088b1da30000d47f4a012deffab",
+          "sourceSha256": "c79b9559d2c0ae45ba310f8217264d714347ca6fa8f10142dc5b35fc0b11e9f5"
+        }
+      ]
     }
   ],
   "outstandingSlots": [],
-  "conceptSlotCoverage": "14 of 14 populated: 10 generated concepts + 4 deterministic renderer studies",
+  "conceptSlotCoverage": "16 of 16 populated: 12 generated concepts + 4 deterministic renderer studies; additional mode comparisons have their own reveal/manifest.json",
   "realProductionPhotographyStatus": "pending physical kit validation",
   "optimisation": {
     "command": "node scripts/optimise-marketing-assets.mjs",

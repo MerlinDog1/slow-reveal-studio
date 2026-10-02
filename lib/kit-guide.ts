@@ -5,8 +5,9 @@ import {
   type RenderGeometry,
   type RenderMode,
 } from "./renderers/types";
+import { identifyMarkerPalette } from "./marker-palettes";
 
-export const KIT_GUIDE_VERSION = "srs-kit-guide/1.0.0";
+export const KIT_GUIDE_VERSION = "srs-kit-guide/1.1.0";
 export const KIT_GUIDE_PAGE = { widthMm: 210, heightMm: 297 } as const;
 
 export interface KitGuideModel {
@@ -23,7 +24,18 @@ export interface KitGuideModel {
     index: number | null;
     color: string;
     usedCellCount: number;
+    markerCode?: string;
+    markerLabel?: string;
   }[];
+  markerProfile?: {
+    id: string;
+    label: string;
+    productUrl: string;
+    status: "unvalidated";
+    disclaimer: string;
+  };
+  /** Cross Stitch key 0 is unmarked paper, never a marker requirement. */
+  blankCellCount?: number;
   warnings: string[];
   sample: {
     circleIndices: number[];
@@ -37,6 +49,27 @@ const ACTIVITIES: Record<
   RenderMode,
   { title: string; steps: KitGuideModel["steps"] }
 > = {
+  "cross-stitch": {
+    title: "Reveal a picture with crosses",
+    steps: [
+      {
+        title: "Read the key before starting",
+        body: "Match numbers 1 and above to the key on page 2. The number 0 means leave that cross blank; it is not a white pen.",
+      },
+      {
+        title: "Fill two diagonal strokes",
+        body: "At each coloured number, fill one short diagonal arm and then the other to make an X. Stay inside its outline.",
+      },
+      {
+        title: "Work one small patch at a time",
+        body: "Every cross has the same size. Keep the gaps and all zero crosses unmarked; do not join neighbouring crosses.",
+      },
+      {
+        title: "Compare after filling a patch",
+        body: "Step back to compare with the reference. Fixed-size crosses reduce silhouette clues, but numbers may hint at the image. Test readability and concealment on real material.",
+      },
+    ],
+  },
   fibonacci: {
     title: "Follow the sunflower spirals",
     steps: [
@@ -377,6 +410,10 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
   )
     throw new Error("Kit guide marks do not match the selected activity.");
   const legend: KitGuideModel["legend"] = [];
+  const markerProfile = supportsPalette(geometry.mode)
+    ? identifyMarkerPalette(settings.palette)
+    : undefined;
+  let blankCellCount = 0;
   if (
     supportsPalette(geometry.mode) &&
     settings.palette &&
@@ -393,9 +430,21 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
         index: index + 1,
         color,
         usedCellCount: 0,
+        ...(markerProfile
+          ? {
+              markerCode: markerProfile.profile.colours[index].code,
+              markerLabel: markerProfile.profile.colours[index].label,
+            }
+          : {}),
       }),
     );
     for (const cell of geometry.cells) {
+      if (geometry.mode === "cross-stitch" && cell.label === "0") {
+        if (cell.color !== "#ffffff")
+          throw new Error("Cross Stitch key 0 must be unmarked paper.");
+        blankCellCount++;
+        continue;
+      }
       const entry = legend.find((item) => item.id === cell.label);
       if (
         !entry ||
@@ -445,7 +494,7 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
           `marker-${entry.id}`,
           entry.index === null
             ? `Mode-appropriate marker for single ink ${entry.color}; tip, SKU, lot and quantity unassigned.`
-            : `Marker matching key ${entry.id} (${entry.color}); SKU, lot and quantity unassigned.`,
+            : `Marker matching key ${entry.id}${entry.markerCode ? ` / pen ${entry.markerCode}` : ""} (${entry.color}); SKU, lot and quantity unassigned.`,
         ),
       ),
     material(
@@ -466,10 +515,16 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
     "Marker selection, quantity, handling and drying instructions remain unresolved until the material trial and supplier instructions are reviewed.",
     "Selected artwork examples omit personal lettering and are digital targets, not hand-completed samples.",
   ];
+  if (markerProfile)
+    warnings.push(
+      `${markerProfile.profile.label}: ${markerProfile.profile.disclaimer}`,
+    );
   if (
-    !geometry.circles.length &&
-    !geometry.cells.length &&
-    !geometry.paths.length
+    (geometry.mode === "cross-stitch" &&
+      blankCellCount === geometry.cells.length) ||
+    (!geometry.circles.length &&
+      !geometry.cells.length &&
+      !geometry.paths.length)
   )
     warnings.push(
       "No artwork marks are present. Do not pack this design without resolving the empty artwork.",
@@ -479,29 +534,51 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
       "Line Amplification remains a research activity until ruler and completion trials pass.",
     );
   const activity =
-    geometry.mode === "fibonacci" && legend[0]?.index !== null
+    geometry.mode === "mosaic" && !settings.palette
       ? {
-          title: "Build colour along the sunflower spirals",
+          title: "Build a mosaic with one ink",
           steps: [
             {
-              title: "Match the numbered pens",
-              body: "Match each printed number to the key on page 2. The operator must assign and test the physical markers first.",
+              title: "Use the selected single ink",
+              body: "This monochrome mosaic uses one marker. There are no numbered colour assignments; check the selected ink in the key.",
             },
             {
-              title: "Follow a spiral of dots",
-              body: "Choose a short sunflower arc and fill each numbered circle with its matching pen. Fill one colour at a time without joining the dots.",
+              title: "Fill each outlined tile",
+              body: "Fill each shape to its printed boundary. Larger tiles make shadows; smaller tiles preserve lighter detail.",
             },
             {
-              title: "Keep the white gaps",
-              body: "Leave unmarked canvas untouched. Each dot uses one pen colour; neighbouring colours blend visually when viewed from a distance.",
+              title: "Leave the gaps unmarked",
+              body: "Keep the space between tiles clear. Do not join shapes or enlarge small tiles to fill the gaps.",
             },
             {
-              title: "Step back and compare",
-              body: "Compare the filled patch with the digital reference. Record number readability, marker matching and whether nearby colours blend.",
+              title: "Compare and record",
+              body: "Compare a filled patch with the digital reference. Record marker coverage, control and guide visibility before approving a physical kit.",
             },
           ],
         }
-      : ACTIVITIES[geometry.mode];
+      : geometry.mode === "fibonacci" && legend[0]?.index !== null
+        ? {
+            title: "Build colour along the sunflower spirals",
+            steps: [
+              {
+                title: "Match the numbered pens",
+                body: "Match each printed number to the key on page 2. The operator must assign and test the physical markers first.",
+              },
+              {
+                title: "Follow a spiral of dots",
+                body: "Choose a short sunflower arc and fill each numbered circle with its matching pen. Fill one colour at a time without joining the dots.",
+              },
+              {
+                title: "Keep the white gaps",
+                body: "Leave unmarked canvas untouched. Each dot uses one pen colour; neighbouring colours blend visually when viewed from a distance.",
+              },
+              {
+                title: "Step back and compare",
+                body: "Compare the filled patch with the digital reference. Record number readability, marker matching and whether nearby colours blend.",
+              },
+            ],
+          }
+        : ACTIVITIES[geometry.mode];
   return {
     version: KIT_GUIDE_VERSION,
     rendererVersion: geometry.version,
@@ -518,6 +595,18 @@ export function buildKitGuide(geometry: RenderGeometry): KitGuideModel {
     })),
     materials,
     legend,
+    ...(markerProfile
+      ? {
+          markerProfile: {
+            id: markerProfile.profile.id,
+            label: markerProfile.profile.label,
+            productUrl: markerProfile.profile.productUrl,
+            status: markerProfile.profile.status,
+            disclaimer: markerProfile.profile.disclaimer,
+          },
+        }
+      : {}),
+    ...(geometry.mode === "cross-stitch" ? { blankCellCount } : {}),
     warnings,
     sample: sampleFrom(geometry),
   };
@@ -537,9 +626,11 @@ export function kitGuideText(model: KitGuideModel): string {
     "DIGITAL COLOUR KEY",
     ...model.legend.map(
       (entry) =>
-        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}: ${entry.color}${supportsPalette(model.mode) ? `; ${entry.usedCellCount} ${model.mode === "mosaic" ? "cells" : "marks"}` : ""}. Physical marker assignment unresolved.`,
+        `${entry.index === null ? "Single ink" : `Key ${entry.id}`}${entry.markerCode ? ` / pen ${entry.markerCode}` : ""}: ${entry.color}${supportsPalette(model.mode) ? `; ${entry.usedCellCount} ${model.mode === "mosaic" ? "cells" : "marks"}` : ""}. Physical marker assignment unresolved.`,
     ),
-    "Leave unmarked canvas unmarked; it is not an additional numbered colour.",
+    model.mode === "cross-stitch"
+      ? `Key 0: leave ${model.blankCellCount ?? 0} crosses unmarked. Paper is not a marker colour and needs no pen.`
+      : "Leave unmarked canvas unmarked; it is not an additional numbered colour.",
     "",
     "OPERATOR: PACKING REQUIREMENTS - NOT PACKING CONFIRMATION",
     ...model.materials.map((item) => `[ ] ${item.label}`),

@@ -47,6 +47,7 @@ async function main() {
         "colour-blend",
         "tv-weave",
         "line-amplification",
+        "cross-stitch",
       ] as const
     ).map((mode) => ({
       name: mode,

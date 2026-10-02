@@ -1,6 +1,6 @@
 {
   "version": "srs-dot-coupons/1.0.0",
-  "rendererVersion": "slow-reveal-geometry/1.8.0",
+  "rendererVersion": "slow-reveal-geometry/1.9.0",
   "fontVersion": "srs-outlines/1.0.0:6670bff0c25c4547",
   "page": {
     "widthMm": 210,
@@ -22,7 +22,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -119,7 +119,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -216,7 +216,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -313,7 +313,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -410,7 +410,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -507,7 +507,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -604,7 +604,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -701,7 +701,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -798,7 +798,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -895,7 +895,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -992,7 +992,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1089,7 +1089,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1186,7 +1186,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1283,7 +1283,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -1706,7 +1706,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.8.0",
+        "version": "slow-reveal-geometry/1.9.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -2108,7 +2108,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2183,7 +2183,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2258,7 +2258,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2333,7 +2333,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2408,7 +2408,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2483,7 +2483,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2558,7 +2558,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2633,7 +2633,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2708,7 +2708,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2783,7 +2783,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2858,7 +2858,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -2933,7 +2933,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3008,7 +3008,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3083,7 +3083,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3158,7 +3158,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3233,7 +3233,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3308,7 +3308,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3383,7 +3383,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3458,7 +3458,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -3533,7 +3533,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4211,7 +4211,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.8.0",
+        "version": "slow-reveal-geometry/1.9.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -4610,7 +4610,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4707,7 +4707,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4804,7 +4804,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4901,7 +4901,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -4998,7 +4998,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5095,7 +5095,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5192,7 +5192,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5289,7 +5289,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5386,7 +5386,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5483,7 +5483,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5580,7 +5580,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5677,7 +5677,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5774,7 +5774,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -5871,7 +5871,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6294,7 +6294,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.8.0",
+        "version": "slow-reveal-geometry/1.9.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,
@@ -6696,7 +6696,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6771,7 +6771,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6846,7 +6846,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6921,7 +6921,7 @@
           "guideWidthMm": 0.08,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -6996,7 +6996,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7071,7 +7071,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7146,7 +7146,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7221,7 +7221,7 @@
           "guideWidthMm": 0.12,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7296,7 +7296,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7371,7 +7371,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7446,7 +7446,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7521,7 +7521,7 @@
           "guideWidthMm": 0.16,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7596,7 +7596,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7671,7 +7671,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7746,7 +7746,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7821,7 +7821,7 @@
           "guideWidthMm": 0.2,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7896,7 +7896,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.1,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -7971,7 +7971,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.2,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -8046,7 +8046,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.3,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -8121,7 +8121,7 @@
           "guideWidthMm": 0.3,
           "guideOpacity": 0.4,
           "geometry": {
-            "version": "slow-reveal-geometry/1.8.0",
+            "version": "slow-reveal-geometry/1.9.0",
             "mode": "dots",
             "widthMm": 210,
             "heightMm": 297,
@@ -8799,7 +8799,7 @@
         }
       ],
       "calibration": {
-        "version": "slow-reveal-geometry/1.8.0",
+        "version": "slow-reveal-geometry/1.9.0",
         "mode": "dots",
         "widthMm": 210,
         "heightMm": 297,

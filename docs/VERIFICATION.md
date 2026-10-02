@@ -2,6 +2,13 @@
 
 This records software checks for the prototype and its follow-up workflow improvements. It is not approval of a physical kit or live commercial service.
 
+## Combined GitHub update — 2 October
+
+- Merged the local creative workbench with the four previously published commits through 446ebf1. Renderer 1.9.0 identifies the combined code without relabelling historical snapshots. The dated checkpoints below retain their original test counts.
+- Required typecheck and production build pass. Full suite with `RENDERER_BROWSER_QA=1` and `PHOTO_BROWSER_QA=1`: **230/230 passing, zero skips**. Build used hosted-prototype previews with checkout and physical approval disabled. Cross Stitch mask suppression keeps the uniform blank guide lattice while excluding paper keys from making work; label sizing and finished-paper semantics match the SVG serializer.
+- Headless Edge checked a named 32-colour Cross Stitch palette, reselecting the current mode, preserving the palette when switching to TV Weave, undo/redo, seven rendered mode comparisons, bounded Fit area sampling and the alternative homepage subject. No page errors; 390 px viewport and page width match. Studio and comparison screenshots were visually inspected. Only licensed/synthetic sources were used.
+- Regenerated hero/social artwork, both PDF packs, ten compatibility cases and the four paired reveal studies against the merged sources. Actual CorelDRAW/RIP imports and physical trials remain outstanding; no live service or deployment validation is claimed by this merge.
+
 ## Creative workbench — 2 October
 
 - Required commands: typecheck and Next production build pass. Full suite with RENDERER_BROWSER_QA=1 and PHOTO_BROWSER_QA=1: **208/208 passing, no skips**. New checks cover creative setting bounds and server preservation, shifted/rotated Fibonacci clearance and apertures, ribbon bounds and SVG size, deterministic palette locks, A4 samples and section accounting, backup checksums/capability exclusion, bounded rename failures, interrupted Stripe responses, concurrent production, timeout reconciliation and mismatched sessions.
@@ -11,6 +18,24 @@ This records software checks for the prototype and its follow-up workflow improv
 - Hero, social, coupon and making-guide artifacts regenerated for renderer 1.8.0. Existing neutral settings retain their primitives; paid historical geometry is not regenerated in place.
 - Follow-up checks pass for paid creative/palette changes requiring new customer proof while preserving prior snapshots, and for complete optical mask suppression even with negative brightness. Worker failures clear any coarse draft, preventing draft export after a failed final render.
 - HEIC codec, real marker/canvas measurements, physical completion photography, representative screen-reader/touch-device tests, PostgreSQL migrations and external provider verification remain outstanding. BUILD_STATUS.md maps the complete 45-item request to code and remaining evidence.
+
+## Reveal, coded marker palettes and presentation — 29 September
+
+- `npm run typecheck`, `npm test` and `npm run build` passed: **217 tests total, 215 passed, zero failed, two existing optional browser checks skipped**. Separate Edge browser checks below cover the changed UI. Production build used the hosted-prototype flag with checkout and physical approval disabled; all seven lab routes are prerendered. Private `.data` files are excluded from all traced server bundles. `git diff --check` passed.
+- Desktop (1280 px) and mobile (390 px) homepage checks found no missing images, failed image requests, page errors or horizontal overflow. All four guide/finished cards switch to their paired assets. Family and wall concepts have visible 11 px HTML disclosures; the initial faint overlays were replaced after review. Customer Mosaic switches between monochrome and the named 32-colour key; Cross Stitch shows the 16/32 selectors, code legend and blank-zero instructions. Hero/social and both version-bound PDFs were regenerated; all twelve A4 pages were visually checked and artifact/source hashes verified.
+- The first updated live deployment (`ba8d7e5`) passed homepage, studies, Mosaic and Cross Stitch browser checks, including coded palettes, Fit/200% and mobile layout. Catalogue reported seven modes, prototype status and checkout/direct uploads disabled; admin returned 401, both retired labs returned 404 and robots disallowed indexing. Review caught a selected Cross Stitch button resetting 32 colours to 16; the follow-up makes selecting the current mode a no-op and retains the palette when switching from Cross Stitch to optical modes. Typecheck and production build were rerun for that UI correction.
+
+- Fit sampling has four focused tests covering dimensions/memory limits, unchanged SVG internals, exact subpixel area averaging and alpha edges. A dense-dot synthetic raster comparison against a 16× reference reduced RMS error from 13.225 to 1.873 out of 255. This is digital sampling evidence, not a pigment or print-quality claim.
+- Local Edge/Playwright browser checks verified TV Weave at Fit (4× sampling), unchanged SVG at 200%, vector templates, Compare at 63%, rapid mode/zoom changes, and zero page errors. Mobile Colour Blend at 390 × 844/DPR 2 verified Fit, 200%, Compare at 42% and no horizontal overflow. Screenshots and reports are under ignored `.data/qa/2026-09-29/`. The normal CUA entry point failed with a missing kernel-assets path, so these checks used the installed Edge browser through Playwright.
+- Cross Stitch regressions cover deterministic full-grid positions/shapes across different sources, physical bounds/gaps, palette assignment, blank zero semantics, mark and ink statistics, SVG pairing, schemas/restore, public mode policy and real local/server guide packages. Named marker-profile tests check exact ordered identification, real chart codes, nested subsets and rejection of historical/custom arrays. Guide tests check code correspondence and A4 annotation bounds.
+- All eight new reveal-study WebPs were inspected and checked against their manifest hashes and dimensions. Templates and finished artwork derive from the same per-mode geometry; the sixteen-colour Ohuhu subset is a chart approximation. The two new lifestyle scenes were inspected and retain their AI-generated captions and original files. No physical approval follows from any digital check.
+
+## Hosted prototype modes — 28 September
+
+- Public preview access is separate from customer-design eligibility. The explicit prototype flag, together with checkout explicitly disabled, enables all six active modes in the editor, catalogue and generated lab pages. Retired Contour and Stipple routes remain excluded.
+- Policy regressions exercise strict flag combinations, missing checkout configuration, approved-mode fallback and unchanged customer eligibility. Provider-free server regressions verify that unapproved alternate-mode customer saves return 409 without persisting their photograph and checkout returns 503 before production or payment-provider work.
+- Existing renderer algorithms, physical-approval checks, webhook handling and paid snapshots are unchanged. Private server saving and production services remain separate launch gates.
+- `npm run typecheck`, `npm test` and `npm run build` passed: 201 tests total, 199 passed, zero failed and two existing optional browser checks skipped. The build used `PUBLIC_PROTOTYPE_MODES_ENABLED=true`, `LIVE_CHECKOUT_ENABLED=false` and `PHYSICAL_VALIDATION_APPROVED=false`; its prerender manifest contains all six active lab routes. All 40 traced function bundles exclude private `.data` files. `git diff --check` passed.
 
 ## Colour Fibonacci Spiral — 28 September
 

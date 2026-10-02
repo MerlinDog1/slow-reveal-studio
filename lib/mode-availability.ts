@@ -7,6 +7,8 @@ export const ACTIVE_RENDER_MODES: readonly RenderMode[] = RENDER_MODES.filter(
 );
 type ModeEnvironment = {
   NODE_ENV?: string;
+  PUBLIC_PROTOTYPE_MODES_ENABLED?: string;
+  LIVE_CHECKOUT_ENABLED?: string;
   PHYSICAL_VALIDATION_APPROVED?: string;
   PHYSICALLY_VALIDATED_MODES?: string;
 };
@@ -25,4 +27,16 @@ export function getAvailableModes(
   return ACTIVE_RENDER_MODES.filter(
     (mode) => mode === "dots" || approved.has(mode),
   );
+}
+
+/** Hosted experiments are a preview policy, never approval for customer designs or sales. */
+export function getPreviewModes(
+  environment: ModeEnvironment = process.env,
+): RenderMode[] {
+  if (
+    environment.PUBLIC_PROTOTYPE_MODES_ENABLED === "true" &&
+    environment.LIVE_CHECKOUT_ENABLED === "false"
+  )
+    return [...ACTIVE_RENDER_MODES];
+  return getAvailableModes(environment);
 }

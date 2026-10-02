@@ -11,12 +11,16 @@ export const RENDER_MODE_IDS = [
   "tv-weave",
   "stipple",
   "fibonacci",
+  "cross-stitch",
 ] as const;
 export type RenderMode = (typeof RENDER_MODE_IDS)[number];
 export const isOpticalMode = (mode: RenderMode) =>
   mode === "colour-blend" || mode === "tv-weave";
 export const supportsPalette = (mode: RenderMode) =>
-  mode === "mosaic" || mode === "fibonacci" || isOpticalMode(mode);
+  mode === "mosaic" ||
+  mode === "fibonacci" ||
+  mode === "cross-stitch" ||
+  isOpticalMode(mode);
 export const usesOpticalColour = (
   s: Pick<RenderSettings, "mode" | "palette">,
 ) => isOpticalMode(s.mode) || (s.mode === "fibonacci" && !!s.palette);
@@ -144,7 +148,7 @@ export interface SvgOptions {
   title?: string;
 }
 
-export const RENDERER_VERSION = "slow-reveal-geometry/1.8.0";
+export const RENDERER_VERSION = "slow-reveal-geometry/1.9.0";
 export const MAX_MARKS = 60_000;
 export const DEFAULT_SETTINGS: RenderSettings = {
   mode: "dots",
@@ -221,6 +225,15 @@ export const PRESETS = {
     threshold: 0.035,
   },
 } satisfies Record<string, Partial<RenderSettings>>;
+
+/** Larger identical crosses leave room for the numbered guide and two marker strokes. */
+export const CROSS_STITCH_PRESETS = {
+  easy: { spacingMm: 7.5, maxDiameterMm: 6.7 },
+  standard: { spacingMm: 5.5, maxDiameterMm: 4.8 },
+  detailed: { spacingMm: 4.5, maxDiameterMm: 3.8 },
+  bold: { spacingMm: 8.2, maxDiameterMm: 7.2 },
+  portrait: { spacingMm: 5, maxDiameterMm: 4.3 },
+} satisfies Record<keyof typeof PRESETS, Partial<RenderSettings>>;
 
 export const round = (n: number): number => Math.round(n * 10000) / 10000;
 export const clamp = (n: number, lo = 0, hi = 1): number =>
@@ -309,9 +322,9 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
   }
   if (typeof s.invert !== "boolean")
     throw new Error("Inversion must be true or false.");
-  if (usesOpticalColour(s) && s.invert)
+  if ((usesOpticalColour(s) || s.mode === "cross-stitch") && s.invert)
     throw new Error(
-      "Colour Blend, TV Weave and colour Fibonacci Spiral use a light canvas. Turn off inversion first.",
+      "Colour Blend, TV Weave, Cross Stitch and colour Fibonacci Spiral use a light canvas. Turn off inversion first.",
     );
   if (typeof s.autoExposure !== "boolean")
     throw new Error("Automatic exposure must be true or false.");
@@ -331,7 +344,10 @@ export function normalizeSettings(settings: RenderSettings): RenderSettings {
     !["square", "rounded", "hexagon"].includes(s.cellShape)
   )
     throw new Error("Choose square, rounded or hexagon cells.");
-  if (isOpticalMode(s.mode) && s.palette === undefined)
+  if (
+    (isOpticalMode(s.mode) || s.mode === "cross-stitch") &&
+    s.palette === undefined
+  )
     s.palette = defaultOpticalPalette();
   if (s.palette !== undefined) {
     if (
